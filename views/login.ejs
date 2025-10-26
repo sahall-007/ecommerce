@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login page</title>
+    <link rel="stylesheet" href="/register.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <div class="container-lg ">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-7 d-none d-sm-block">
+                <img src="/images/login1.jpg" alt="login image" style="width: 90%;">
+            </div>
+            <div class="col-10 col-sm-5 d-flex justify-content-center">
+                <div class="register-form">
+
+                    <h1 class="fs-1">Welcome back</h1>
+                    <p class="fs-6">Enter your details below</p>
+
+                    <form action="/admin/login" method="post" class="">
+
+                    
+                        <div class="form-field mt-5 mb-4 position-relative">
+                            <i class="bi bi-person-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" type="text" placeholder="Username" name="name">
+                        </div>
+
+                        <div class="form-field mb-4 position-relative">
+                            <i class="bi bi-envelope-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" type="text" placeholder="Email" name="email">
+                        </div>
+
+                        <div class="form-field mb-5 position-relative">
+                            <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" type="password" placeholder="Password" name="password">
+                        </div>
+
+                        <div>
+                            <button class="submit-btn w-100 rounded" type="submit">confirm Login</button>
+                        </div>
+
+                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+                    </form>
+
+                    <button class="border border-dark bg-transparent mt-4 w-100 py-1 rounded"><img class="pe-4" src="/images/google-logo.png" alt="google logo" style="width: 15%;">Loign with google</button>
+
+                    <p class="have-account my-3">Don't have an account? <a href="">Register</a></p>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin home page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar bg-black">
+        <div class="container">
+            <a class="navbar-brand text-light" href="#">
+                Logo
+            </a>
+        </div>
+    </nav>
+
+
+    <div class="d-flex  m-5">
+        <div class=" d-inline-block border border-secondary text-secondary sidebar align-self-start py-3"
+            style="padding-bottom: -100px;">
+            <div class="">
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Product</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Category</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Order</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Coupon</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Transactions</h1>
+                </div>
+
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Offer</h1>
+                </div>
+            </div>
+
+            <div class="my-5">
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Manage Admins</h1>
+                </div>
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Manage customers</h1>
+                </div>
+            </div>
+
+            <div>
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Settings</h1>
+                </div>
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Help</h1>
+                </div>
+                <div class="test ps-2">
+                    <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
+                    <h1 class="fs-6 px-3 pb-3 ms-3 mb-0">Logout</h1>
+                </div>
+            </div>
+
+        </div>
+        <div class="card flex-fill">
+            <div class="card-header">
+                <h1 class="text-center">User Management</h1>
+                <div class="d-flex my-5">
+
+                    <div
+                        class="d-flex justify-content-around flex-fill border-bottom border-3 align-self-start pb-1 user-status">
+                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">All
+                        </h1>
+                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Blocked
+                        </h1>
+                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
+                    </div>
+
+                    <div class=" flex-fill align-self-start">
+                        <input class="form-control me-2 p-0" type="search" placeholder="Search" aria-label="Search" />
+                    </div>
+
+                    <div class="d-flex justify-content-end flex-fill align-self-start">
+                        <button class="add-user-btn text-light border-0 rounded px-4 py-1">New User</button>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card-body">
+                <h4 class="card-title">Striped Table</h4>
+                <p class="card-description"> Add class <code>.table-striped</code>
+                </p>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th> Username </th>
+                                <th> Email </th>
+                                <th> phone </th>
+                                <th> Status </th>
+                                <th> Actions </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-1">Sahal</td>
+                                <td> muhammedsahal275@gmail.com </td>
+                                <td>9778765901</td>
+                                <td>Active</td>
+                                <td>
+                                    <div class="d-flex justify-content-around">
+                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-eye"></i>
+                                        <i class="bi bi-trash"></i>
+                                    </div>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const statuses = document.querySelectorAll('.status');
+
+        statuses.forEach(status => {
+            status.addEventListener('click', () => {
+                statuses.forEach(s => s.classList.remove('active'));
+                status.classList.add('active');
+            });
+        });
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

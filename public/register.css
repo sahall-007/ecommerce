@@ -1,0 +1,33 @@
+body{
+    font-family: "Montserrat", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+input{
+    font-family: "Montserrat", sans-serif;
+    outline: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+
+}
+
+.submit-btn{
+    font-family: "Montserrat", sans-serif;
+    color: white;
+    border: none;
+    background-color: #EF6627;
+
+    padding: 5px ;
+}
+
+.have-account{
+    font-size: small;
+}
+
+i{
+    color: #6c757d;
+}
