@@ -12,4 +12,9 @@ router.route('/login')
 router.route('/dashboard')
     .get(adminController.loadDashboard)
 
+router.route('/userManagement')
+    .get(adminController.loadUserManagement)
+
+
+
 module.exports = router

@@ -1,5 +1,7 @@
 
-const adminService = require('../service/adminService.js')
+
+const adminSchema = require('../model/adminSchema.js')
+const userSchema = require('../model/userSchema.js')
 
 
 const loadLogin = async (req, res) => {
@@ -16,7 +18,11 @@ const loginVerify = async (req, res) =>{
     try{
         const { name, email, password } = req.body
 
-        const result = await adminService.adminVerify({name, email, password})
+        const admin = await adminSchema.findOne({ name })
+        console.log(admin)
+        if(!admin){
+            throw new Error("wrong credentials")
+        }
 
         res.redirect('/admin/dashboard')
 
@@ -34,6 +40,16 @@ const loadDashboard = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to load admin dashboard!")
+    }
+}
+
+const loadUserManagement = async (req, res) => {
+    try{
+        const users = await userSchema.find()
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to load user management page")
     }
 }
 
