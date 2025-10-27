@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     password: String,
     phone: Number,
     gender: String,
-    isBlocked: Boolean
+    isListed: Boolean
 })
 
 module.exports = mongoose.model("user", userSchema)

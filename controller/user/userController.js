@@ -1,5 +1,5 @@
 
-const userSchema = require('../model/userSchema.js')
+const userSchema = require('../../model/userSchema.js')
 const bcrypt = require('bcrypt')
 
 const salt = 10
@@ -30,7 +30,8 @@ const registerUser = async (req, res) => {
         const newuser = await new userSchema({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            isListed: true
         })
 
         await newuser.save()

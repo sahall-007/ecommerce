@@ -1,0 +1,37 @@
+<div class="card-body" style="background-color: #edededb8;">
+    <div class="">
+        <h1 class="text-center m-b5">User Management</h1>
+    </div>
+    <form action="" method="post">
+        <div class="container">
+            <div class="row justify-content-center position-relative">
+
+                <div class="col col-lg-7 my-4">
+                    <div class="row align-items-center">
+                        <label for="username" class="col-2 col-form-label">Username</label>
+                        <div class="col-10">
+                            <input class="form-control w-100 pe-5 bg-white border-0" id="username" type="text"
+                                placeholder="John Doe" name="username">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col col-lg-7 my-4">
+                    <div class="row align-items-center">
+                        <label for="email" class="col-2 col-form-label">Email</label>
+                        <div class="col-10">
+                            <input class="form-control w-100 pe-5 bg-white border-0" id="email" type="text"
+                                placeholder="john333@gmail.com" name="email">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="position-absolute bottom-0 end-0">
+                    <button type="submit">submit</button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
