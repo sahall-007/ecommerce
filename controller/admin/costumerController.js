@@ -9,13 +9,20 @@ const salt = 10
 const loadUserManagement = async (req, res) => {
 
     try{
+        const userCount = await userSchema.countDocuments()
+        const limit = 5
         const users = await userSchema.find().sort({_id: -1}).limit(5)
+
+        if (limit >= userCount) {
+            return res.render('userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
         
-        res.render('userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
     }
     catch(err){
         console.log(err)
         console.log("failed to load user management page")
+        res.status(500).json({message: "somthing went wrong (user management page)"})
     }
 }
 
@@ -70,6 +77,7 @@ const blockUser = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to block the user")
+        res.status(500).json({message: "something went wrong (block user)"})
     }
 }
 
@@ -86,6 +94,7 @@ const unBlockUser = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to unblock user")
+        res.status(500).json({message: "something went wrong (unblock user)"})
     }
 }
 
@@ -100,7 +109,7 @@ const deleteUser = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to delete user")
-        res.status(500).json({message: "something went wrong, try again"})
+        res.status(500).json({message: "something went wrong, (delete user)"})
     }
 }
 
@@ -132,7 +141,7 @@ const nextPage = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to retrieve next page")
-        res.status(500).json({message: "something went wrong, try again"})
+        res.status(500).json({message: "something went wrong, (user next page)"})
     }
 }
 
@@ -157,7 +166,7 @@ const prevPage = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to get previous page")
-        res.status(500).json({message: "something went wrong, try again later"})
+        res.status(500).json({message: "something went wrong, (user prev page)"})
     }
 }
 
@@ -183,6 +192,7 @@ const searchUser = async (req, res) => {
     catch(err){
         console.log(err)
         console.log("failed to search the user")
+        res.status(500).json({message: "something went wrong (search user)"})
     }
 }
 

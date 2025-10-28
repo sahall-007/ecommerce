@@ -6,11 +6,12 @@ const adminSchema = require('../../model/adminSchema.js')
 
 const loadLogin = async (req, res) => {
     try{
-        res.render('login')
+        res.status(200).render('login')
     }
     catch(err){
         console.log(err)
         console.log("failed to load the login page!")
+        res.status(500).json({messge: "something went wrong (admin login page)"})
     }
 }
 
