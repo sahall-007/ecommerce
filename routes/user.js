@@ -1,7 +1,9 @@
 
 
 const express = require('express')
-const userController = require('../controller/user/userController.js')
+const userController = require('../controller/user/userController.js');
+const middleware = require('../middlewares/userAuth.js')
+const passport = require('passport');
 
 const router = express.Router()
 
@@ -10,14 +12,39 @@ router.get('/', (req, res) => {
 })
 
 router.route('/register')
-    .get(userController.loadRegister)
+    .get(middleware.hasSession, userController.loadRegister)
     .post(userController.registerUser)
 
 router.route('/login')
-    .get(userController.loadLogin)
+    .get(middleware.hasSession, userController.loadLogin)
+    .post(userController.loginPost)
     
+// otp 
+router.route('/otp')
+    .get(middleware.hasSession, userController.loadOtpPage)
+    .post(userController.verifyOtp)
+
+router.route('/resendOtp')
+    .post(userController.resendOtp)
+
+// google sign up    
+router.route('/auth/google')
+    .get(passport.authenticate('google', {scope: ['profile', 'email']}))
+
+router.route('/auth/google/callback')
+    .get(passport.authenticate('google', {failureRedirect: '/register'}), (req, res) => {
+        res.redirect('/home')
+    })
+
+// home page
+router.route('/home')
+    .get(middleware.checkSession, userController.getHomePage)
+
+router.route('/logout')
+    .get(userController.logout)
 
 
-
+router.route('/productDetail/:id')
+    .get(middleware.checkSession, userController.productDetail)
 
 module.exports = router

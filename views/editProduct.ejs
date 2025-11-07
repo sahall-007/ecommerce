@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin home page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+
+        .actions {
+            color: #151414;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar bg-black">
+        <div class="container">
+            <a class="navbar-brand text-light" href="#">
+                Logo
+            </a>
+        </div>
+    </nav>
+
+
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary text-secondary sidebar align-self-start p-0"
+                style="padding-bottom: -100px;">
+                <div class="">
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Product</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Category</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Order</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Coupon</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Transactions</h1>
+                    </div>
+
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Offer</h1>
+                    </div>
+                </div>
+
+                <div class="my-5">
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Admins</h1>
+                    </div>
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">customers</h1>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Settings</h1>
+                    </div>
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Help</h1>
+                    </div>
+                    <div class="test ps-2">
+                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
+                        <h1 class="fs-6 px-3 pb-3 ms-3 mb-0">Logout</h1>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card col col-md-9  px-0 mx-3">
+
+                <div class="card-body" style="background-color: #edededb8;">
+                    <div class="">
+                        <h1 class="text-center m-b5">Edit product</h1>
+                    </div>
+                    <form action="/admin/editProduct/<%= editId %>" method="post">
+                        <div class="container">
+                            <div class="row row-cols-1 justify-content-center ">
+
+                                <div class="col col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label for="name" class="col-2 col-form-label">Name</label>
+                                        <div class="col-10">
+                                            <input class="form-control w-100 pe-5 bg-white border-0" id="name"
+                                                type="text" placeholder="John Doe" name="newName">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label for="discount" class="col-2 col-form-label">Discount</label>
+                                        <div class="col-10">
+                                            <input class="form-control w-100 pe-5 bg-white border-0" id="discount" type="number"
+                                                placeholder="0" name="newDiscount">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label class="col-2 col-form-label" for="discription">Discrpton</label>
+                                        <div class="col-10">
+                                            <textarea class="form-control  rounded p-2" name="newDiscription" type="text"
+                                                id="discription" placeholder="Type here"></textarea>                                            
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label for="brand" class="col-2 col-form-label">Brand</label>
+                                        <div class="col-10">
+                                            <input class="form-control w-100 pe-5 bg-white border-0" id="brand"
+                                                type="text" placeholder="brand" name="newBrand">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label class="col-2 col-form-label" for="category">Category</label>
+                                        <div class="col-10">
+                                            <select class="form-select rounded p-2" id="category" name="newCategory">
+                                                <option value="" hidden>Select Category</option>
+                                
+                                                <% category.forEach(ele => { %>
+                                                    <option value="<%= ele.name %>"><%= ele.name %></option>
+                                                <%})%>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-7 d-flex justify-content-end my-4 gap-3">
+                                    <a href="/admin/product" role="button" type="submit"  class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
+                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" style="background-color: #EF6627;">Add user</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+    </div>
+
+
+        <script>
+
+            const statuses = document.querySelectorAll('.status');
+
+            statuses.forEach(status => {
+                status.addEventListener('click', () => {
+                    statuses.forEach(s => s.classList.remove('active'));
+                    status.classList.add('active');
+                });
+            });
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+
+</body>
+
+</html>

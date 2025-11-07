@@ -167,7 +167,7 @@
                                             <%= category.name %>
                                         </td>
                                         <td>
-                                            <%= category.createdAt %>
+                                            <%= category.createdAt.toISOString().split("T")[0] %>
                                         </td>
                                         <td>
                                             100
@@ -337,7 +337,7 @@
 
         async function confirmUnBlock(){
             console.log("un block confirm")
-            const res = await fetch('/admin/c', {
+            const res = await fetch('/admin/unBlockCategory', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: unBlockId })

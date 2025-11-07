@@ -9,7 +9,7 @@ const loadCategoryManagement = async (req, res) => {
         const categories = await categorySchema.find().sort({_id: -1}).limit(limit)
 
         if (limit >= categoryCount) {
-            return res.render('categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
         res.status(200).render('categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
@@ -35,6 +35,14 @@ const addCategoryPage = async (req, res) => {
 const addCategoryPost = async(req, res) => {
     try{
         const { name, status } = req.body
+
+        const existCategory = await categorySchema.findOne({name})
+
+        console.log(existCategory)
+
+        if(existCategory){
+            return res.status(403).json({success: false, message: "category already exist"})
+        }
 
         const isListed = (status=="active") ? true : false
 
@@ -92,7 +100,14 @@ const deleteCategory = async (req, res) => {
     try{
         const { id } = req.body
 
-        await categorySchema.findOneAndDelete({_id: id})
+        const category = await categorySchema.findOneAndDelete({_id: id})
+
+        if(category){
+            res.status(200).json({message: "successfully deleted the category"})
+        }
+        else{
+            res.status(404).json({status: false, message: "category not found"})
+        }
 
         res.status(200).json({message: "successfully deleted the category"})
     }

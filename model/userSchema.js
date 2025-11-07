@@ -6,7 +6,11 @@ const userSchema = new mongoose.Schema({
     password: String,
     phone: Number,
     gender: String,
-    isListed: Boolean
+    isListed: Boolean,
+    googleId: {
+        type: String,
+        Unique: true
+    }
 })
 
 module.exports = mongoose.model("user", userSchema)

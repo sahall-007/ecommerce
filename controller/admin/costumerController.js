@@ -72,6 +72,8 @@ const blockUser = async (req, res) => {
 
         await userSchema.findOneAndUpdate({_id: id}, {$set: {isListed: false}})
 
+        req.session.user = null
+
         res.status(200).json({message: "user has been blocked"})
     }
     catch(err){

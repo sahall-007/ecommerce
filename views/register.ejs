@@ -24,7 +24,7 @@
             </div>
             <div class="col-10 col-sm-5 d-flex justify-content-center">
                 <div class="register-form">
-
+                    
                     <h1 class="fs-1">Create an account</h1>
                     <p class="fs-6">Enter your details below</p>
 
@@ -33,27 +33,36 @@
                         <div class="form-field mt-5 mb-4 position-relative">
                             <i class="bi bi-person-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" type="text" placeholder="Username" name="username">
+                            <P class="text-danger" style="font-size: small;"><%= username %></P>
                         </div>
 
                         <div class="form-field mb-4 position-relative">
                             <i class="bi bi-envelope-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" type="text" placeholder="Email" name="email">
+                            <P class="text-danger" style="font-size: small;"><%= email %></P>
+                        </div>
+
+                        <div class="form-field mb-4 position-relative">
+                            <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" type="password" placeholder="Password" name="password">
+                            <P class="text-danger" style="font-size: small;"><%= password %></P>
                         </div>
 
                         <div class="form-field mb-5 position-relative">
                             <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
-                            <input class="w-100 pe-5" type="password" placeholder="Password" name="password">
+                            <input class="w-100 pe-5" type="password" placeholder="confirm" name="confirm">
+                            <P class="text-danger" style="font-size: small;"><%= confirm %></P>
                         </div>
 
                         <div>
-                            <button class="submit-btn w-100 rounded" type="submit">Create account</button>
+                            <button class="submit-btn w-100 rounded" type="submit">Generate OTP</button>
                         </div>
 
                         <!-- <div class="g-signin2" data-onsuccess="onSignIn"></div> -->
 
                     </form>
 
-                    <button class="border border-dark bg-transparent mt-4 w-100 py-1 rounded"><img class="pe-4" src="images/google-logo.png" alt="google logo" style="width: 15%;"> Sign up with google</button>
+                    <a href="/auth/google" class="btn border border-dark bg-transparent mt-4 w-100 py-1 rounded"><img class="pe-4" src="images/google-logo.png" alt="google logo" style="width: 15%;"> Sign up with google</a>
 
                     <p class="have-account my-3">Already have an account? <a href="/login">Login</a></p>
 

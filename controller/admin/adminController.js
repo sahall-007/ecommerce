@@ -1,6 +1,7 @@
 
 
 const adminSchema = require('../../model/adminSchema.js')
+const bcrypt = require("bcrypt")
 // const userSchema = require('../../model/userSchema.js')
 
 
@@ -25,6 +26,14 @@ const loginVerify = async (req, res) =>{
             throw new Error("wrong credentials")
         }
 
+        const isMatch = await bcrypt.compare(password, admin.password)
+        if (!isMatch || admin.email !== email) {
+            console.log("inside condition")
+            return res.status(401).redirect('/admin/login')
+        }
+
+        req.session.admin = true
+
         res.redirect('/admin/dashboard')
 
     }
@@ -44,9 +53,22 @@ const loadDashboard = async (req, res) => {
     }
 }
 
+const logout = async (req, res) => {
+    try{
+        req.session.admin = null
+        res.redirect('/admin/login')
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to logout")
+        res.status(500).json({success: false, message: "somwthing went wrong (admin logout)"})
+    }
+}
+
 
 module.exports = {
     loadLogin,
     loginVerify,
-    loadDashboard
+    loadDashboard,
+    logout
 }

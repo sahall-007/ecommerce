@@ -44,118 +44,121 @@
     </nav>
 
 
-    <div class="d-flex gap-5 m-5">
-        <div class=" d-inline-block border border-secondary text-secondary sidebar align-self-start py-3"
-            style="padding-bottom: -100px;">
-            <div class="">
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                    <a href="/admin/dashboard" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                    <a href="/admin/category" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Order</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Coupon</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Transactions</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
-                </div>
-            </div>
-
-            <div class="my-5">
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
-                </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                    <a href="/admin/userManagement" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
-                </div>
-            </div>
-
-            <div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Settings</a>
-                </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Help</a>
-                </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                    <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
-                </div>
-            </div>
-
-        </div>
-        <div class="card flex-fill">
-
-            <div class="card-body" style="background-color: #edededb8;">
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary text-secondary sidebar align-self-start p-0"
+                style="padding-bottom: -100px;">
                 <div class="">
-                    <h1 class="text-center m-b5">Add new category</h1>
-                </div>
-                <form action="/admin/addCategory" method="post">
-                    <div class="container">
-                        <div class="row justify-content-center ">
 
-                            <div class="col col-lg-7 my-4">
-                                <div class="row align-items-center">
-                                    <label for="username" class="col-2 col-form-label">Name</label>
-                                    <div class="col-10">
-                                        <input class="form-control w-100 pe-5 bg-white border-0" id="username"
-                                            type="text" placeholder="Laptop" name="name">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col col-lg-7 my-4">
-                                <div class="row align-items-center">
-                                    <label for="status" class="col-2 col-form-label">Status</label>
-                                    <div class="col-10">
-                                        <select class="form-select w-100 pe-5 bg-white border-0" id="status"
-                                            name="status">
-                                            <option value="active">Active</option>
-                                            <option value="blocked">Blocked</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-7 d-flex justify-content-end my-4 gap-3">
-                                <a role="button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
-                                <button type="submit" class="text-light px-4 py-1 border-0 rounded" style="background-color: #EF6627;">Add</button>
-                            </div>
-
-                        </div>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
+                        <a href="/admin/dashboard" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
                     </div>
 
-                </form>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
+                    </div>
+
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
+                        <a href="/admin/category" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
+                    </div>
+
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Order</a>
+                    </div>
+
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Coupon</a>
+                    </div>
+
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Transactions</a>
+                    </div>
+
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
+                    </div>
+                </div>
+
+                <div class="my-5">
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
+                    </div>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
+                        <a href="/admin/userManagement" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Settings</a>
+                    </div>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
+                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Help</a>
+                    </div>
+                    <div class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
+                        <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
+                    </div>
+                </div>
+
             </div>
-        </div>
+            <div class="card col col-md-9  px-0 mx-3">
+
+                <div class="card-body" style="background-color: #edededb8;">
+                    <div class="">
+                        <h1 class="text-center m-b5">Add new category</h1>
+                    </div>
+                    <form action="/admin/addCategory" method="post">
+                        <div class="container">
+                            <div class="row justify-content-center ">
+
+                                <div class="col-12 col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label for="username" class="col-2 col-form-label">Name</label>
+                                        <div class="col-10">
+                                            <input class="form-control w-100 pe-5 bg-white border-0" id="username"
+                                                type="text" placeholder="Laptop" name="name">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-lg-7 my-4">
+                                    <div class="row align-items-center">
+                                        <label for="status" class="col-2 col-form-label">Status</label>
+                                        <div class="col-10">
+                                            <select class="form-select w-100 pe-5 bg-white border-0" id="status"
+                                                name="status">
+                                                <option value="active">Active</option>
+                                                <option value="blocked">Blocked</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-7 d-flex justify-content-end my-4 gap-3">
+                                    <a role="button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
+                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" style="background-color: #EF6627;">Add</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+    </div>
+
 
         <script>
 

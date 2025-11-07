@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OTP — Enter Code</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    :root{--bg:#f6f8fb;--card:#ffffff;--accent:#2f6bff;--muted:#6c7380}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#eef3fb);display:flex;align-items:center;justify-content:center;padding:24px}
+
+    .container{width:100%;max-width:460px;padding:28px;border-radius:12px;background:var(--card);box-shadow:0 10px 30px rgba(20,35,70,0.06);}
+
+    .title{font-size:22px;font-weight:700;margin:0 0 6px}
+    .subtitle{margin:0 0 18px;color:var(--muted);font-size:14px}
+
+    /* OTP inputs row */
+    .otp-row{display:flex;gap:12px;justify-content:center}
+    .otp-row input{
+      width:56px;      /* fixed small width so inputs never overflow container */
+      height:56px;
+      border-radius:10px;
+      border:1px solid #e3e8f2;
+      background:#fbfdff;
+      font-size:22px;
+      text-align:center;
+      outline:none;
+    }
+    .otp-row input:focus{box-shadow:0 6px 18px rgba(47,107,255,0.12);border-color:var(--accent)}
+
+    .actions{display:flex;gap:12px;justify-content:center;margin-top:18px}
+    .btn{padding:12px 18px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+    .btn.primary{background:var(--accent);color:white;min-width:220px}
+    .btn.ghost{background:transparent;border:1px solid #dbe7ff;color:var(--accent)}
+
+    .hint{margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+
+    .message{margin-top:12px}
+    .success{background:#ecfff1;border-left:4px solid #2ecc71;padding:10px 12px;border-radius:8px;color:#175c2f}
+    .error{background:#fff1f1;border-left:4px solid #ff6b6b;padding:10px 12px;border-radius:8px;color:#7a1b1b}
+
+    footer{margin-top:16px;text-align:center;color:var(--muted);font-size:12px}
+
+    @media (max-width:420px){
+      .otp-row input{width:44px;height:48px;font-size:20px}
+      .btn.primary{min-width:180px}
+    }
+  </style>
+</head>
+<body>
+
+  
+
+  <div class="container" id="card">
+    <h1 class="title">Enter the 6‑digit code</h1>
+    <p class="subtitle">We’ve sent a 6-digit verification code to your phone/email. Enter it below to continue.</p>
+
+    <div class="otp-row" role="group" aria-label="OTP inputs">
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+      <input inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp" />
+    </div>
+
+    <div class="actions">
+      <button id="verifyBtn" class="btn primary">Verify</button>
+      <button id="resendBtn" class="btn ghost">Resend</button>
+    </div>
+
+    <div id="message" class="message" aria-live="polite"></div>
+
+    <p class="hint">Didn't receive it? You can resend in <span id="timer">5</span>s.</p>
+    <!-- <footer>Code expires in 5 minutes • Secure</footer> -->
+  </div>
+
+  <script>
+
+    const receivedOTp = "<%= otp %>";
+    
+    // Demo-only client-side logic (replace with real server validation in production)
+    const otpInputs = Array.from(document.querySelectorAll('.otp'));
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const messageEl = document.getElementById('message');
+    const timerEl = document.getElementById('timer');
+
+let simulatedOtp = null;
+let countdown = 5;
+let countdownInterval = null;
+
+    function showMessage(text, type){
+      if(!text){ messageEl.innerHTML = ''; return }
+      if(type === 'success') messageEl.innerHTML = '<div class="success">'+text+'</div>'
+      else messageEl.innerHTML = '<div class="error">'+text+'</div>'
+    }
+
+
+// Start or resume timer
+function startCountdown(savedStartTime = null) {
+  clearInterval(countdownInterval);
+
+  const startTime = savedStartTime ? Number(savedStartTime) : Date.now();
+  localStorage.setItem('otpStartTime', startTime);
+
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  countdown = Math.max(5 - elapsed, 0);
+  timerEl.textContent = countdown;
+
+  countdownInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    countdown = Math.max(5 - elapsed, 0);
+    timerEl.textContent = countdown;
+
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      localStorage.removeItem('otpStartTime');
+    }
+  }, 1000);
+}
+
+function sendSimulatedOtp() {
+  showMessage('A one-time code was sent.', 'success');
+  startCountdown(); // start new timer
+}
+
+function resumeCountdownIfExists() {
+  const savedStart = localStorage.getItem('otpStartTime');
+  if (savedStart) {
+    const elapsed = Math.floor((Date.now() - savedStart) / 1000);
+    if (elapsed < 5) {
+      startCountdown(savedStart); // resume from where left off
+      return true; // means existing countdown found
+    } else {
+      localStorage.removeItem('otpStartTime');
+    }
+  }
+  return false; // means no active countdown
+}
+
+// Initialize properly
+if (!resumeCountdownIfExists()) {
+  sendSimulatedOtp(); // first-time visit only
+}
+
+
+    // auto-advance focus and handle backspace
+    otpInputs.forEach((el, idx)=>{
+      el.addEventListener('input', (e)=>{
+        const v = e.target.value.replace(/[^0-9]/g,'');
+        e.target.value = v.slice(-1);
+        if(v && idx < otpInputs.length-1) otpInputs[idx+1].focus();
+      });
+      el.addEventListener('keydown', (e)=>{
+        if(e.key === 'Backspace' && !e.target.value && idx > 0){
+          otpInputs[idx-1].focus();
+        }
+        // allow arrow navigation
+        if(e.key === 'ArrowLeft' && idx>0) otpInputs[idx-1].focus();
+        if(e.key === 'ArrowRight' && idx<otpInputs.length-1) otpInputs[idx+1].focus();
+      });
+    });
+
+    verifyBtn.addEventListener('click', async ()=>{
+      const inputCode = otpInputs.map(i=>i.value).join('');
+      let code = Number(inputCode)
+      
+      if(inputCode.length < 6){ 
+        showMessage('Please enter the full 6-digit code.','error'); return 
+      }
+      // if(code === receivedOTp ){
+      //  alert("both are same")
+        $.ajax({
+          type: "POST",
+          url: "/otp",
+          data: {otp:code},
+          success: function(response){
+            if(response.success)
+            showMessage('OTP verified — success!','success'); 
+            window.location.href = '/home'
+          },
+          error: function (){
+            showMessage('Incorrect code. Please try again.','error'); 
+          }
+         })
+      // }
+      // else { 
+      //   showMessage('Incorrect code. Please try again.','error');
+      // }
+      // return false
+    });
+
+    resendBtn.addEventListener('click', ()=>{
+      if(countdown > 0){ showMessage('Please wait until the timer finishes to resend.','error'); return }
+      sendSimulatedOtp();
+      otpInputs.forEach(i=>i.value='');
+      otpInputs[0].focus();
+
+      $.ajax({
+        type: "POST",
+        url: "/resendOtp",
+        success: function(response){
+          if(response.success)
+          showMessage('OTP resend — success!','success'); 
+          // window.location.href = response.redirectUrl
+        },
+        error: function (){
+          showMessage('failed to resend OTP Please try again.','error'); 
+        }
+      })
+    });
+
+
+  </script>
+</body>
+</html>
