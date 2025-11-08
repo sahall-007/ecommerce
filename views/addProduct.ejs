@@ -92,7 +92,7 @@
 
                     <div class="test ps-2 pb-3 px-3 py-1">
                         <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 mb-0 text-secondary text-decoration-none">Product</a>
+                        <a href="/admin/product" class="fs-6 pb-3 px-3 py-1 mb-0 text-secondary text-decoration-none">Product</a>
                     </div>
 
                     <div class="test ps-2 pb-3 px-3 py-1">
@@ -166,12 +166,14 @@
                                 <label class="d-block mb-2 fs-5" for="name">Product name</label>
                                 <input class="form-control border-dark rounded-0 p-2" name="name" type="text" id="name"
                                     placeholder="Type here">
+                                <p class="text-danger" id="productNameMsg" style="font-size: small;"></p>
                             </div>
 
                             <div class="col col-md-5 col-lg-4">
                                 <label class="d-block mb-2 fs-5" for="discount">Discount</label>
-                                <input class="form-control border-dark rounded-0 p-2" name="discount" type="text"
-                                    id="discount" placeholder="Type here">
+                                <input class="form-control border-dark rounded-0 p-2" name="discount" type="number"
+                                    id="discount" min="0" max="100" placeholder="Type here">
+                                <p class="text-danger" id="discountMsg" style="font-size: small;"></p>
                             </div>
 
                         </div>
@@ -182,6 +184,7 @@
                                 <label class="d-block mb-2 fs-5" for="discription">Discription</label>
                                 <textarea class="form-control border-dark rounded-0 p-2" name="discription" type="text"
                                     id="discription" placeholder="Type here"></textarea>
+                                <p class="text-danger" id="discriptionMsg" style="font-size: small;"></p>
                             </div>
 
                         </div>
@@ -192,24 +195,22 @@
                                 <label class="d-block mb-2 fs-5" for="brand">Brand name</label>
                                 <input class="form-control border-dark rounded-0 p-2" name="brand" type="text" id="brand"
                                     placeholder="Type here">
+                                <p class="text-danger" id="brandMsg" style="font-size: small;"></p>
                             </div>
 
                             <div class="col col-md-5 col-lg-4">
                                 <label class="d-block mb-2 fs-5" for="category">Category</label>
-                                <select class="form-select border-dark rounded-0 p-2" id="category" name="category">
+                                <select class="form-select border-dark rounded-0 p-2" id="category" name="category" required>
                                     <option value="" hidden>Select Category</option>
                                     <% category.forEach(ele => { %>
                                         <option value="<%= ele.name %>"><%= ele.name %></option>
                                     <%})%>
-                                    <!-- <option value="phone">Phone</option>
-                                    <option value="laptop">Laptop</option>
-                                    <option value="earbuds">Earbuds</option>
-                                    <option value="smartwatch">Smart Watch</option> -->
                                 </select>
+                                <p class="text-danger" id="categoryMsg" style="font-size: small;"></p>
 
                             </div>
 
-                        </div>
+                         </div>
 
                         <!----------------------- variant session ------------------------->
 
@@ -225,30 +226,35 @@
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="ram">RAM</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="ram" type="text"
-                                                id="ram" placeholder="Type here">
+                                                id="ram-1" placeholder="Type here">
+                                            <p class="text-danger" id="ramMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="storage">Storage</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="storage"
-                                                type="text" id="storage" placeholder="Type here">
+                                                type="text" id="storage-1" placeholder="Type here">
+                                            <p class="text-danger" id="storageMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="color">Color</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="color"
-                                                type="text" id="color" placeholder="Type here">
+                                                type="text" id="color-1" placeholder="Type here">
+                                            <p class="text-danger" id="colorMsg-1" style="font-size: small;"></p>
                                         </div>
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="quantity">Quantity</label>
-                                            <input class="form-control border-dark rounded-0 p-2" name="quantity" type="text"
-                                                id="quantity" placeholder="Type here">
+                                            <input class="form-control border-dark rounded-0 p-2" name="quantity" type="number"
+                                                id="quantity-1" placeholder="Type here">
+                                            <p class="text-danger" id="quantityMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="price">Price</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="price"
-                                                type="text" id="price" placeholder="Type here">
+                                                type="text" id="price-1" placeholder="Type here">
+                                            <p class="text-danger" id="priceMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <!-- <div class="col col-md-4 mt-3 ">
@@ -277,6 +283,7 @@
                                             image</label>
                                         <input id="image-1" type="file" name="image-1" accept="image/*" multiple onchange="newFile(1)"
                                             class="border border-black d-none">
+                                        <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
                                     </div>
 
                                     <div class="row justify-content-center">
@@ -320,7 +327,7 @@
 
     <script>
 
-            const sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.getElementById('menuToggle');
 
     toggleBtn.addEventListener('click', () => {
@@ -370,36 +377,42 @@
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="ram">RAM</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="ram" type="text"
-                                                id="ram" placeholder="Type here">
+                                                id="ram-${variantCount}" placeholder="Type here">
+                                            <p class="text-danger" id="ramMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="storage">Storage</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="storage"
-                                                type="text" id="storage" placeholder="Type here">
+                                                type="text" id="storage-${variantCount}" placeholder="Type here">
+                                            <p class="text-danger" id="storageMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="color">Color</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="color"
-                                                type="text" id="color" placeholder="Type here">
+                                                type="text" id="color-${variantCount}" placeholder="Type here">
+                                            <p class="text-danger" id="colorMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="quantity">Quantity</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="quantity" type="text"
-                                                id="quantity" placeholder="Type here">
+                                                id="quantity-${variantCount}" placeholder="Type here">
+                                            <p class="text-danger" id="quantityMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="price">Price</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="price" 
-                                                type="text" id="price" placeholder="Type here">
+                                                type="text" id="price-${variantCount}" placeholder="Type here">
+                                            <p class="text-danger" id="priceMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
 
                                         <!-- <div class="col col-md-4 mt-3 ">
                                                 <label class="d-block mb-1 fs-5" for="discount">Discount</label>
-                                                <input class="form-control border-dark rounded-0 p-2" name="discount" type="text" id="discount"
+                                                <input class="form-control border-dark rounded-0 p-2" name="discount" type="text" id="discount-${variantCount}"
                                                     placeholder="Type here">
+                                                <p class="text-danger" id="discountMsg-${variantCount}" style="font-size: small;"></p>
                                             </div> -->
 
 
@@ -417,6 +430,7 @@
                                                 image</label>
                                             <input id="image-${variantCount}" type="file" multiple accept="image/*"
                                                 class="border border-black d-none" name="image-${variantCount}"  onchange="newFile(${variantCount})">
+                                            <p class="text-danger" id="imageMsg-${variantCount}" style="font-size: small;"></p>
                                         </div>
 
 
@@ -444,7 +458,6 @@
         // to cancel the newly created variant session
         // function cancelVariantSubmit(element, id){
 
-        //     // console.log("djfdkfjd", id)
         //     event.preventDefault()
 
         //     const parent = document.getElementById("variant-session-" + id)
@@ -597,6 +610,158 @@
         document.getElementById("publish").addEventListener('click', async () => {
 
             event.preventDefault()
+
+            const name = document.getElementById("name")
+            const discount = document.getElementById("discount")
+            const discription = document.getElementById("discription")
+            const brand = document.getElementById("brand")
+            const category = document.getElementById("category")
+
+            const productNameMsg = document.getElementById("productNameMsg")
+            const discountMsg = document.getElementById("discountMsg")
+            const discriptionMsg = document.getElementById("discriptionMsg")
+            const brandMsg = document.getElementById("brandMsg")
+            const categoryMsg = document.getElementById("productNameMsg")
+            
+            const nameRegex = /^(?!\s*$)(?!\d+$)[A-Za-z0-9][A-Za-z0-9 \-\.+]*$/;
+            const discountRegex = /^(100|[1-9]?[0-9])$/;
+            const descriptionRegex = /^(?=.*\S).+$/
+            const brandRegex = /^(?!\s*$)[A-Za-z][A-Za-z0-9 \-\.+]*$/
+            
+            const ramRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
+            const storageRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
+            const colorRegex = /^\s*[A-Za-z]+([ -]?[A-Za-z]+)*\s*$/
+            const quantityRegex = /^\s*\d+\s*$/
+            const priceRegex = /^\s*\d+(\.\d{1,2})?\s*$/;
+
+            if(!nameRegex.test(name.value) && !discountRegex.test(discount.value) && !descriptionRegex.test(discription.value) && !brandRegex.test(brand.value)){
+                productNameMsg.textContent = "invalide name format"
+                discountMsg.textContent = "invalide discount format"
+                discriptionMsg.textContent = "invalide discription format"
+                brandMsg.textContent = "invalide brand format"
+
+                return 1
+            }
+            else if(!nameRegex.test(name.value)){
+                productNameMsg.textContent = "invalide name format"
+                discountMsg.textContent = ""
+                discriptionMsg.textContent = ""
+                brandMsg.textContent = ""
+
+                return 1
+            }
+            else if(!discountRegex.test(discount.value)){
+                productNameMsg.textContent = ""
+                discountMsg.textContent = "invalide discount format"
+                discriptionMsg.textContent = ""
+                brandMsg.textContent = ""
+
+                return 1
+            }
+            else if(!descriptionRegex.test(discription.value)){
+                productNameMsg.textContent = ""
+                discountMsg.textContent = ""
+                discriptionMsg.textContent = "invalide discription format"
+                brandMsg.textContent = ""
+
+                return 1
+            }
+            else if(!brandRegex.test(brand.value)){
+                productNameMsg.textContent = ""
+                discountMsg.textContent = ""
+                discriptionMsg.textContent = ""
+                brandMsg.textContent = "invalide brand format"
+
+                return 1
+            }
+            else{
+                productNameMsg.textContent = ""
+                discountMsg.textContent = ""
+                discriptionMsg.textContent = ""
+                brandMsg.textContent = ""
+            }
+
+            for(let i=1; i<=variantCount; i++){
+                console.log(variantCount)
+                console.log("worururururuur")
+                const ram = document.getElementById("ram-" + i)
+                const storage = document.getElementById("storage-" + i)
+                const color = document.getElementById("color-" + i)
+                const quantity = document.getElementById("quantity-" + i)
+                const price = document.getElementById("price-" + i)
+
+                const ramMsg = document.getElementById("ramMsg-" + i);
+                const storageMsg = document.getElementById("storageMsg-" + i);
+                const colorMsg = document.getElementById("colorMsg-" + i);
+                const quantityMsg = document.getElementById("quantityMsg-" + i);
+                const priceMsg = document.getElementById("priceMsg-" + i);
+
+                if( !ramRegex.test(ram.value) && !storageRegex.test(storage.value) && !colorRegex.test(color.value) && !storageRegex.test(quantity.value) && !priceRegex.test(price.value)){
+                    ramMsg.textContent = "invalid ram format"
+                    storageMsg.textContent = "invalid storage format"
+                    colorMsg.textContent = "invalid color format"
+                    quantityMsg.textContent = "invalid quantity format"
+                    priceMsg.textContent = "invalid price format"
+
+                    return 1
+                }
+                else if(!ramRegex.test(ram.value)){
+                    ramMsg.textContent = "invalid ram format"
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!storageRegex.test(storage.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = "invalid storage format"
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!colorRegex.test(color.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = "invalid color format"
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!quantityRegex.test(quantity.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = "invalid quantity format"
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!priceRegex.test(price.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = "invalid price format"
+
+                    return 1
+                }
+                else{
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+                }
+            }
+            
+            // alert("8")
+            
+
             const form = document.getElementById("productForm")
             const formdata = new FormData(form)
 
