@@ -57,7 +57,7 @@
 
                 <div class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
+                    <a href="/admin/product" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
                 </div>
 
                 <div class="test ps-2 pb-3 px-3 py-1">
@@ -212,7 +212,6 @@
         </div>
     </div>
 
-    <!-- <div class="card d-inline-block px-5 position-fixed top-50 start-50 translate-middle"> -->
 <!----------------------  delete modal  ----------------------->
     <div class="modal fade" id="deleteModal">
         <div class="modal-dialog">
@@ -267,7 +266,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmUnBlock()">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmUnBlock()" data-bs-dismiss="modal">Confirm</button>
                     </div>
                 </div>
 
@@ -276,7 +275,7 @@
     </div>
 
     
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
         const statuses = document.querySelectorAll('.status')
@@ -301,7 +300,6 @@
 
         function unBlock(id){
             unBlockId = id
-            console.log(id)
         }
 
         function deleteCategory(id){
@@ -309,30 +307,18 @@
         }
 
         async function confirmBlock(){
-            console.log("its hitting.........")
             const res = await fetch('/admin/blockCategory', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: blockId })
             })
+            swal.fire({
+                title: "successfully blocked the category",
+                icon: "success",
+                timer: 1500
+            })
             .then(() => window.location.reload())
-
-    
-            // const block = document.querySelectorl("block-btn")
-            // const unblock = document.querySelectorAll("unblock-btn") 
-            // const unblockOnBlock = document.querySelector("unblock-btn-on-block") 
-
-            // console.log("user has been blocked")
-            // console.log(res.status)
-            // const data = await res.json()
-
-
-
-            // block.classList.add("d-none")
-            // unblockOnBlock.classList.remove("d-none")
-            // unblock.classList.remove("d-none")
-
-
+            
         }
 
         async function confirmUnBlock(){
@@ -341,6 +327,11 @@
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: unBlockId })
+            })
+            swal.fire({
+                title: "successfully unblocked the category",
+                icon: "success",
+                timer: 1500
             })
             .then(() => window.location.reload())
         }
@@ -352,6 +343,11 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: deleteId })
             })
+            swal.fire({
+                title: "successfully deleted the category",
+                icon: "success",
+                timer: 1500
+            })                
             .then(() => window.location.reload())
         }
     </script>
