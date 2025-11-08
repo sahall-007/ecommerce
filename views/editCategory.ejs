@@ -124,10 +124,11 @@
 
                             <div class="col col-lg-7 my-4">
                                 <div class="row align-items-center">
-                                    <label for="username" class="col-2 col-form-label">Name</label>
+                                    <label for="category" class="col-2 col-form-label">Name</label>
                                     <div class="col-10">
-                                        <input class="form-control w-100 pe-5 bg-white border-0" id="username"
+                                        <input class="form-control w-100 pe-5 bg-white border-0" id="category"
                                             type="text" placeholder="Laptop" name="newName">
+                                        <p class="text-danger" id="categoryMsg" style="font-size: small;"></p>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +138,7 @@
                                     <label for="status" class="col-2 col-form-label">Status</label>
                                     <div class="col-10">
                                         <select class="form-select w-100 pe-5 bg-white border-0" id="status"
-                                            name="newStatus">
+                                            name="newStatus" required>
                                             <option value="active">Active</option>
                                             <option value="blocked">Blocked</option>
                                         </select>
@@ -146,8 +147,8 @@
                             </div>
 
                             <div class="col-lg-7 d-flex justify-content-end my-4 gap-3">
-                                <a role="button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
-                                <button type="submit" class="text-light px-4 py-1 border-0 rounded" style="background-color: #EF6627;">Edit</button>
+                                <a href="/admin/category" role="button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
+                                <button type="submit" class="text-light px-4 py-1 border-0 rounded" id="submitBtn" style="background-color: #EF6627;">Edit</button>
                             </div>
 
                         </div>
@@ -158,6 +159,22 @@
         </div>
 
         <script>
+
+            document.getElementById("submitBtn").addEventListener('click', (event) => {
+
+                const category = document.getElementById("category")
+                const categoryRegex = /^\s*[A-Za-z]+(\s[A-Za-z]+)*\s*$/
+                const categoryMsg = document.getElementById("categoryMsg")
+
+                if(!categoryRegex.test(category.value)){
+                    event.preventDefault()
+                    categoryMsg.textContent = "Invalid category format"
+                }
+                else{
+                    categoryMsg.textContent = ""
+                }
+
+            })
 
             const statuses = document.querySelectorAll('.status');
 

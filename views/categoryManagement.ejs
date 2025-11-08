@@ -224,7 +224,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmDelete()">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmDelete()"  data-bs-dismiss="modal">Confirm</button>
                     </div>
                 </div>
 
@@ -287,7 +287,6 @@
             });
         });
 
-
         let editId, blockId, unBlockId, deleteId
 
         // function editCategory(id){
@@ -318,7 +317,6 @@
                 timer: 1500
             })
             .then(() => window.location.reload())
-            
         }
 
         async function confirmUnBlock(){
@@ -350,6 +348,7 @@
             })                
             .then(() => window.location.reload())
         }
+        
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
