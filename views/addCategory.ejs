@@ -8,6 +8,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
+        body{
+            overflow-x: hidden;
+        }
         .test:hover {
             background-color: rgb(238, 238, 238);
         }
@@ -30,6 +33,28 @@
         .actions {
             color: #151414;
         }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+ 
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }        
     </style>
 </head>
 
@@ -40,6 +65,10 @@
             <a class="navbar-brand text-light" href="#">
                 Logo
             </a>
+            <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
         </div>
     </nav>
 
@@ -108,12 +137,12 @@
                     </div>
                     <div class="test ps-2 pb-3 px-3 py-1">
                         <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                        <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
+                        <a href="/admin/logout" class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
                     </div>
                 </div>
 
             </div>
-            <div class="card col col-md-9  px-0 mx-3">
+            <div class="card col-10 col-md-8 col-lg-9  px-0 mx-3 main-content" >
 
                 <div class="card-body" style="background-color: #edededb8;">
                     <div class="">
@@ -160,21 +189,63 @@
             </div>
     </div>
 
-
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
 
-            document.getElementById("submitBtn").addEventListener('click', (event) => {
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
 
+            document.getElementById("submitBtn").addEventListener('click', async (event) => {
+                
+                event.preventDefault()
+                
                 const category = document.getElementById("category")
+                const status = document.getElementById("status")
                 const categoryRegex = /^\s*[A-Za-z]+(\s[A-Za-z]+)*\s*$/
                 const categoryMsg = document.getElementById("categoryMsg")
 
                 if(!categoryRegex.test(category.value)){
-                    event.preventDefault()
+                    
                     categoryMsg.textContent = "Invalid category format"
+                    return 1
                 }
                 else{
                     categoryMsg.textContent = ""
+                }
+
+
+                try{
+                    // alert(category.value)
+                    const result = await fetch('/admin/addCategory', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: category.value, status: status.value })
+                    })
+                    .then((res) => {
+                        console.log(res)
+                        if(res.status==200){
+                            swal.fire({
+                                title: "category added successfully",
+                                icon: "success",
+                                timer: 1500
+                            })
+                        }
+                        else{
+                            swal.fire({
+                                title: "Failed to add category",
+                                text: "category already exist",
+                                icon: "error",
+                                timer: 1500
+                            })
+                        }
+                    })
+                }
+                catch(err){
+                    console.log(err)
+                    
                 }
 
             })

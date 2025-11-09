@@ -30,6 +30,26 @@
         .actions {
             color: #151414;
         }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }   
     </style>
 </head>
 
@@ -40,6 +60,10 @@
             <a class="navbar-brand text-light" href="#">
                 Logo
             </a>
+            <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
         </div>
     </nav>
 
@@ -189,6 +213,12 @@
 
 
         <script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
 
             const statuses = document.querySelectorAll('.status');
 

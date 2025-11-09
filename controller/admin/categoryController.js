@@ -38,9 +38,8 @@ const addCategoryPost = async(req, res) => {
 
         const existCategory = await categorySchema.findOne({name})
 
-        console.log(existCategory)
-
         if(existCategory){
+            // throw new Error()
             return res.status(403).json({success: false, message: "category already exist"})
         }
 
@@ -64,7 +63,6 @@ const addCategoryPost = async(req, res) => {
 }
 
 const blockCategory = async (req, res) => {
-    console.log("handler hit ..............")
     try{
         const { id } = req.body
 
@@ -103,10 +101,10 @@ const deleteCategory = async (req, res) => {
         const category = await categorySchema.findOneAndDelete({_id: id})
 
         if(category){
-            res.status(200).json({message: "successfully deleted the category"})
+            return res.status(200).json({message: "successfully deleted the category"})
         }
         else{
-            res.status(404).json({status: false, message: "category not found"})
+            return res.status(404).json({status: false, message: "category not found"})
         }
 
         res.status(200).json({message: "successfully deleted the category"})

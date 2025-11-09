@@ -178,7 +178,7 @@ const verifyOtp = async (req, res) => {
         const { otp } = req.body
         
         console.log("this is working - otp: ", otp)
-        console.log("this shyt is session: ", req.session.userOTP)
+        console.log("this is session: ", req.session.userOTP)
         
         if(otp == req.session.userOTP){
             
@@ -194,7 +194,7 @@ const verifyOtp = async (req, res) => {
 
             await saveUser.save()
             req.session.user = saveUser._id
-            console.log("working till here")
+
             return res.redirect('/home')
         }
         else{

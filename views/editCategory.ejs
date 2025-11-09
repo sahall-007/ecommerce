@@ -30,6 +30,26 @@
         .actions {
             color: #151414;
         }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }
     </style>
 </head>
 
@@ -40,6 +60,10 @@
             <a class="navbar-brand text-light" href="#">
                 Logo
             </a>
+            <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
         </div>
     </nav>
 
@@ -118,9 +142,9 @@
                 <div class="">
                     <h1 class="text-center m-b5">Edit category</h1>
                 </div>
-                <form action="/admin/EditCategory/<%= editName%>" method="post">
+                <form action="/admin/EditCategory/<%= editName %>" method="post">
                     <div class="container">
-                        <div class="row justify-content-center ">
+                        <div class="row row-cols-1 justify-content-center ">
 
                             <div class="col col-lg-7 my-4">
                                 <div class="row align-items-center">
@@ -158,20 +182,62 @@
             </div>
         </div>
 
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
+
+            const editName = "<%= editName %>"
 
             document.getElementById("submitBtn").addEventListener('click', (event) => {
+                
+                event.preventDefault()
 
                 const category = document.getElementById("category")
+                const status = document.getElementById("status")
                 const categoryRegex = /^\s*[A-Za-z]+(\s[A-Za-z]+)*\s*$/
                 const categoryMsg = document.getElementById("categoryMsg")
 
                 if(!categoryRegex.test(category.value)){
-                    event.preventDefault()
                     categoryMsg.textContent = "Invalid category format"
+                    return 1
                 }
                 else{
                     categoryMsg.textContent = ""
+                }
+
+                try{
+                    const result = fetch(`/admin/EditCategory/${editName}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ newName: category.value, newStatus: status.value })
+                    })
+                    .then((res) => {
+                        console.log(res)
+                        if(res.status==200){
+                            swal.fire({
+                                title: "category edited successfully",
+                                icon: "success",
+                                timer: 1500
+                            })
+                        }
+                        else{
+                            swal.fire({
+                                title: "Failed to edit category",
+                                text: "category already exist",
+                                icon: "error",
+                                timer: 1500
+                            })
+                        }
+                    })
+                }
+                catch(err){
+                    conosle.log(err)
                 }
 
             })
