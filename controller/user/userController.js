@@ -5,6 +5,7 @@ const variantSchema = require('../../model/variantSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
+const { Types } = require('mongoose')
 
 const salt = 10
 
@@ -249,19 +250,42 @@ const getHomePage = async (req, res) => {
                 from: "products",
                 localField: "productId",
                 foreignField: "_id",
-                as: "offerDoc"
+                as: "productDoc"
             }},
-            { $unwind: "$offerDoc" },
-            { $match: { "offerDoc.discount": {$gte: 20} } },
-            { $sample: { size: 5 }},
-            { $limit: 5 } 
+            { $unwind: "$productDoc" },
+            { $match: { "productDoc.discount": {$gte: 20} } },
+            { $lookup: {
+                from: "categories",
+                localField: "productDoc.categoryId",
+                foreignField: "_id",
+                as: "categoryDoc"
+            } },
+            { $unwind: "$categoryDoc" },
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
+            { $sample: { size: 5 }}
         ])
         
         const newArrivals = await variantSchema.aggregate([
             {$sort: {_id: -1}},
-            {$limit: 5},
-            {$sample: {size: 5}}
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "productDoc"
+            }},
+            {$unwind: "$productDoc"},
+            {$lookup: {
+                from: "categories",
+                localField: "productDoc.categoryId",
+                foreignField: "_id",
+                as: "categoryDoc"
+            }},
+            {$unwind: "$categoryDoc"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
+            {$sample: {size: 10}}
         ])
+
+        // console.log(newArrivals)
 
         // const newArrivalPrice = await variantSchema.aggregate([
         //     {$sort: {_id: -1}},
@@ -270,10 +294,14 @@ const getHomePage = async (req, res) => {
         //         {$}
         //     ]}
         // ])
+
         
-        const populated = await variantSchema.populate(newArrivals, { path: 'productId'})
         
-        res.render('home', { newArrivals: populated, inOffer })
+        // const populated = await variantSchema.populate(newArrivals, { path: 'productId'})
+
+        // console.log("this is populated offer", populatedOffer)
+        
+        res.render('home', { newArrivals, inOffer })
     }
     catch(err){
         console.log(err)
@@ -297,23 +325,58 @@ const logout = async (req, res) => {
     }
 }
 
+// to get the product detail page
 const productDetail = async (req, res) => {
     try{
         const { id } = req.params
 
-        const variant = await variantSchema.find({_id: id}).populate('productId')
+        // const variant = await variantSchema.find({_id: id}).populate('productId')
+
+        const variant = await variantSchema.aggregate([
+            {$match: {_id: new Types.ObjectId(id) }},
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "productDoc"
+            }},
+            {$unwind: "$productDoc"},
+            {$lookup: {
+                from: "categories",
+                localField: "productDoc.categoryId",
+                foreignField: "_id",
+                as: "categoryDoc"
+            }},
+            {$unwind: "$categoryDoc"}
+        ])
+
+        console.log(variant)
 
         const exploreMore = await variantSchema.aggregate([
-            {$sample: {size: 20}},
-            {$limit: 5}
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "productDoc"
+            }},
+            {$unwind: "$productDoc"},
+            {$lookup: {
+                from: "categories",
+                localField: "productDoc.categoryId",
+                foreignField: "_id",
+                as: "categoryDoc"
+            }},
+            {$unwind: "$categoryDoc"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
+            {$sample: {size: 10}}
         ])
-        const populated = await variantSchema.populate(exploreMore, { path: 'productId'})
+        // const populated = await variantSchema.populate(exploreMore, { path: 'productId'})
 
         const variantOptions = await variantSchema.find({productId: variant[0].productId._id })
 
-        console.log("this is variant options", variantOptions)
+        // console.log("this is variant options", variantOptions)
 
-        res.render('productDetail', {variant, exploreMore: populated, variantOptions})
+        res.render('productDetail', { variant, exploreMore, variantOptions })
 
     }
     catch(err){

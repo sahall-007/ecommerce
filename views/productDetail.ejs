@@ -101,10 +101,12 @@
 
 <div class="container py-5 px-0 mx-auto mt-5">
     <div class="row g-4 justify-content-around">
+      <% if(variant[0].categoryDoc.isListed && variant[0].productDoc.isListed){ %>
         <div class="col-lg-5 d-flex flex-column flex-lg-row align-items-start gap-5">
 
             <!-- Big Image -->
 
+            
             <img src="/<%= variant[0].image[0] %>" 
                 class="main-img mb-3 mb-lg-0 me-lg-5 w-100 zoom" 
                 id="mainImage" data-magnify-src="/<%= variant[0].image[0] %>">
@@ -126,7 +128,7 @@
 
         <div class="col-lg-5 d-flex justify-content-center align-items-center">
             <div>
-                <h3><%= variant[0].productId.name %></h3>
+                <h3><%= variant[0].productDoc.name %></h3>
                 <p class="text-warning">★★★★★ <span class="text-muted">(4 reviews)</span></p>
                 <p class="fs-5 mb-3">PlayStation5 Digital Edition The PS5 Digital Edition unleashes new gaming possibilities that you never anticipated. *PS5 Digital Edition (CFI-2000 model group slim).</p>
 
@@ -146,6 +148,21 @@
             </div>
 
         </div>
+      <% } else{ %>
+         <div class="col-10 col-md-6 col-lg-4">
+          <div class="card text-center border-danger shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title text-danger fw-bold">Product Blocked</h5>
+              <p class="card-text text-muted">
+                This product is currently unavailable because it has been blocked by the administrator.
+              </p>
+            </div>
+            <div class="card-footer bg-danger text-white fw-semibold">
+              Contact Support for Assistance
+            </div>
+          </div>
+        </div>
+      <% } %>
     </div>
 </div>
 
@@ -157,16 +174,17 @@
         </div>
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
        <% exploreMore.forEach(ele => { %>
+        <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
           <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
             <div class="card product-card border border-0 shadow-sm">
               <img src="/<%= ele.image[0] %>" class="card-img-top">
               <div class="card-body text-center">
-                <h6 class=""><%= ele.productId.name %></h6>
+                <h6 class=""><%= ele.productDoc.name %></h6>
                 <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
 
                 <% 
                   let price2 = Number(ele.price); 
-                  let discount2 = Number(ele.productId.discount); 
+                  let discount2 = Number(ele.productDoc.discount); 
                   let offAmount2 = price2 * (discount2 / 100); 
                   let finalPrice2 = Math.floor(price2 - offAmount2);
                 %>
@@ -178,7 +196,8 @@
                 <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
               </div>
             </div>
-          </div>          
+          </div>    
+          <% } %>      
         <% }) %>
       </div>
     </div>

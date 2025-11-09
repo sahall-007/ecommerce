@@ -105,29 +105,31 @@
         </div>
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
         <% newArrivals.forEach(ele => { %>
-          <div class="col" onclick='viewProduct("<%= ele._id %>")'>
-            <div class="card product-card border border-0 shadow-sm">
-              <img src="<%= ele.image[0] %>" class="card-img-top">
-              <div class="card-body text-center">
-                <h6 class=""><%= ele.productId.name %></h6>
-                <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
+          <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
+            <div class="col" onclick='viewProduct("<%= ele._id %>")'>
+              <div class="card product-card border border-0 shadow-sm">
+                <img src="<%= ele.image[0] %>" class="card-img-top">
+                <div class="card-body text-center">
+                  <h6 class=""><%= ele.productDoc.name %></h6>
+                  <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
 
-                <% 
-                  let price1 = Number(ele.price); 
-                  let discount1 = Number(ele.productId.discount); 
-                  let offAmount1 = price1 * (discount1 / 100); 
-                  let finalPrice1 = Math.floor(price1 - offAmount1);
-                %>
+                  <% 
+                    let price1 = Number(ele.price); 
+                    let discount1 = Number(ele.productDoc.discount); 
+                    let offAmount1 = price1 * (discount1 / 100); 
+                    let finalPrice1 = Math.floor(price1 - offAmount1);
+                  %>
 
-                <div class="d-flex gap-3 justify-content-center">
-                  <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
-                  <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                  <div class="d-flex gap-3 justify-content-center">
+                    <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
+                    <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                  </div>
+
+                  <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
                 </div>
-
-                <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
               </div>
-            </div>
-          </div>          
+            </div> 
+          <% } %>           
         <% }) %>
        
       </div>
@@ -141,30 +143,34 @@
             <h2 class="align-self-end fs-6">view all</h2>
         </div>
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+        
         <% inOffer.forEach(ele => { %>
-          <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
-            <div class="card product-card border border-0 shadow-sm">
-              <img src="<%= ele.image[0] %>" class="card-img-top">
-              <div class="card-body text-center">
-                <h6 class=""><%= ele.offerDoc.name %></h6>
-                <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
+          <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
+            <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
+              <div class="card product-card border border-0 shadow-sm">
+                <img src="<%= ele.image[0] %>" class="card-img-top">
+                <div class="card-body text-center">
+                  <h6 class=""><%= ele.productDoc.name %></h6>
+                  <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
 
-                <% 
-                  let price2 = Number(ele.price); 
-                  let discount2 = Number(ele.offerDoc.discount); 
-                  let offAmount2 = price2 * (discount2 / 100); 
-                  let finalPrice2 = Math.floor(price2 - offAmount2);
-                %>
+                  <% 
+                    let price2 = Number(ele.price); 
+                    let discount2 = Number(ele.productDoc.discount); 
+                    let offAmount2 = price2 * (discount2 / 100); 
+                    let finalPrice2 = Math.floor(price2 - offAmount2);
+                  %>
 
-                <div class="d-flex gap-3 justify-content-center">
-                  <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice2 %></p>
-                  <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                  <div class="d-flex gap-3 justify-content-center">
+                    <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice2 %></p>
+                    <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                  </div>
+                  <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
                 </div>
-                <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
               </div>
-            </div>
-          </div>          
+            </div>  
+          <% } %>        
         <% }) %>
+        
 
       </div>
     </div>
