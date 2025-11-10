@@ -4,6 +4,7 @@ const adminController = require('../controller/admin/adminController.js')
 const costumerController = require('../controller/admin/costumerController.js')
 const categoryController = require('../controller/admin/categoryController.js')
 const productController = require('../controller/admin/productController.js')
+const brandController = require('../controller/admin/brandController.js')
 const middleware = require('../middlewares/adminAuth.js')
 const uploads = require('../middlewares/multer.js')
 
@@ -121,5 +122,40 @@ router.route('/searchProduct')
 router.route('/productSearchResult/:name')
     .get(middleware.checkSession, productController.searchResult)
 
+
+// brand 
+
+router.route('/addBrand')
+    .get(brandController.addBrandPage)
+    .post(brandController.addBrandPost)
+
+router.route('/brand')
+    .get(brandController.brandManagement)
+
+
+router.route('/editBrand/:name')
+    .get(brandController.brandEditPage)
+    .post(brandController.brandEditPost)
+
+router.route('/blockBrand')
+    .patch(brandController.brandBlock)
+
+router.route('/unblockBrand')
+    .patch(brandController.brandUnblock)
+
+router.route('/deleteBrand')
+    .delete(brandController.deleteBrand)
+
+router.route('/brand/next')
+    .get(brandController.nextPage)
+
+router.route('/brand/prev')
+    .get(brandController.prevPage)
+
+router.route('/searchBrand')
+    .post(brandController.searchBrand)
+
+router.route('/brandSearchResult/:name')
+    .get(brandController.searchResult)
 
 module.exports = router

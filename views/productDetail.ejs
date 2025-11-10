@@ -132,7 +132,14 @@
                 <p class="text-warning">★★★★★ <span class="text-muted">(4 reviews)</span></p>
                 <p class="fs-5 mb-3">PlayStation5 Digital Edition The PS5 Digital Edition unleashes new gaming possibilities that you never anticipated. *PS5 Digital Edition (CFI-2000 model group slim).</p>
 
-                <h4 class=" fs-2 fw-bold"><%= variant[0].price %> <span class="price-old fs-3"><%= variant[0].price %></span> <span class="text-success"><%= variant[0].productId.discount %>% off</span></h4>
+                <% 
+                  let price1 = Number(variant[0].price); 
+                  let discount1 = Number(variant[0].productDoc.discount); 
+                  let offAmount1 = price1 * (discount1 / 100); 
+                  let finalPrice1 = Math.floor(price1 - offAmount1);
+                %>
+
+                <h4 class=" fs-2 fw-bold"><%= finalPrice1 %> <span class="price-old fs-3"><%= variant[0].price %></span> <span class="text-success"><%= variant[0].productDoc.discount %>% off</span></h4>
 
                 <label class="mt-3 d-block">Variant:</label>
                 <select class="form-select w-50 mb-4">
@@ -216,6 +223,9 @@
     mainImg.src = src
 
     mainImg.setAttribute("data-magnify-src", src);
+
+    const extra = document.querySelector(".magnify-lens")
+    extra.style.background = `url(${src})`
 
     // new Magnify(mainImg)
   }

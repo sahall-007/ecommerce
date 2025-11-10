@@ -38,13 +38,13 @@ router.route('/auth/google/callback')
 
 // home page
 router.route('/home')
-    .get(middleware.checkSession, userController.getHomePage)
+    .get(userController.getHomePage)
 
 router.route('/logout')
     .get(userController.logout)
 
 
 router.route('/productDetail/:id')
-    .get(middleware.checkSession, userController.productDetail)
+    .get(userController.productDetail)
 
 module.exports = router
