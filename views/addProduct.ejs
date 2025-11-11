@@ -194,8 +194,12 @@
 
                             <div class="col col-md-5 col-lg-4">
                                 <label class="d-block mb-2 fs-5" for="brand">Brand name</label>
-                                <input class="form-control border-dark rounded-0 p-2" name="brand" type="text" id="brand"
-                                    placeholder="Type here">
+                                <select class="form-select border-dark rounded-0 p-2" id="brand" name="brand" required>
+                                    <option value="" hidden>Select brand</option>
+                                    <% brand.forEach(ele => { %>
+                                        <option value="<%= ele.name %>"><%= ele.name %></option>
+                                    <%})%>
+                                </select>
                                 <p class="text-danger" id="brandMsg" style="font-size: small;"></p>
                             </div>
 
@@ -326,6 +330,7 @@
     </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
 
     const sidebar = document.querySelector('.sidebar');
@@ -777,6 +782,30 @@
                     method: "POST",
                     body: formdata
                 })
+                .then((res) => {
+                    console.log("-------inside then")
+                    if(res.ok){
+                    console.log("-------inside if")
+                    swal.fire({
+                        title: "Success",
+                        text: "Successfully added the product",
+                        icon: "success",
+                        timer: 1500
+                    })
+                    .then(() => window.location.href = "/admin/product")
+                    }
+                    else{
+                    console.log("-------inside else")
+                        swal.fire({
+                            title: "Error",
+                            text: "Failed to added the product",
+                            icon: "error",
+                            timer: 1500
+                        })
+                        .then(() => window.location.href = "/admin/product")
+                    }
+                })
+                
             }
             catch(err){
                 console.log(err)

@@ -330,6 +330,8 @@ const productDetail = async (req, res) => {
     try{
         const { id } = req.params
 
+        console.log("working", id)
+
         // const variant = await variantSchema.find({_id: id}).populate('productId')
 
         const variant = await variantSchema.aggregate([
@@ -372,7 +374,7 @@ const productDetail = async (req, res) => {
         ])
         // const populated = await variantSchema.populate(exploreMore, { path: 'productId'})
 
-        const variantOptions = await variantSchema.find({productId: variant[0].productId._id })
+        const variantOptions = await variantSchema.find({productId: variant[0].productDoc._id })
 
         // console.log("this is variant options", variantOptions)
 

@@ -29,8 +29,8 @@ html.magnifying > body {
 }
 .magnify > .magnify-lens { /* Magnifying lens */
   position: absolute;
-  width: 300px;
-  height: 300px;
+  width: 250px;
+  height: 250px;
   border-radius: 100%;
   /* Multiple box shadows to achieve the glass lens effect */
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.85),

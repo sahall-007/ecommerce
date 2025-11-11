@@ -115,7 +115,7 @@
             <div class="d-flex flex-row flex-lg-column gap-2">
               <% variant.forEach(ele => { %>
                 <% ele.image.forEach(image => { %>
-                  <img src="/<%= image %>" class="thumb-img " onclick="changeImage(this.src)" />
+                  <img src="/<%= image %>" class="thumb-img " onclick="changeImage(this)" />
                 <% }) %>
               <% }) %>
                 <!-- <img src="/uploads/image-1-1762263599050-cropped-1.jpeg" class="thumb-img " onclick="changeImage(this.src)" />
@@ -183,8 +183,8 @@
        <% exploreMore.forEach(ele => { %>
         <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
           <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
-            <div class="card product-card border border-0 shadow-sm">
-              <img src="/<%= ele.image[0] %>" class="card-img-top">
+            <div class="card product-card border border-1  border-dark shadow-sm">
+              <img src="/<%= ele.image[0] %>" class="card-img-top ">
               <div class="card-body text-center">
                 <h6 class=""><%= ele.productDoc.name %></h6>
                 <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
@@ -218,14 +218,22 @@
 </script>
 
 <script>
-  function changeImage(src) {
+  function changeImage(element) {
+    
     const mainImg = document.getElementById("mainImage");
-    mainImg.src = src
 
-    mainImg.setAttribute("data-magnify-src", src);
+    // const reletiveSrc = element.getAttribute("src")
+
+    
+    // console.log(reletiveSrc)
+   
+    mainImg.src = element.src
+    
+
+    mainImg.setAttribute("data-magnify-src", element.src);
 
     const extra = document.querySelector(".magnify-lens")
-    extra.style.background = `url(${src})`
+    extra.style.background = `url(${element.src})`
 
     // new Magnify(mainImg)
   }

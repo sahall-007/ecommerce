@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
+    <title>Variant Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -141,7 +141,7 @@
             </div>
             <div class="card col col-md-8 col-lg-9  px-0 mx-3">
                 <div class="card-header">
-                    <h1 class="text-center">Product Management</h1>
+                    <h1 class="text-center">Variant Management</h1>
 
                     <div class="container">
                         <div class="row justify-content-between my-5">
@@ -154,7 +154,7 @@
                             <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
                         </div>
 
-                        <form action="/admin/searchProduct" class="col-4 align-self-start d-flex gap-2" method="post">
+                        <form action="" class="col-4 align-self-start d-flex gap-2" method="post">
                             <input class="form-control me-2 " name="name" type="search" placeholder="Search" aria-label="Search" />
                             <button class="btn btn-outline-success" type="submit">Search</button>
                         </form>
@@ -171,38 +171,42 @@
                 <div class="card-body">
                     <div class="">
 
-                        <% if (products) { %>
+                        <% if (variants) { %>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th> Name </th>
-                                        <th> discription </th>
-                                        <th> brand </th>
-                                        <th> category </th>
-                                        <th> Status </th>
+                                        <th> RAM </th>
+                                        <th> Storage </th>
+                                        <th> Color </th>
+                                        <th> Quantity </th>
+                                        <th> Price </th>
+                                        <th> status </th>
                                         <th> Actions </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% products.forEach((product, index) => { %>
+                                    <% variants.forEach((variant, index) => { %>
 
-                                        <tr onclick='productInfo("<%= product._id%>")'>
+                                        <tr>
                                             <td><%= index+1 %></td>
                                             <td class="py-1">
-                                                <%= product.name %>
+                                                <%= variant.ram %>
                                             </td>
                                             <td>
-                                                <%= product.discription %>
+                                                <%= variant.storage %>
                                             </td>
                                             <td>
-                                                <%= product.brand.name%>
+                                                <%= variant.color%>
                                             </td>
                                             <td>
-                                                <%= product.category.name %>
+                                                <%= variant.quantity %>
+                                            </td>
+                                            <td>
+                                                <%= variant.price %>
                                             </td>
 
-                                            <% if(product.isListed) { %>
+                                            <% if(variant.isListed) { %>
                                                 <td class="text-success">Active</td>
                                             <% } else{ %>
                                                 <td class="text-danger">blocked</td>
@@ -211,13 +215,13 @@
                                             <td>
                                                 <div class="d-flex gap-4 ">
 
-                                                    <a class="actions" href="/admin/editProduct/<%= product._id %>"  onclick='editCategory("<%= product._id%>")' ><i class="bi bi-pencil"></i></a>
-                                                    <% if(product.isListed) { %>
-                                                        <a class="actions block-btn"  onclick='block("<%= product._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+                                                    <a class="actions" href="/admin/editProduct/<%= variant._id %>"  onclick='editCategory("<%= variant._id%>")' ><i class="bi bi-pencil"></i></a>
+                                                    <% if(variant.isListed) { %>
+                                                        <a class="actions block-btn"  onclick='block("<%= variant._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
                                                     <% } else{ %>
-                                                        <a class="actions " onclick='unBlock("<%= product._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                        <a class="actions " onclick='unBlock("<%= variant._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
                                                     <% } %>
-                                                    <a class="actions" onclick='deleteCategory("<%= product._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
+                                                    <a class="actions" onclick='deleteCategory("<%= variant._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
                                                 </div>
                                             </td>
                                         </tr>

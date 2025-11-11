@@ -3,7 +3,7 @@ const { schema } = require('./categorySchema')
 
 const productSchema = new mongoose.Schema({
     name: String,
-    discount: String,
+    discount: Number,
     offer: String,
     isListed: {
         type: Boolean,

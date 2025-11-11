@@ -2,6 +2,7 @@
 
 const express = require('express')
 const userController = require('../controller/user/userController.js');
+const allProducctController = require('../controller/user/allProductController.js')
 const middleware = require('../middlewares/userAuth.js')
 const passport = require('passport');
 
@@ -46,5 +47,15 @@ router.route('/logout')
 
 router.route('/productDetail/:id')
     .get(userController.productDetail)
+
+router.route('/allProducts')
+    .get(allProducctController.allProducts)
+
+router.route('/filter')
+    .get(allProducctController.filterPage)
+    .post(allProducctController.filter)
+
+router.route('/search')
+    .post(allProducctController.search)
 
 module.exports = router

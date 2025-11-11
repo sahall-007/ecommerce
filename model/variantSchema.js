@@ -5,7 +5,7 @@ const variantSchema = new mongoose.Schema({
     ram: String,
     storage: String,
     color: String,
-    price: String,
+    price: Number,
     quantity: String,
     isListed: {
         type: Boolean,

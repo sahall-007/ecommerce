@@ -5,10 +5,12 @@ const costumerController = require('../controller/admin/costumerController.js')
 const categoryController = require('../controller/admin/categoryController.js')
 const productController = require('../controller/admin/productController.js')
 const brandController = require('../controller/admin/brandController.js')
+const variantController = require('../controller/admin/variantController.js')
 const middleware = require('../middlewares/adminAuth.js')
 const uploads = require('../middlewares/multer.js')
 
 const productSchema = require('../model/productSchema.js')
+const variantSchema = require('../model/variantSchema.js')
 
 const router = express.Router()
 
@@ -158,4 +160,8 @@ router.route('/searchBrand')
 router.route('/brandSearchResult/:name')
     .get(brandController.searchResult)
 
+
+// variant management
+router.route('/variant/:id')
+    .get(variantController.variantManagement)
 module.exports = router

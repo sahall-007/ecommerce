@@ -1,5 +1,6 @@
 
 const categorySchema = require('../../model/categorySchema.js')
+const brandSchema = require('../../model/brandSchema.js')
 const productSchema = require('../../model/productSchema.js')
 const { castObject } = require('../../model/userSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
@@ -8,7 +9,26 @@ const productManagement = async (req, res) => {
     try{
         const productCount = await productSchema.countDocuments()
         let limit = 5
-        const products = await productSchema.find().sort({_id: -1}).limit(limit)
+        // const products = await productSchema.find().sort({_id: -1}).limit(limit)
+
+        const products = await productSchema.aggregate([
+            {$lookup: {
+                from: "categories",
+                localField: "categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$sort: {_id: -1}},
+            {$limit: limit}
+        ])
 
         if (limit >= productCount) {
             return res.render('productManagement', { products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
@@ -26,9 +46,10 @@ const productManagement = async (req, res) => {
 const addProductPage = async (req, res) => {
     try{
         const category = await categorySchema.find().sort({_id: -1})
+        const brand = await brandSchema.find().sort({_id: -1})
         // console.log(category)
 
-        res.status(200).render('addProduct', { category })
+        res.status(200).render('addProduct', { category, brand })
     }
     catch(err){
         console.log(err)
@@ -44,7 +65,7 @@ const addProductPost = async (req, res) => {
 
         let totalVariants = 0
         let index =  req.files[0].fieldname.indexOf("-")
-console.log("hitting 1")
+
         req.files.forEach(element => {
             let id = Number(element.fieldname.slice(index+1))
            
@@ -88,12 +109,21 @@ console.log(images)
         //     return res.status(403).json({success: false, message: "product already exist"})
         // }
 
+        const categoryDetail = await categorySchema.findOne({name: category}, {name: 1, _id: 1})
+        const brandDetail = await brandSchema.findOne({name: brand}, {name: 1, _id: 1})
+
+        console.log(categoryDetail)
+
+        if(!categoryDetail){
+            return res.stauts(401).json({success: false, message: "cannot find the category"})
+        }
+
         const product = await productSchema.create({
             name,
             discount,
             discription,
-            brand,
-            category
+            brandId: brandDetail._id,
+            categoryId: categoryDetail._id
         })
 
         console.log("new product", product)
@@ -123,6 +153,8 @@ console.log(images)
                 productId: product._id
             })            
         }
+
+        return res.status(200).json({success: true, message: "product created succussfully"})
        
     }
     catch(err){
@@ -180,7 +212,6 @@ const editProductPost = async (req, res) => {
 }
 
 const blockProduct = async (req, res) => {
-    console.log("block handler hit...........")
     try{
         const { id } = req.body
 
@@ -242,9 +273,30 @@ const nextPage = async (req, res) => {
             return res.redirect('/admin/product')
         }
         const productCount = await productSchema.countDocuments()
-        const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+        // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        // console.log(productCount)
+        const products = await productSchema.aggregate([
+            {$lookup: {
+                from: "categories",
+                localField: "categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$sort: {_id: -1}},
+            {$skip: limit*pageNo},
+            {$limit: limit}
+        ])
+
+        console.log(pageNo * limit + limit)
+        console.log(productCount)
 
         if(pageNo * limit + limit >= productCount){
             res.render('productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
@@ -271,7 +323,27 @@ const prevPage = async (req, res) => {
             return res.status(200).redirect('/admin/product')
         }
 
-        const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+        // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+
+        const products = await productSchema.aggregate([
+            {$lookup: {
+                from: "categories",
+                localField: "categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$sort: {_id: -1}},
+            {$skip: limit*pageNo},
+            {$limit: limit}
+        ])
 
         res.status(200).render('productManagement', { products, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
 
