@@ -58,4 +58,9 @@ router.route('/filter')
 router.route('/search')
     .post(allProducctController.search)
 
+router.route('/allProducts/next')
+    .get(allProducctController.nextPage)
+
+router.route('/allProducts/prev')
+    .get(allProducctController.prevPage)
 module.exports = router

@@ -108,12 +108,12 @@
         <div class="d-flex justify-content-between">
             <a href="/home" class="btn btn-dark text-white mb-3 mt-3 py-1 px-4">Back</a>
         </div>
-      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
         <% allProducts.forEach(ele => { %>
           <% if(ele.category.isListed && ele.product.isListed ){ %>
             <div class="col" onclick='viewProduct("<%= ele._id %>")'>
               <div class="card product-card  border-1  border-dark  shadow-sm">
-                <img src="<%= ele.image[0] %>" class="card-img-top ">
+                <img src="/<%= ele.image[0] %>" class="card-img-top ">
                 <div class="card-body text-center">
                   <h6 class=""><%= ele.product.name %></h6>
                   <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
@@ -140,6 +140,11 @@
       </div>
     </div>
   </section>
+
+  <div class="d-flex justify-content-center gap-2">
+    <a href="/allProducts/prev?page=<%= prevPage %>" class="btn btn-dark py-1 px-3 text-light m-0 <%= prevDisable %>">Prev</a>
+    <a href="/allProducts/next?page=<%= nextPage %>" class="btn py-1 px-3 text-light m-0 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+  </div>
 
 
   <!-- Footer -->

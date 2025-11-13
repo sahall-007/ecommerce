@@ -4,6 +4,10 @@ const variantSchema = require('../../model/variantSchema.js')
 
 const allProducts = async (req, res) => {
     try {
+
+        const variantCount = await variantSchema.countDocuments()
+        const limit = 12
+
         const allProducts = await variantSchema.aggregate([
             {$sort: {_id: -1}},
             {$lookup: {
@@ -21,10 +25,14 @@ const allProducts = async (req, res) => {
             }},
             {$unwind: "$category"},
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
-            {$sample: {size: 20}}
+            {$sample: {size: limit}}
         ])
 
-        res.status(200).render('allProducts', { allProducts })
+        if(limit>=variantCount){
+            return res.status(200).render('allProducts', { allProducts, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+
+        res.status(200).render('allProducts', { allProducts, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     } 
     catch (err) {
@@ -218,10 +226,101 @@ const search = async (req, res) => {
     }
 }
 
+const nextPage = async (req, res) => {
+    try{
+        const { page } = req.query
+        const pageNo = Number(page)
+        const limit = 12
+
+        if(pageNo==0){
+            return res.redirect('/allProducts')
+        }
+
+        const variantCount = await variantSchema.countDocuments()
+        const allProducts = await variantSchema.aggregate([
+            {$skip: limit * pageNo},
+            {$sort: {_id: -1}},
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "product"
+            }},
+            {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
+            {$sample: {size: limit}}
+        ])
+
+        if(pageNo * limit + limit >= variantCount){
+            res.render('allProducts', { allProducts, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+        }
+        else{
+            res.render('allProducts', { allProducts, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+        }
+
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to get the next page of all products")
+        res.status(500).json({success: false, message: "something went wrong (all products next page)"})
+    }
+}
+
+const prevPage = async (req, res) => {
+    try{
+        const { page } = req.query
+        
+        const pageNo = Number(page)
+        const limit = 12
+
+        if(pageNo==0){
+            return res.redirect('/allProducts')
+        }
+
+        const variantCount = await variantSchema.countDocuments()
+        const allProducts = await variantSchema.aggregate([
+            {$skip: limit * pageNo},
+            {$sort: {_id: -1}},
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "product"
+            }},
+            {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
+            {$sample: {size: limit}}
+        ])
+
+        res.render( 'allProducts', { allProducts, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to get the previous page of all products")
+        res.status(500).json({success: false, message: "something went wrong (all products previous page)"})
+    }
+}
 
 module.exports = {
     allProducts,
     filter,
     filterPage,
-    search
+    search,
+    nextPage,
+    prevPage
 }
