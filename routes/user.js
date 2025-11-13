@@ -5,6 +5,7 @@ const userController = require('../controller/user/userController.js');
 const allProducctController = require('../controller/user/allProductController.js')
 const middleware = require('../middlewares/userAuth.js')
 const passport = require('passport');
+const profileController = require('../controller/user/profileController.js')
 
 const router = express.Router()
 
@@ -39,20 +40,20 @@ router.route('/auth/google/callback')
 
 // home page
 router.route('/home')
-    .get(userController.getHomePage)
+    .get(middleware.checkSession, userController.getHomePage)
 
 router.route('/logout')
     .get(userController.logout)
 
 
 router.route('/productDetail/:id')
-    .get(userController.productDetail)
+    .get(middleware.checkSession, userController.productDetail)
 
 router.route('/allProducts')
-    .get(allProducctController.allProducts)
+    .get(middleware.checkSession, allProducctController.allProducts)
 
 router.route('/filter')
-    .get(allProducctController.filterPage)
+    .get(middleware.checkSession, allProducctController.filterPage)
     .post(allProducctController.filter)
 
 router.route('/search')
@@ -63,4 +64,12 @@ router.route('/allProducts/next')
 
 router.route('/allProducts/prev')
     .get(allProducctController.prevPage)
+
+// forgot password
+router.route('/forgotPassword')
+    .get(profileController.forgotPassPage)
+
+router.route('/forgotEmailValidation')
+    .post(profileController.forgotEmailValidation)
+
 module.exports = router

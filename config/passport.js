@@ -8,9 +8,10 @@ const env = require('dotenv').config()
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:3000/auth/google/callback'
+    callbackURL: 'http://localhost:3000/auth/google/callback',
+    passReqToCallback: true
 },
-async (accessToken, refreshToken, profile, done) => {
+async (req, accessToken, refreshToken, profile, done) => {
     try{
         let googleUser = await userSchema.findOne({googleId: profile.id})
         
