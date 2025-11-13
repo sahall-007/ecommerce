@@ -21,6 +21,191 @@ const variantManagement = async (req, res) => {
     }
 }
 
+const addvariantPage = async (req, res) => {
+    try {
+        const { id } = req.params
+
+        res.status(200).render('addVariant', { editId: id})
+    } 
+    catch (err) {
+        console.log(err)    
+        console.log("failed to get add variant page")
+        res.status(500).json({success: false, message: "something went wrong (add variant page)"})
+    }
+}
+
+const addvariantPost = async (req, res) => {
+    try{
+
+        const { id } = req.params
+        console.log(id)
+        console.log("this is variant body", req.body)
+        console.log("this is variant img files", req.files)
+
+        let images = {}
+        for(let i=0; i<req.files.length; i++){
+
+            let path = req.files[i].path.replace(/\\/g, '/')
+
+            if(images[req.files[i].fieldname]){
+                images[req.files[i].fieldname].push(path)
+            }
+            else{
+                
+                images[req.files[i].fieldname] = [path]
+            }
+        }
+
+        console.log(images)
+
+        let { ram, storage, color, quantity, price } = req.body
+
+        const product = await productSchema.findOne({_id: id})
+
+        const newVariant = await variantSchema.create({
+            ram,
+            storage,
+            color,
+            quantity,
+            price,
+            image: images["image-1"],
+            productId: product._id
+        })
+
+        console.log("new variant", newVariant)
+
+        res.status(200).json({message: "kalapilaaa"})
+    }
+    catch(err){
+
+    }
+}
+
+const editVariantPage = async (req, res) => {
+    try{
+        const { id } = req.params
+
+        const variant = await variantSchema.findOne({_id: id})
+
+        console.log(id)
+        // console.log(variant)
+
+        res.status(200).render('editVariant', { editId: id, images: variant.image, productId: variant.productId})
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to get edit variant page")
+        res.status(500).json({succsess: false, message: "something went wrong (edite variant page)"})
+    }
+}
+
+const deleteImg = async (req, res) => {
+    try {
+        const { variantId, imageIndex } = req.body
+
+        const img = await variantSchema.findOne({_id: variantId}, {image: 1})
+        
+        const deleteVariantImg = await variantSchema.updateOne({_id: variantId}, {$pull: {image: img.image[imageIndex]}})
+        const afterDelete = await variantSchema.findOne({_id: variantId})
+        
+        if(deleteVariantImg.modifiedCount == 1){
+            res.status(200).json({success: true, message: "successfully deleted the image"})
+        }
+        else{
+            res.status(404).json({success: false, message: "cannot find the image"})
+        }
+
+    } 
+    catch (err) {
+        console.log(err)
+        console.log("failed to delete the image")
+        res.status(500).json({succsess: false, message: "something went wrong (delete image)"})
+    }
+}
+
+const editVariantPost = async (req, res) => {
+    try{
+        const { id } = req.params
+        // console.log(req.files)
+        console.log(req.body)
+
+        // ---------------- to update the variant details -------------------
+
+        const variant = await variantSchema.findOne({_id: id}, {image: 0})
+
+        if(!variant){
+            return res.status(404).josn({success: false, message: "variant not found"})
+        }
+
+        const { ram, storage, color, quantity, price } = req.body
+
+        let editRam = ram || variant.ram
+        let editStorage = storage || variant.storage
+        let editColor = color || variant.color
+        let editQuantity = quantity || variant.quantity
+        let editPrice = price || variant.price
+
+        await variantSchema.updateOne({_id: id}, {
+            ram: editRam,
+            storage: editStorage,
+            color: editColor,
+            quantity: editQuantity,
+            price: editPrice
+        })
+
+        
+        // ----------------- to update the image ---------------------
+
+        if(req.files.length >= 1){
+            let indexOfDash = req.files[0].fieldname.indexOf("-")
+
+            for(let i=0; i<req.files.length; i++){
+            
+                let path = req.files[i].path.replace(/\\/g, '/')
+                
+                if(req.files[i].originalname == "extraNewImage.jpeg"){
+                    console.log(path)
+                    const addNewExtraImg = await variantSchema.updateOne({_id: id}, {$push: {image: path}})
+                }
+                else{
+                    let index = Number(req.files[i].fieldname.slice(indexOfDash+1))
+
+                    const img = await variantSchema.findOne({_id: id}, {image: 1})
+                    const deleteVariantImg = await variantSchema.updateOne({_id: id}, {$pull: {image: img.image[index]}})
+                    const insertNewImage = await variantSchema.updateOne({_id: id}, {$push: {image: {$each: [path], $position: index}}})
+                }
+                
+            
+            }
+
+            const productIdOfVariant = await variantSchema.findOne({_id: id}, {productId: 1})
+
+            if(productIdOfVariant){
+                res.status(200).redirect(`/admin/variant/${productIdOfVariant.productId}`)
+            }
+            else{
+                res.status(404).json({success: false, message: "could not find the productid"})
+            }
+        }
+
+        const afterDelete = await variantSchema.findOne({_id: id})
+        console.log("this is after delete", afterDelete)
+
+        res.status(200).json({success: true, message: "successfully edited the variant"})
+
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to edit the variants")
+        res.status(500).json({success: false, message: "something went wrong (edit variant post)"})
+    }
+}
+
 module.exports = {
-    variantManagement
+    variantManagement,
+    addvariantPage,
+    addvariantPost,
+    editVariantPage,
+    deleteImg,
+    editVariantPost
 }

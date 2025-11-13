@@ -314,7 +314,7 @@
 
                         <div class="row justify-content-around" id="publishBtn">
                             <div class="col-6">
-                                <button class="btn btn-warning  w-100" id="publish">Publish</button>
+                                <button class="btn w-100" id="publish" style="background-color: #EF6627;">Publish</button>
                             </div>
                         </div>
 
@@ -584,7 +584,7 @@
             croppedBlob.variant = variantNumber
             croppedBlobs.push(croppedBlob)
 
-            // console.log("this is blob during btn click",  croppedBlobs)
+            console.log("this is blob during btn click",  croppedBlob)
 
             setTimeout(() => {
                 croppers.pop()
@@ -783,19 +783,16 @@
                     body: formdata
                 })
                 .then((res) => {
-                    console.log("-------inside then")
                     if(res.ok){
-                    console.log("-------inside if")
-                    swal.fire({
-                        title: "Success",
-                        text: "Successfully added the product",
-                        icon: "success",
-                        timer: 1500
-                    })
-                    .then(() => window.location.href = "/admin/product")
+                        swal.fire({
+                            title: "Success",
+                            text: "Successfully added the product",
+                            icon: "success",
+                            timer: 1500
+                        })
+                        .then(() => window.location.href = "/admin/product")
                     }
                     else{
-                    console.log("-------inside else")
                         swal.fire({
                             title: "Error",
                             text: "Failed to added the product",

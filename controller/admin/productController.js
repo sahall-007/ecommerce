@@ -85,6 +85,7 @@ const addProductPost = async (req, res) => {
                 images[req.files[i].fieldname] = [path]
             }
         }
+
 console.log(images)
 
         let keys = Object.keys(images)
@@ -126,7 +127,7 @@ console.log(images)
             categoryId: categoryDetail._id
         })
 
-        console.log("new product", product)
+        // console.log("new product", product)
 
         let indexOfDash = keys[0].indexOf("-")
 
@@ -137,11 +138,15 @@ console.log(images)
 
             for(let j=0; j<keys.length; j++){
                 if(Number(keys[j].slice(indexOfDash+1)) == i+1){
+                    console.log("before imagefield", imageFieldName, i)
                     imageFieldName = keys[j]
+                    console.log("after imagefield", imageFieldName, i)
                 }
             }
-
+            console.log("imagefield", imageFieldName)
             let variantImage = images[imageFieldName]
+
+            console.log("this is variant image", variantImage)
 
             await variantSchema.create({
                 ram: ram[i],

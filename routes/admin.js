@@ -164,4 +164,18 @@ router.route('/brandSearchResult/:name')
 // variant management
 router.route('/variant/:id')
     .get(variantController.variantManagement)
+
+router.route('/addVariant/:id')
+    .get(variantController.addvariantPage)
+    .post(uploads.upload.any(), variantController.addvariantPost)
+
+router.route('/editVariant/:id')
+    .get(variantController.editVariantPage)
+    .post(uploads.upload.any(), variantController.editVariantPost)
+
+router.route('/deleteImg')
+    .post(variantController.deleteImg)
+
+
+
 module.exports = router
