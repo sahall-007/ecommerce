@@ -40,6 +40,7 @@ const loadRegister = async (req, res) => {
     catch (err) {
         console.log(err)
         console.log("failed to load the register page!")
+        res.status(500).json({success: false, message: "something went wrong (register page)"})
     }
 }
 
@@ -113,6 +114,7 @@ const registerUser = async (req, res) => {
     catch (err) {
         console.log(err)
         console.log("failed to register the user!")
+        res.status(500).json({success: false, message: "something went wrong (reigster post)"})
     }
 }
 
@@ -187,7 +189,7 @@ const verifyOtp = async (req, res) => {
             const hashedPassword = await bcrypt.hash(user.password, salt)
 
             const saveUser = await new userSchema({
-                username: user.name,
+                username: user.username,
                 email: user.email,
                 password: hashedPassword,
                 isListed: true
