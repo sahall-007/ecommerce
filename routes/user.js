@@ -9,9 +9,8 @@ const profileController = require('../controller/user/profileController.js')
 
 const router = express.Router()
 
-router.get('/', (req, res) => {
-    res.json({ message: "App has started to work!!!" });
-})
+router.route('/')
+    .get(middleware.checkSession, userController.getHomePage)
 
 router.route('/register')
     .get(middleware.hasSession, userController.loadRegister)

@@ -146,7 +146,7 @@ const loginPost = async (req, res) => {
         }
 
         req.session.user = userExist[0]._id
-        res.redirect('/home')
+        res.redirect('/')
 
     }
     catch(err){
@@ -198,7 +198,7 @@ const verifyOtp = async (req, res) => {
             await saveUser.save()
             req.session.user = saveUser._id
 
-            return res.redirect('/home')
+            return res.redirect('/')
         }
         else{
             res.status(400).json({success: false, message: "invalid OTP, please try again"})

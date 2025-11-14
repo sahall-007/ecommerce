@@ -1,5 +1,6 @@
 
 
+const { connect } = require('mongoose')
 const adminSchema = require('../../model/adminSchema.js')
 const bcrypt = require("bcrypt")
 // const userSchema = require('../../model/userSchema.js')
@@ -18,23 +19,26 @@ const loadLogin = async (req, res) => {
 
 const loginVerify = async (req, res) =>{
     try{
-        const { name, email, password } = req.body
+        const { email, password } = req.body
 
-        const admin = await adminSchema.findOne({ name })
+        console.log(email, password)
+
+        const admin = await adminSchema.findOne({ email })
 
         if(!admin){
-            throw new Error("wrong credentials")
+            return res.status(404).json({success: false, message: "email not found in the database"})
         }
 
         const isMatch = await bcrypt.compare(password, admin.password)
+
         if (!isMatch || admin.email !== email) {
             console.log("inside condition")
-            return res.status(401).redirect('/admin/login')
+            return res.status(401).json({success: false, message: "invalid email or password !"})
         }
 
         req.session.admin = true
-
-        res.redirect('/admin/dashboard')
+console.log("session created")
+        res.status(200).redirect('/admin/dashboard')
 
     }
     catch(err){

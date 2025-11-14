@@ -181,7 +181,7 @@ if (!resumeCountdownIfExists()) {
           success: function(response){
             if(response.success)
             showMessage('OTP verified — success!','success'); 
-            window.location.href = '/home'
+            window.location.href = '/'
           },
           error: function (){
             showMessage('Incorrect code. Please try again.','error'); 
