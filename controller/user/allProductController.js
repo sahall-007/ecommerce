@@ -1,15 +1,49 @@
 const userSchema = require('../../model/userSchema.js')
 const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
+const categorySchema = require('../../model/categorySchema.js')
+const brandSchema = require('../../model/brandSchema.js')
+
 
 const allProducts = async (req, res) => {
     try {
 
+        
+        const filter = {}
+        const toSort = {}
+
+        if(req.session.filter){
+            const { category, brand, min, max, sort } = req.session.filter
+    
+            if(category?.length){
+                filter["category.name"] = {$in: category}
+            }
+            if(brand?.length){
+                filter["brand.name"] = {$in: brand}
+            }
+            if(min || max){
+                if(min=="" && max!="") filter.price = {$gte: 0, $lte: +max}            
+                if(min!="" && max=="") filter.price = {$gte: +min, $lte: Infinity}            
+                if(min!="" && max!="") filter.price = {$gte: +min, $lte: +max}
+            }
+            if(sort){
+                if(sort=="none") toSort.$sort = {"natural": 1}
+    
+                else if(sort=="h-l") toSort.$sort = {price: -1}
+                else if(sort=="l-h") toSort.$sort = {price: 1}
+                
+                else if(sort=="a-z") toSort.$sort = {"product.name": 1}
+                else if(sort=="z-a") toSort.$sort = {"product.name": -1}
+            }
+        }
+        else{
+            toSort.$sort = {"natural": 1}
+        }
+     
         const variantCount = await variantSchema.countDocuments()
         const limit = 12
 
         const allProducts = await variantSchema.aggregate([
-            {$sort: {_id: -1}},
             {$lookup: {
                 from: "products",
                 localField: "productId",
@@ -24,21 +58,43 @@ const allProducts = async (req, res) => {
                 as: "category"
             }},
             {$unwind: "$category"},
-            {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
-            {$sample: {size: limit}}
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
+            {$match: filter},
+            {$sample: {size: limit}},
+            toSort,
+            {$limit: limit},
         ])
 
-        if(limit>=variantCount){
-            return res.status(200).render('allProducts', { allProducts, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
-        }
+        console.log(filter)
+        console.log(toSort)
 
-        res.status(200).render('allProducts', { allProducts, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        const category = await categorySchema.find({isListed: true}, {name: 1})
+        const brand = await brandSchema.find({isListed: true}, {name: 1})
+
+        if(allProducts.length < limit){
+            req.session.filter = null
+            return res.status(200).render('allProducts', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+        if(limit>=variantCount){
+            req.session.filter = null
+            console.log("inside condition")
+            return res.status(200).render('allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+        req.session.filter = null
+        res.status(200).render('allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     } 
     catch (err) {
         console.log(err)    
         console.log("failed to get all products page")
-        res.status(500).josn({success: false, message: "something went wrong (all products page)"})
+        res.status(500).json({success: false, message: "something went wrong (all products page)"})
     }
 }
 
@@ -121,13 +177,7 @@ const filter = async (req, res) => {
 const filterPage = async (req, res) => {
     try{
 
-        // const filterpro = req.session.filter
-
         const { category, brand, min, max, sort } = req.session.filter
-
-        
-
-        // console.log(category, brand, min, max, sort)
 
         const filter = {}
         const toSort = {}
@@ -143,9 +193,8 @@ const filterPage = async (req, res) => {
             if(max=="" && min!="") filter.price = {$gte: +min, $lte: Infinity}            
             if(min!="" && max!="") filter.price = {$gte: +min, $lte: +max}
         }
-
         if(sort){
-            if(sort=="none") toSort.$sort = {"natural": 1}
+            if(sort=="none" || sort==undefined) toSort.$sort = {"natural": 1}
 
             else if(sort=="h-l") toSort.$sort = {price: -1}
             else if(sort=="l-h") toSort.$sort = {price: 1}
@@ -154,7 +203,9 @@ const filterPage = async (req, res) => {
             else if(sort=="z-a") toSort.$sort = {"product.name": -1}
         }
         
-
+        const variantCount = await variantSchema.countDocuments()
+        let limit = 10
+        
         const products = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -179,9 +230,15 @@ const filterPage = async (req, res) => {
             {$unwind: "$brand"},
             {$match: filter},
             toSort,
+            {$limit: limit}
         ])
 
-        res.status(200).render('allProducts', { allProducts: products})
+        if(limit >= variantCount){
+            return res.status(200).render('allProducts', { allProducts: products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+
+        res.status(200).render('allProducts', { allProducts: sample, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+
 
     }
     catch(err){
@@ -239,7 +296,7 @@ const nextPage = async (req, res) => {
         const variantCount = await variantSchema.countDocuments()
         const allProducts = await variantSchema.aggregate([
             {$skip: limit * pageNo},
-            {$sort: {_id: -1}},
+            {$sort: {_id: 1}},
             {$lookup: {
                 from: "products",
                 localField: "productId",
@@ -254,15 +311,25 @@ const nextPage = async (req, res) => {
                 as: "category"
             }},
             {$unwind: "$category"},
-            {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
             {$sample: {size: limit}}
         ])
 
+        const category = await categorySchema.find({isListed: true}, {name: 1})
+        const brand = await brandSchema.find({isListed: true}, {name: 1})
+
         if(pageNo * limit + limit >= variantCount){
-            res.render('allProducts', { allProducts, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('allProducts', { allProducts, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
 
     }

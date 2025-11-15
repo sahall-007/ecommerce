@@ -35,7 +35,7 @@
 </head>
 <body>
   
-  <nav  class="navbar navbar-expand-lg bg-black sticky-top shadow-sm">
+  <nav  class="navbar navbar-expand-xl bg-black sticky-top shadow-sm">
     <div class="container">
       <!-- Brand -->
       <a class="navbar-brand text-light fw-bold d-flex align-items-center" href="#">
@@ -70,10 +70,10 @@
       <div class="collapse navbar-collapse" id="navbarContent">
         <!-- Center Nav Links -->
         <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link text-light active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light active" href="/home">Home</a></li>
           <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
           <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
-          <li class="nav-item"><a class="nav-link text-light" data-bs-toggle="modal" data-bs-target="#filterModal" >Filter</a></li>
+          <li class="nav-item"><a class="nav-link text-light d-block d-xl-none" data-bs-toggle="modal" data-bs-target="#filterModal" >Filter</a></li>
         </ul>
 
         <!-- Right: Search + Icons -->
@@ -82,11 +82,11 @@
           
 
           <!-- Icons -->
-          <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3">
+          <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
             <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
             <a href="#" class="text-light"><i class="bi bi-cart3"></i></a>
             <a href="#" class="text-light"><i class="bi bi-person-circle"></i></a>
-          </div>]
+          </div>
 
         </div>
         <div class="d-flex justify-content-center">
@@ -99,52 +99,138 @@
     </div>
   </nav>
 
-
-
-
-  <!-- Featured Products -->
-  <section id="featured" class="bg-light pb-5">
-    <div class="container">
-        <!-- <div class="d-flex justify-content-between">
-            <a href="/home" class="btn btn-dark text-white mb-3 mt-3 py-1 px-4">Back</a>
-        </div> -->
-      <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
-        <% allProducts.forEach(ele => { %>
-          <% if(ele.category.isListed && ele.product.isListed ){ %>
-            <div class="col" onclick='viewProduct("<%= ele._id %>")'>
-              <div class="card product-card  border-1  border-dark  shadow-sm">
-                <img src="/<%= ele.image[0] %>" class="card-img-top ">
-                <div class="card-body text-center">
-                  <h6 class=""><%= ele.product.name %></h6>
-                  <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
-
-                  <% 
-                    let price1 = Number(ele.price); 
-                    let discount1 = Number(ele.product.discount); 
-                    let offAmount1 = price1 * (discount1 / 100); 
-                    let finalPrice1 = Math.floor(price1 - offAmount1);
-                  %>
-
-                  <div class="d-flex gap-3 justify-content-center">
-                    <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
-                    <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
-                  </div>
-
-                  <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
-                </div>
+  <div class="container-fluid px-0 mt-5">
+    <div class="row ps-5">
+      <div class="col col-md-2  d-xl-block d-none border border-secondary text-secondary sidebar align-self-start p-0">
+        <div class="">
+          <h1 class="fs-2 text-center mt-2 mb-4">Filter</h1>
+          <div class="container my-4 mx-auto">
+            <div class="row row-cols-1 justify-content-center">
+              <div class="col mb-3">
+                <p>category</p>
+                <ul style="list-style-type: none;">
+                  <li>
+                    <% category.forEach(ele => {  %>
+                      <input type="checkbox" id="<%= ele.name %>" name="category" value="<%= ele.name %>">
+                      <label for="<%= ele.name %>"><%= ele.name %></label><br>
+                    <% }) %>
+                  </li>
+                </ul>
+                
               </div>
-            </div> 
-          <% } %>           
-        <% }) %>
-       
+              <div class="col mb-3">
+                <p>Brand</p>
+                <ul style="list-style-type: none;">
+                  <li>
+                    <% brand.forEach(ele => {  %>
+                      <input type="checkbox" id="<%= ele.name %>" name="brand" value="<%= ele.name %>">
+                      <label for="<%= ele.name %>"><%= ele.name %></label><br>
+                    <% }) %>
+                  </li>
+                </ul>                
+              </div>
+
+              <div class="col mb-3">
+                <p for="">price range: </p>
+                <ul style="list-style-type: none;">
+                  <li>
+                    <div class="">
+                      <div class="d-flex gap-2 mb-2">
+                        <label for="min">Min</label>
+                        <input type="number" name="min" id="min" min="0" style="max-width: 80px;">
+                      </div>
+                      
+                      <div class="d-flex  gap-2">
+                        <label for="max">Max</label>
+                        <input type="number" name="max" id="max" min="0"  style="max-width: 80px;">
+                      </div>
+                    </div>   
+                  </li>
+                </ul>                                 
+              </div>
+
+              <div class="col mb-3">
+                <p for="">Sort by: </p>
+                <ul style="list-style-type: none;">
+                  <li>
+                    <input id="nonePrice" type="radio" name="sort" value="none" checked="checked">
+                    <label for="nonePrice">None</label><br>
+                    <input id="h-l" type="radio" name="sort" value="h-l">
+                    <label for="h-l">Price High to low</label><br>                          
+                    <input id="l-h" type="radio" name="sort" value="l-h">
+                    <label for="l-h">Price Low to high</label><br>
+
+                    <!-- <input id="noneProduct" type="radio" name="sort" value="none" checked="checked"> -->
+                    <!-- <label for="noneProduct">None</label><br> -->
+                    <input id="a-z`" type="radio" name="sort" value="a-z">
+                    <label for="a-z`">Aa - Zz</label><br>                          
+                    <input id="z-a" type="radio" name="sort" value="z-a">
+                    <label for="z-a">Zz - Aa</label>
+                  </li>
+                </ul>                        
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-center gap-3 mb-3">
+              <button class="border-0 rounded px-3 py-1 bg-black text-light"
+                  data-bs-dismiss="modal">Cancel</button>
+              <button class="border-0 rounded px-3 py-1 text-light"
+                  style="background-color: #EF6627;" data-bs-dismiss="modal" id="appyBtn">Apply</button>
+          </div>
+        </div>
+      </div>
+      <div class="col  px-0 mx-3">
+        <section id="featured" class="bg-light pb-5">
+          <div class="container-fluid">
+              <!-- <div class="d-flex justify-content-between">
+                  <a href="/home" class="btn btn-dark text-white mb-3 mt-3 py-1 px-4">Back</a>
+              </div> -->
+              <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
+                <% allProducts.forEach(ele => { %>
+                  <% if(ele.category.isListed && ele.product.isListed ){ %>
+                    <div class="col" onclick='viewProduct("<%= ele._id %>")'>
+                      <div class="card product-card  border-1  border-dark  shadow-sm">
+                        <img src="/<%= ele.image[0] %>" class="card-img-top ">
+                        <div class="card-body text-center">
+                          <h6 class=""><%= ele.product.name %></h6>
+                          <p class="" style="font-size: small;"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></p>
+
+                          <% 
+                            let price1 = Number(ele.price); 
+                            let discount1 = Number(ele.product.discount); 
+                            let offAmount1 = price1 * (discount1 / 100); 
+                            let finalPrice1 = Math.floor(price1 - offAmount1);
+                          %>
+
+                          <div class="d-flex gap-3 justify-content-center">
+                            <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
+                            <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                          </div>
+
+                          <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
+                        </div>
+                      </div>
+                    </div> 
+                  <% } %>           
+                <% }) %>
+              
+              </div>
+          </div>
+        </section>
+        <div class="d-flex justify-content-center gap-2">
+          <a href="/allProducts/prev?page=<%= prevPage %>" class="btn btn-dark py-1 px-3 text-light m-0 <%= prevDisable %>">Prev</a>
+          <a href="/allProducts/next?page=<%= nextPage %>" class="btn py-1 px-3 text-light m-0 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+        </div>
       </div>
     </div>
-  </section>
-
-  <div class="d-flex justify-content-center gap-2">
-    <a href="/allProducts/prev?page=<%= prevPage %>" class="btn btn-dark py-1 px-3 text-light m-0 <%= prevDisable %>">Prev</a>
-    <a href="/allProducts/next?page=<%= nextPage %>" class="btn py-1 px-3 text-light m-0 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
   </div>
+
+
+ 
+
+  
+
+  
 
 
   <!-- Footer -->
@@ -156,7 +242,6 @@
     <div class="modal fade" id="filterModal">
       <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
-
               <div class="modal-body px-5">
                   <h1 class="fs-2 text-center mt-2 mb-4">Filter</h1>
                   <div class="container my-4">
@@ -314,22 +399,18 @@
       const brand = Array.from(brands).map(ele => ele.value)
 
 
+      // `/allProducts?category=${category.join(",")}&brand=${brand.join(",")}&min=${min}&max=${max}&sort=${sort}`
 
       const result = await fetch('/filter', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          category,
-          brand,
-          min,
-          max,
-          sort
-        })
-      })
-      .then((res) => {
-        window.location.href = '/filter'
+        body: JSON.stringify({ category, brand, min, max, sort })
       })
 
+      if(result.status==200){
+        window.location.href = '/allProducts'
+      }
+      
       // console.log(category, brand, min, max)
 
     })
