@@ -88,9 +88,9 @@ const editVariantPage = async (req, res) => {
         const variant = await variantSchema.findOne({_id: id})
 
         console.log(id)
-        // console.log(variant)
+        console.log(variant)
 
-        res.status(200).render('editVariant', { editId: id, images: variant.image, productId: variant.productId})
+        res.status(200).render('editVariant', { variant, images: variant.image, productId: variant.productId})
     }
     catch(err){
         console.log(err)
@@ -126,7 +126,7 @@ const deleteImg = async (req, res) => {
 const editVariantPost = async (req, res) => {
     try{
         const { id } = req.params
-        // console.log(req.files)
+        console.log(req.files)
         console.log(req.body)
 
         // ---------------- to update the variant details -------------------
@@ -134,10 +134,12 @@ const editVariantPost = async (req, res) => {
         const variant = await variantSchema.findOne({_id: id}, {image: 0})
 
         if(!variant){
-            return res.status(404).josn({success: false, message: "variant not found"})
+            return res.status(404).json({success: false, message: "variant not found"})
         }
 
         const { ram, storage, color, quantity, price } = req.body
+
+        console.log(" this is req.body ", req.body)
 
         let editRam = ram || variant.ram
         let editStorage = storage || variant.storage

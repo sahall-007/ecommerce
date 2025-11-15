@@ -174,8 +174,12 @@ const editProductPage = async (req, res) => {
         const { id } = req.params
 
         const category = await categorySchema.find().sort({_id: -1})
+        const brand = await brandSchema.find()
+        const product = await productSchema.findOne({_id: id})
+
+        console.log(product)
         
-        res.render('editProduct', {editId: id, category })
+        res.render('editProduct', { product, category, brand })
     }
     catch(err){
         console.log(err)

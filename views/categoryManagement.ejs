@@ -74,19 +74,19 @@
         <div class=" d-inline-block border border-secondary text-secondary sidebar align-self-start py-3">
             <div class="">
 
-                <div class="test ps-2 pb-3 px-3 py-1">
+                <div onclick="location.href='/admin/dashboard'" class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                    <a href="/admin/dashboard" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
+                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
                 </div>
 
-                <div class="test ps-2 pb-3 px-3 py-1">
+                <div onclick="location.href='/admin/product'" class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                    <a href="/admin/product" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
+                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
                 </div>
 
-                <div class="test ps-2 pb-3 px-3 py-1">
+                <div onclick="location.href='/admin/category'" class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                    <a href="/admin/category" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
+                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
                 </div>
 
                 <div class="test ps-2 pb-3 px-3 py-1">
@@ -108,6 +108,11 @@
                     <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
                     <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
                 </div>
+
+                <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
+                    <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
+                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
+                </div>
             </div>
 
             <div class="my-5">
@@ -115,22 +120,15 @@
                     <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
                     <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
                 </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
+                <div onclick="location.href='/admin/userManagement'" class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                    <a href="/admin/userManagement" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
+                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
                 </div>
             </div>
 
             <div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Settings</a>
-                </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Help</a>
-                </div>
-                <div class="test ps-2 pb-3 px-3 py-1">
+                
+                <div onclick="location.href='/admin/logout'" class="test ps-2 pb-3 px-3 py-1">
                     <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
                     <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
                 </div>
@@ -215,7 +213,6 @@
                                                 <% } else{ %>
                                                     <a class="actions " onclick='unBlock("<%= category._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
                                                 <% } %>
-                                                <a class="actions" onclick='deleteCategory("<%= category._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>

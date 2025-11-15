@@ -65,7 +65,12 @@ const brandManagement = async (req, res) => {
 const brandEditPage = async (req, res) => {
     try{
         const { name } = req.params
-        res.status(200).render('editBrand', { editName: name})
+
+        const brand = await brandSchema.findOne({name})
+
+        console.log(brand)
+
+        res.status(200).render('editBrand', { brand })
     }
     catch(err){
         console.log(err)

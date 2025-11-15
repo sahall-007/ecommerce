@@ -34,14 +34,10 @@ app.use(nocache())
 // view engine---------------------------------------
 app.set("view engine", "ejs")
 
-
 // router
 
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
-
-
-
 
 connected()
 

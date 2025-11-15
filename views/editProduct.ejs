@@ -74,17 +74,17 @@
                 style="padding-bottom: -100px;">
                 <div class="">
 
-                    <div class="test ps-2">
+                    <div onclick="location.href='/admin/dashboard'" class="test ps-2">
                         <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
+                        <h1  class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
                     </div>
 
-                    <div class="test ps-2">
+                    <div onclick="location.href='/admin/product'" class="test ps-2">
                         <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Product</h1>
                     </div>
 
-                    <div class="test ps-2">
+                    <div onclick="location.href='/admin/category'" class="test ps-2">
                         <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Category</h1>
                     </div>
@@ -108,6 +108,11 @@
                         <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Offer</h1>
                     </div>
+
+                    <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
+                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
+                        <a href="/admin/brand" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
+                </div>
                 </div>
 
                 <div class="my-5">
@@ -115,22 +120,15 @@
                         <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Admins</h1>
                     </div>
-                    <div class="test ps-2">
+                    <div onclick="location.href='/admin/userManagement'" class="test ps-2">
                         <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">customers</h1>
                     </div>
                 </div>
 
                 <div>
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/settings.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Settings</h1>
-                    </div>
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/help.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Help</h1>
-                    </div>
-                    <div class="test ps-2">
+                    
+                    <div onclick="location.href='/admin/logout'" class="test ps-2">
                         <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
                         <h1 class="fs-6 px-3 pb-3 ms-3 mb-0">Logout</h1>
                     </div>
@@ -143,7 +141,7 @@
                     <div class="">
                         <h1 class="text-center m-b5">Edit product</h1>
                     </div>
-                    <form action="/admin/editProduct/<%= editId %>" method="post">
+                    <form action="/admin/editProduct/<%= product._id %>" method="post">
                         <div class="container">
                             <div class="row row-cols-1 justify-content-center ">
 
@@ -152,7 +150,7 @@
                                         <label for="name" class="col-2 col-form-label">Name</label>
                                         <div class="col-10">
                                             <input class="form-control w-100 pe-5 bg-white border-0" id="name"
-                                                type="text" placeholder="John Doe" name="newName">
+                                                type="text" placeholder="John Doe" name="newName" value="<%= product.name %>">
                                         </div>
                                     </div>
                                 </div>
@@ -162,7 +160,7 @@
                                         <label for="discount" class="col-2 col-form-label">Discount</label>
                                         <div class="col-10">
                                             <input class="form-control w-100 pe-5 bg-white border-0" id="discount" type="number"
-                                                placeholder="0" name="newDiscount">
+                                                placeholder="0" name="newDiscount" value="<%= product.discount %>">
                                         </div>
                                     </div>
                                 </div>
@@ -171,7 +169,7 @@
                                         <label class="col-2 col-form-label" for="discription">Discrpton</label>
                                         <div class="col-10">
                                             <textarea class="form-control  rounded p-2" name="newDiscription" type="text"
-                                                id="discription" placeholder="Type here"></textarea>                                            
+                                                id="discription" placeholder="Type here"><%= product.discription %></textarea>                                            
                                         </div>
                                     </div>
                                 </div>
@@ -180,8 +178,15 @@
                                     <div class="row align-items-center">
                                         <label for="brand" class="col-2 col-form-label">Brand</label>
                                         <div class="col-10">
-                                            <input class="form-control w-100 pe-5 bg-white border-0" id="brand"
-                                                type="text" placeholder="brand" name="newBrand">
+                                           
+                                            <select class="form-select rounded p-2" id="brand" name="newBrand">
+                                                <option value="" hidden>Select Brand</option>
+                                
+                                                <% brand.forEach(ele => { %>
+                                                    <option value="<%= ele.name %>"><%= ele.name %></option>
+                                                <%})%>
+
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

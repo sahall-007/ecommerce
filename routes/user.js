@@ -34,12 +34,12 @@ router.route('/auth/google')
 
 router.route('/auth/google/callback')
     .get(passport.authenticate('google', {failureRedirect: '/register'}), (req, res) => {
-        res.redirect('/home')
+        res.redirect('/')
     })
 
 // home page
-router.route('/home')
-    .get(middleware.checkSession, userController.getHomePage)
+// router.route('/home')
+//     .get(middleware.checkSession, userController.getHomePage)
 
 router.route('/logout')
     .get(userController.logout)
