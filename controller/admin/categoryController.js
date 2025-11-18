@@ -34,9 +34,11 @@ const addCategoryPage = async (req, res) => {
 
 const addCategoryPost = async(req, res) => {
     try{
-        const { name, status } = req.body
+        let { name, status } = req.body
 
-        const existCategory = await categorySchema.findOne({name})
+        
+
+        const existCategory = await categorySchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
         if(existCategory){
             // throw new Error()
@@ -238,18 +240,16 @@ const editCategoryPost = async (req, res) => {
     const { newName, newStatus } = req.body
     const { name } = req.params
 
+    const categoryExist = await categorySchema.findOne({name: newName})
+    
+    if(categoryExist){
+        return res.status(403).json({success: false, message: "category already exist"})
+    }
+    
     const category = await categorySchema.findOne({name})
 
-    // if(!newName){
-    //     newName = category.name
-    // }
-
     let editingName = newName || category.name
-
-    console.log(newName, newStatus)
-
     let isListed = (newStatus=="active") ? true : false
-
 
     const edited = await categorySchema.findOneAndUpdate({name}, {$set: { name: editingName, isListed}})
 

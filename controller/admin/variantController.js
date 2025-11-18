@@ -203,11 +203,47 @@ const editVariantPost = async (req, res) => {
     }
 }
 
+const blockVariant = async (req, res) => {
+    try{
+        const { id } = req.body
+
+        console.log(id)
+                
+        await variantSchema.findOneAndUpdate({_id: id}, {$set: {isListed: false}})
+
+        res.status(200).json({message: "variant has been blocked"})
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to block the variant")
+        res.stauts(500).json({succcess: false, message: "failed to blck the variant"})
+    }
+}
+
+const unBlockVariant = async (req, res) => {
+    try{
+      const { id } = req.body
+
+    console.log(id)
+            
+    await variantSchema.findOneAndUpdate({_id: id}, {$set: {isListed: true}})
+
+    res.status(200).json({message: "variant has been un blocked"})
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to unblock the variant")
+        res.status(500).json({success: false, message: "something went wrong (unblock the variant )"})
+    }
+}
+
 module.exports = {
     variantManagement,
     addvariantPage,
     addvariantPost,
     editVariantPage,
     deleteImg,
-    editVariantPost
+    editVariantPost,
+    blockVariant,
+    unBlockVariant
 }

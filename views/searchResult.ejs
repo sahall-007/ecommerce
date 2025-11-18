@@ -185,6 +185,7 @@
                   <a href="/home" class="btn btn-dark text-white mb-3 mt-3 py-1 px-4">Back</a>
               </div> -->
               <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
+                <% let productName = allProducts.length ? allProducts[0].product.name : "" %>
                 <% allProducts.forEach(ele => { %>
                   <% if(ele.category.isListed && ele.product.isListed ){ %>
                     <div class="col" onclick='viewProduct("<%= ele._id %>")'>
@@ -327,10 +328,13 @@
 
   <script>
 
+    const productName = "<%= productName %>"
+
     const searchResult = document.getElementById("searchResult")
     
     const search = document.getElementById("search")
     
+    // to search for the products
     async function searchFilter(){
       searchResult.innerHTML = ""
 
@@ -370,14 +374,12 @@
                 <p class="mb-0">${data.product[i].name}</p>
                 <img src="/${data.product[i].variant.image[0]}" style="max-width: 40px; max-height: 40px">
               </a>
-              
-                <hr class="m-1">
+              <hr class="m-1">
             </div>
-                `)
-              }
-              
-              
-              // <img src="/${data.product.variant.image[0]}" style="max-width: 40px; max-height: 40px">
+        `)
+      }
+
+
     }
 
    
@@ -403,14 +405,14 @@
 
       // `/allProducts?category=${category.join(",")}&brand=${brand.join(",")}&min=${min}&max=${max}&sort=${sort}`
 
-      const result = await fetch('/filter', {
+      const result = await fetch('/searchFilter', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category, brand, min, max, sort })
       })
 
       if(result.status==200){
-        window.location.href = '/allProducts'
+        window.location.href = `/search?name=${productName}`
       }
       
       // console.log(category, brand, min, max)

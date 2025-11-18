@@ -70,8 +70,8 @@ router.route('/blockCategory')
 router.route('/unBlockCategory')
     .patch(categoryController.unBlockCategory)
 
-router.route('/deleteCategory')    
-    .delete(categoryController.deleteCategory)
+// router.route('/deleteCategory')    
+//     .delete(categoryController.deleteCategory)
 
 router.route('/category/next')
     .get(middleware.checkSession, categoryController.nextPage)
@@ -128,15 +128,15 @@ router.route('/productSearchResult/:name')
 // brand 
 
 router.route('/addBrand')
-    .get(brandController.addBrandPage)
+    .get(middleware.checkSession, brandController.addBrandPage)
     .post(brandController.addBrandPost)
 
 router.route('/brand')
-    .get(brandController.brandManagement)
+    .get(middleware.checkSession, brandController.brandManagement)
 
 
 router.route('/editBrand/:name')
-    .get(brandController.brandEditPage)
+    .get(middleware.checkSession, brandController.brandEditPage)
     .post(brandController.brandEditPost)
 
 router.route('/blockBrand')
@@ -145,14 +145,14 @@ router.route('/blockBrand')
 router.route('/unblockBrand')
     .patch(brandController.brandUnblock)
 
-router.route('/deleteBrand')
-    .delete(brandController.deleteBrand)
+// router.route('/deleteBrand')
+//     .delete(brandController.deleteBrand)
 
 router.route('/brand/next')
-    .get(brandController.nextPage)
+    .get(middleware.checkSession, brandController.nextPage)
 
 router.route('/brand/prev')
-    .get(brandController.prevPage)
+    .get(middleware.checkSession, brandController.prevPage)
 
 router.route('/searchBrand')
     .post(brandController.searchBrand)
@@ -163,19 +163,23 @@ router.route('/brandSearchResult/:name')
 
 // variant management
 router.route('/variant/:id')
-    .get(variantController.variantManagement)
+    .get(middleware.checkSession, variantController.variantManagement)
 
 router.route('/addVariant/:id')
-    .get(variantController.addvariantPage)
+    .get(middleware.checkSession, variantController.addvariantPage)
     .post(uploads.upload.any(), variantController.addvariantPost)
 
 router.route('/editVariant/:id')
-    .get(variantController.editVariantPage)
+    .get(middleware.checkSession, variantController.editVariantPage)
     .post(uploads.upload.any(), variantController.editVariantPost)
 
 router.route('/deleteImg')
     .post(variantController.deleteImg)
 
+router.route('/blockVariant')
+    .patch(variantController.blockVariant)
 
+router.route('/unBlockVariant')
+    .patch(variantController.unBlockVariant)
 
 module.exports = router

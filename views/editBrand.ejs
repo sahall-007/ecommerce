@@ -190,7 +190,7 @@
             sidebar.classList.toggle('show');
             });
 
-            const brand = "<%= brand %>"
+            const brandName = "<%= brand.name %>"
 
             document.getElementById("submitBtn").addEventListener('click', (event) => {
                 
@@ -211,7 +211,7 @@
                 }
 
                 try{
-                    const result = fetch(`/admin/EditBrand/${brand.name}`, {
+                    const result = fetch(`/admin/EditBrand/${brandName}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ newName: brand.value, newStatus: status.value })
@@ -224,6 +224,7 @@
                                 icon: "success",
                                 timer: 1500
                             })
+                            .then(() => window.location.href = "/admin/brand")
                         }
                         else{
                             swal.fire({
@@ -232,6 +233,7 @@
                                 icon: "error",
                                 timer: 1500
                             })
+                            
                         }
                     })
                 }

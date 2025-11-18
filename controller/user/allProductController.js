@@ -3,6 +3,7 @@ const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
+const { options } = require('../../routes/user.js')
 
 
 const allProducts = async (req, res) => {
@@ -256,25 +257,46 @@ const search = async (req, res) => {
 
         let filter = search.split("").map(ele => `(?=.*${ele})`).join("")
 
-        let regex = new RegExp(`^${filter}.*$`)
+        console.log(filter)
 
-        const product = await productSchema.find({name: {$regex: regex, $options: 'i'}}, {name: 1})
+        // let regex = new RegExp(`^${filter}.*$`)
 
-        const variant = await variantSchema.aggregate([
+        // const product = await productSchema.find({name: {$regex: regex, $options: 'i'}}, {name: 1})
+
+        const product = await productSchema.aggregate([
+            // {$addFields: {productName: {$regexMatch: {input: "$name", regex: new RegExp(`^${filter}.*$`), options: "i"}}}},
+            // {$regexMatch: {input: "$name", regex: new RegExp(`^${filter}.*$`), options: "i"}},
+            {$match: {name: {$regex: new RegExp(`^${filter}.*$`), $options: 'i'}}},
             {$lookup: {
-                from: "products",
-                localField: "productId",
-                foreignField: "_id",
-                as: "product"
+                from: "variants",
+                let: {id: "$_id"},
+                pipeline: [
+                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+                    {$limit: 1},
+                    {$project: {image: 1}}
+                ],
+                as: "variant"
             }},
-            {$unwind: "$product"},
-            {$match: {"product.name": {$regex: regex, $options: 'i'}}},
-            {$project: {"product.name": 1, _id: 1}}
+            {$unwind: "$variant"},
+            {$project: {name: 1, _id: 1, variant: 1}},
+          
         ])
 
-        console.log(variant)
+        // const variant = await variantSchema.aggregate([
+        //     {$lookup: {
+        //         from: "products",
+        //         localField: "productId",
+        //         foreignField: "_id",
+        //         as: "product"
+        //     }},
+        //     {$unwind: "$product"},
+        //     {$match: {"product.name": {$regex: regex, $options: 'i'}}},
+        //     {$project: {"product.name": 1, _id: 1}}
+        // ])
 
-        res.status(200).json({variant, success: true, message: "search success"})
+        console.log(product)
+
+        res.status(200).json({product, success: true, message: "search success"})
     }
     catch(err){
         console.log(err)

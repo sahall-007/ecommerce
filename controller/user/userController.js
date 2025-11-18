@@ -105,7 +105,11 @@ const registerUser = async (req, res) => {
             return res.json({message: "error sendig email"})
         }
 
-        req.session.userOTP = otp
+        req.session.userOTP = {
+            otp,
+            expiryAt: Date.now() + 30*1000
+        }
+    
         req.session.userData = { username, email, password }
 
         res.redirect('/otp')
@@ -167,6 +171,8 @@ const loadOtpPage = async (req, res) =>{
         // req.session.userOTP = 123456
         console.log(req.session.userOTP)
         res.render('otp', { otp: req.session.userOTP })
+
+        
     }
     catch(err){
         console.log(err)
@@ -180,10 +186,16 @@ const verifyOtp = async (req, res) => {
     try{
         const { otp } = req.body
         
+        
         console.log("this is working - otp: ", otp)
         console.log("this is session: ", req.session.userOTP)
+
+        if(Date.now() > req.session.userOTP.expiryAt){
+            console.log("otp expired------------")
+            return res.status(400).json({success: false, message: "invalid OTP, please try again"})
+        }
         
-        if(otp == req.session.userOTP){
+        if(otp == req.session.userOTP.otp){
             
             const user = req.session.userData
             const hashedPassword = await bcrypt.hash(user.password, salt)
@@ -222,7 +234,11 @@ const resendOtp = async (req, res) => {
 
         const otp = generateOtp()
 
-        req.session.userOTP = otp
+        req.session.userOTP = {
+            otp,
+            expiryAt: Date.now() + 30 * 1000
+        }
+        console.log(otp)
 
         
         const emailSent = await sendVerificationEmail(email, otp)

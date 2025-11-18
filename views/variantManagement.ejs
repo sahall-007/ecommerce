@@ -347,8 +347,8 @@
         }
 
         async function confirmBlock(){
-            console.log("its hitting.........")
-            const res = await fetch('/admin/blockProduct', {
+            alert("its hitting.........")
+            const res = await fetch('/admin/blockVariant', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: blockId })
@@ -357,8 +357,8 @@
         }
 
         async function confirmUnBlock(){
-            console.log("un block confirm")
-            const res = await fetch('/admin/unblockProduct', {
+            alert("un block confirm")
+            const res = await fetch('/admin/unBlockVariant', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: unBlockId })

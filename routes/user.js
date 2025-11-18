@@ -6,6 +6,7 @@ const allProducctController = require('../controller/user/allProductController.j
 const middleware = require('../middlewares/userAuth.js')
 const passport = require('passport');
 const profileController = require('../controller/user/profileController.js')
+const searchController = require('../controller/user/searchController.js');
 
 const router = express.Router()
 
@@ -49,14 +50,13 @@ router.route('/productDetail/:id')
     .get(middleware.checkSession, userController.productDetail)
 
 router.route('/allProducts')
-    .get(middleware.checkSession, allProducctController.allProducts)
+    .get(allProducctController.allProducts)
 
 router.route('/filter')
     .get(middleware.checkSession, allProducctController.filterPage)
     .post(allProducctController.filter)
 
-router.route('/search')
-    .post(allProducctController.search)
+// router.route('/search')
 
 router.route('/allProducts/next')
     .get(allProducctController.nextPage)
@@ -70,5 +70,25 @@ router.route('/forgotPassword')
 
 router.route('/forgotEmailValidation')
     .post(profileController.forgotEmailValidation)
+
+router.route('/forgotOtp')
+    .get(profileController.otpPage)
+    .post(profileController.otpPost)
+
+router.route('/changePassword')
+    .get(profileController.changePassword)
+    .post(profileController.changePasswordPost)
+
+router.route('/forgotResendOtp')
+    .post(profileController.forgotResendOtp)
+
+// search result
+router.route('/search')
+    .get(searchController.searchResult)
+    .post(allProducctController.search)
+
+router.route('/searchFilter')
+    .post(searchController.searchFilter)
+
 
 module.exports = router

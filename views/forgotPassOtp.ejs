@@ -80,7 +80,7 @@
 
   <script>
 
-    const receivedOTp = "<%= otp %>";
+   
     
     // Demo-only client-side logic (replace with real server validation in production)
     const otpInputs = Array.from(document.querySelectorAll('.otp'));
@@ -176,12 +176,12 @@ if (!resumeCountdownIfExists()) {
       //  alert("both are same")
         $.ajax({
           type: "POST",
-          url: "/otp",
+          url: "/forgotOtp",
           data: {otp:code},
           success: function(response){
             if(response.success)
             showMessage('OTP verified — success!','success'); 
-            window.location.href = '/'
+            window.location.href = '/changePassword'
           },
           error: function (){
             showMessage('Incorrect code. Please try again.','error'); 
@@ -202,7 +202,7 @@ if (!resumeCountdownIfExists()) {
 
       $.ajax({
         type: "POST",
-        url: "/resendOtp",
+        url: "/forgotResendOtp",
         success: function(response){
           if(response.success)
           showMessage('OTP resend — success!','success'); 

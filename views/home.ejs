@@ -87,7 +87,7 @@
 
   <!-- Hero Section -->
   <section class="my-2">
-    <div class="container hero">
+    <div class="container-sm hero">
       <img src="/images/category/msi.jpeg" class="w-100" alt="">
         <!-- <div>
             <h1>Discover the Best Deals Online</h1>
@@ -99,7 +99,7 @@
 
   <!-- Featured Products -->
   <section id="featured" class="bg-light pb-5">
-    <div class="container">
+    <div class="container-sm">
         <div class="d-flex justify-content-between">
             <h2 class="fs-3 mb-3">New arrivals</h2>
             <!-- <a href="/allProducts" class="btn btn-outline-dark align-self-end fs-6 text-decoration-none mb-1">More ></a> -->
@@ -123,7 +123,10 @@
 
                   <div class="d-flex gap-3 justify-content-center">
                     <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
-                    <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                    <div class="d-flex gap-1">
+                      <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %> </p>
+                      <p class="text-dark" style="font-size: small;"> <%= ele.productDoc.discount %>% off</p>
+                    </div>
                   </div>
 
                   <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
@@ -138,7 +141,7 @@
   </section>
 
     <section id="offer" class="bg-light py-5">
-    <div class="container">
+    <div class="container-sm">
         <div class="d-flex justify-content-between">
             <h2 class="fs-3 mb-3">In offer</h2>
             <!-- <h2 class="align-self-end fs-6">view all</h2> -->

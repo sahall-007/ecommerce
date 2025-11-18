@@ -26,6 +26,17 @@ const productManagement = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
+            {$lookup: {
+                from: "variants",
+                let: {id: "$_id"},
+                pipeline: [
+                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+                    {$limit: 1},
+                    {$project: {image: 1}}
+                ],
+                as: "variant"
+            }},
+            {$unwind: "$variant"},
             {$sort: {_id: -1}},
             {$limit: limit}
         ])
@@ -299,6 +310,17 @@ const nextPage = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
+            {$lookup: {
+                from: "variants",
+                let: {id: "$_id"},
+                pipeline: [
+                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+                    {$limit: 1},
+                    {$project: {image: 1}}
+                ],
+                as: "variant"
+            }},
+            {$unwind: "$variant"},
             {$sort: {_id: -1}},
             {$skip: limit*pageNo},
             {$limit: limit}
@@ -349,6 +371,17 @@ const prevPage = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
+            {$lookup: {
+                from: "variants",
+                let: {id: "$_id"},
+                pipeline: [
+                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+                    {$limit: 1},
+                    {$project: {image: 1}}
+                ],
+                as: "variant"
+            }},
+            {$unwind: "$variant"},
             {$sort: {_id: -1}},
             {$skip: limit*pageNo},
             {$limit: limit}

@@ -16,7 +16,7 @@ const checkSession = (req, res, next) => {
 const hasSession = (req, res, next) => {
     if(req.session.user || req.session.passport){
         // console.log("has session")
-        res.redirect('/home')
+        res.redirect('/')
     }
     else{
         next()

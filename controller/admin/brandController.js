@@ -15,11 +15,12 @@ const addBrandPage = async (req, res) => {
 
 const addBrandPost = async (req, res) => {
     try{
-        const { name, status } = req.body
+        let { name, status } = req.body
 
+        // name = name.toLowerCase()
+        // console.log(name, status)
 
-        console.log(name, status)
-        const brandExist = await brandSchema.findOne({name})
+        const brandExist = await brandSchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
         if(brandExist){
             return res.status(403).json({success: false, message: "brand already exist"})
@@ -83,11 +84,19 @@ const brandEditPost = async (req, res) => {
     try{
         const { newName, newStatus } = req.body
         const { name } = req.params
-    
+
+        const brandExist = await brandSchema.findOne({name: newName})
+        
+        // let lowerCaseNewName = newName.toLowerCase()
+        // let lowerCaseCurrentName = brand.name.toLowerCase()
+        
+        if(brandExist){
+            return res.status(403).json({success: false, message: "Brand already exist"})
+        }
+
         const brand = await brandSchema.findOne({name})
         
         let editingName = newName || brand.name
-    
         let isListed = (newStatus=="active") ? true : false
     
         const edited = await brandSchema.findOneAndUpdate({name}, {$set: { name: editingName, isListed}})

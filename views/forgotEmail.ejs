@@ -131,7 +131,7 @@
         feedback.textContent = '';
       }
 
-      form.addEventListener('submit', function(ev){
+      form.addEventListener('submit', async function(ev){
         ev.preventDefault();
         clearMessage();
         const raw = email.value;
@@ -154,11 +154,23 @@
         submitBtn.textContent = 'Sending...';
 
         // simulate network request (replace with actual fetch)
-        setTimeout(()=>{
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Send reset link';
-          showMessage('success', 'If an account exists for that email, a reset link has been sent.');
-        }, 900);
+        // setTimeout(()=>{
+        //   submitBtn.disabled = false;
+        //   submitBtn.textContent = 'Send reset link';
+        //   showMessage('success', 'If an account exists for that email, a reset link has been sent.');
+        // }, 900);
+
+        const request = await fetch('/forgotEmailValidation', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: raw })
+        })
+        .then(() => window.location.href = "/forgotOtp")
+        
+        // if(request.status==200){
+        //   window.location.href = "/forgotOtp"
+        // }
+
       });
 
       cancelBtn.addEventListener('click', ()=>{
@@ -178,7 +190,7 @@
           email.focus();
           return;
         }
-        showMessage('success', 'A new reset link has been sent (simulated).');
+         ('success', 'A new reset link has been sent (simulated).');
       });
 
       // accessibility: press Enter on input submits; trim trailing/leading spaces on blur

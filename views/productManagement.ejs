@@ -189,7 +189,10 @@
                                         <tr onclick='productInfo("<%= product._id%>")'>
                                             <td><%= index+1 %></td>
                                             <td class="py-1">
-                                                <%= product.name %>
+                                                <div class="d-flex gap-3">
+                                                    <img src="/<%= product.variant.image[0] %>" alt="" style="max-width: 50px; max-height: 50px;">
+                                                    <%= product.name %>
+                                                </div>
                                             </td>
                                             <td>
                                                 <%= product.discription %>
@@ -331,15 +334,18 @@
         // }
 
         function block(id){
+            event.stopPropagation();
             blockId = id
         }
 
         function unBlock(id){
+            event.stopPropagation();
             unBlockId = id
             console.log(id)
         }
 
         function deleteCategory(id){
+            event.stopPropagation();
             deleteId = id
         }
 
