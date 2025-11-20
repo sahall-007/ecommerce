@@ -102,11 +102,11 @@
     <div class="container-sm">
         <div class="d-flex justify-content-between">
             <h2 class="fs-3 mb-3">New arrivals</h2>
-            <!-- <a href="/allProducts" class="btn btn-outline-dark align-self-end fs-6 text-decoration-none mb-1">More ></a> -->
+            <a href="/newArrivals" class="btn btn-outline-dark align-self-end fs-6 text-decoration-none mb-1">More ></a>
         </div>
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
         <% newArrivals.forEach(ele => { %>
-          <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
+          <% if(ele.categoryDoc.isListed && ele.productDoc.isListed && ele.isListed ){ %>
             <div class="col" onclick='viewProduct("<%= ele._id %>")'>
               <div class="card product-card border border-0 shadow-sm">
                 <img src="<%= ele.image[0] %>" class="card-img-top">
@@ -181,29 +181,7 @@
   </section>
 
     <!-- Categories -->
-  <section id="categories" class="container py-5">
-    <h2 class="text-center mb-4">Shop by Category</h2>
-    <div class="row g-4">
-      <div class="col-md-4">
-        <div class="category-card text-center">
-          <img src="/images/category/phone.png" class="w-100 mb-3">
-          <h5>Smart phones</h5>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="category-card text-center">
-          <img src="/images/category/laptop.png" class="w-100 mb-3">
-          <h5>Laptops</h5>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="category-card text-center">
-          <img src="/images/category/smartwatch.jpeg" class="w-100 mb-3">
-          <h5>Smart watches</h5>
-        </div>
-      </div>
-    </div>
-  </section>
+  
 
     <!-- <section id="trending" class="bg-light py-5">
     <div class="container">
@@ -271,6 +249,8 @@
   </footer>
 
   <script>
+
+    window.addEventListener("unload", function () {});
     
     function viewProduct(id){
       window.location.href = `/productDetail/${id}`

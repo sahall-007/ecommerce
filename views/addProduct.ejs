@@ -66,17 +66,17 @@
 <body>
 
   <!-- Navbar -->
-  <nav class="navbar bg-black navbar-dark">
-    <div class="container d-flex justify-content-between align-items-center">
-      <a class="navbar-brand text-light" href="#">Logo</a>
-
-      <!-- Hamburger button visible only below md -->
-      <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
-    </div>
-  </nav>
+  <nav class="navbar bg-black">
+        <div class="container">
+            <a class="navbar-brand text-light" href="#">
+                <i class="bi bi-box me-2"></i> ShopEase
+            </a>
+            <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
+        </div>
+    </nav>
 
 
     <div class="container px-0 mt-5">
@@ -283,6 +283,10 @@
                                             image</label>
                                         <input id="image-1" type="file" name="image-1" accept="image/*" multiple onchange="newFile(1)"
                                             class="border border-black d-none">
+                                        
+                                    </div>
+
+                                    <div class="d-flex justify-content-center mt-3" id="image-msg-1">
                                         <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
                                     </div>
 
@@ -348,8 +352,8 @@
             event.preventDefault()
 
             if(cropCount[variantSessionNumber-1] < 3 || cropCount[variantSessionNumber-1] == undefined){
-                alert("working")
                 document.getElementById(`imageMsg-${variantSessionNumber}`).textContent = "Minimum 3 images needed, maximum 5"
+                window.location.href = `#image-msg-${variantSessionNumber}`
                 return 1
             }
 
@@ -495,6 +499,20 @@
             if (file) {
                 
                 for (let i = 0; i < length; i++) {
+
+                    if (!file[i].type.startsWith("image/")) {
+
+                            imageInput.value = "";
+                            
+                            Swal.fire({
+                                icon: "error",
+                                title: "Invalid File",
+                                text: `Only image files are accepted`,
+                            });
+
+
+                            return; 
+                        }
                     
                     if(imageCount[id-1]==undefined) imageCount[id-1] = 1
                     else imageCount[id-1]++
@@ -726,7 +744,6 @@
 
             for(let i=1; i<=variantCount; i++){
                 console.log(variantCount)
-                console.log("worururururuur")
                 const ram = document.getElementById("ram-" + i)
                 const storage = document.getElementById("storage-" + i)
                 const color = document.getElementById("color-" + i)
@@ -850,7 +867,7 @@
                             icon: "error",
                             timer: 1500
                         })
-                        .then(() => window.location.href = "/admin/product")
+                        
                     }
                 })
                 

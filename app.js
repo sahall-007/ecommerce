@@ -1,7 +1,8 @@
 const express = require("express")
 const connected = require('./db/connectDB.js')
 const userRoute = require('./routes/user.js')
-const adminRoute = require('./routes/admin.js')
+const adminRoute = require('./routes/admin/admin.js')
+
 const session = require('express-session')
 const nocache = require('nocache')
 const passport = require('./config/passport.js')

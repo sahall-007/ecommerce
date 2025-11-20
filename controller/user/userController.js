@@ -2,6 +2,8 @@
 const userSchema = require('../../model/userSchema.js')
 const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
+const categorySchema = require('../../model/categorySchema.js')
+const brandSchema = require('../../model/brandSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
@@ -138,19 +140,20 @@ const loginPost = async (req, res) => {
     try{
         const { username, email, password } = req.body
 
-        const userExist = await userSchema.find({username})
+        const userExist = await userSchema.find({email})
 
-        if(!userExist){
-            return res.status(401).json({success: false, message: "create an account first"})
+        if(!email){
+            return res.status(404).json({success: false, message: "create an account first"})
         }
 
         const isMatch = await bcrypt.compare(password, userExist[0].password)
-        if (!isMatch || userExist[0].username !== username) {
-            return res.status(401).redirect('/login')
+        if (!isMatch || userExist[0].email !== email) {
+            return res.status(401).json({success: false, message: "invalid email or password"})
         }
 
         req.session.user = userExist[0]._id
-        res.redirect('/')
+        res.status(200).json({success: true, message: "successfully logged in"})
+        // res.redirect('/')
 
     }
     catch(err){
@@ -263,6 +266,9 @@ const resendOtp = async (req, res) => {
 // to get the home page
 const getHomePage = async (req, res) => {
     try{
+
+        console.log("working")
+
         const inOffer = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -279,7 +285,14 @@ const getHomePage = async (req, res) => {
                 as: "categoryDoc"
             } },
             { $unwind: "$categoryDoc" },
-            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
+            {$lookup: {
+                from: "brands",
+                localField: "productDoc.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             { $sample: { size: 5 }}
         ])
         
@@ -299,7 +312,14 @@ const getHomePage = async (req, res) => {
                 as: "categoryDoc"
             }},
             {$unwind: "$categoryDoc"},
-            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
+            {$lookup: {
+                from: "brands",
+                localField: "productDoc.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             {$sample: {size: 10}}
         ])
 
@@ -367,7 +387,14 @@ const productDetail = async (req, res) => {
                 foreignField: "_id",
                 as: "categoryDoc"
             }},
-            {$unwind: "$categoryDoc"}
+            {$unwind: "$categoryDoc"},
+            {$lookup: {
+                from: "brands",
+                localField: "productDoc.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"}
         ])
 
         console.log(variant)
@@ -406,6 +433,97 @@ const productDetail = async (req, res) => {
     }
 }
 
+const newArrivals = async (req, res) => {
+    try{
+        const filter = {}
+        const toSort = {}
+
+        if(req.session.filter){
+            const { category, brand, min, max, sort } = req.session.filter
+    
+            if(category?.length){
+                filter["category.name"] = {$in: category}
+            }
+            if(brand?.length){
+                filter["brand.name"] = {$in: brand}
+            }
+            if(min || max){
+                if(min=="" && max!="") filter.price = {$gte: 0, $lte: +max}            
+                if(min!="" && max=="") filter.price = {$gte: +min, $lte: Infinity}            
+                if(min!="" && max!="") filter.price = {$gte: +min, $lte: +max}
+            }
+            if(sort){
+                if(sort=="none") toSort.$sort = {"natural": 1}
+    
+                else if(sort=="h-l") toSort.$sort = {price: -1}
+                else if(sort=="l-h") toSort.$sort = {price: 1}
+                
+                else if(sort=="a-z") toSort.$sort = {"product.name": 1}
+                else if(sort=="z-a") toSort.$sort = {"product.name": -1}
+            }
+        }
+        else{
+            toSort.$sort = {"natural": 1}
+        }
+     
+        const variantCount = await variantSchema.countDocuments()
+        const limit = 12
+
+        const allProducts = await variantSchema.aggregate([
+            {$sort: {_id: -1}},
+            {$lookup: {
+                from: "products",
+                localField: "productId",
+                foreignField: "_id",
+                as: "product"
+            }},
+            {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
+            {$match: filter},
+            {$sample: {size: limit}},
+            toSort,
+            {$limit: limit},
+        ])
+
+        console.log(filter)
+        console.log(toSort)
+
+        const category = await categorySchema.find({isListed: true}, {name: 1})
+        const brand = await brandSchema.find({isListed: true}, {name: 1})
+
+        if(allProducts.length < limit){
+            req.session.filter = null
+            return res.status(200).render('newArrivals', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+        if(limit>=variantCount){
+            req.session.filter = null
+            console.log("inside condition")
+            return res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+        req.session.filter = null
+        res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to get new arrivals page")
+        res.status(500).json({success: false, message: "something went wrong (get new arrivals)"})
+    }
+}
 
 module.exports = {
     loadRegister,
@@ -417,5 +535,6 @@ module.exports = {
     resendOtp,
     getHomePage,
     logout,
-    productDetail
+    productDetail,
+    newArrivals
 }

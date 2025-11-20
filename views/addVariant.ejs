@@ -64,7 +64,7 @@
     <nav class="navbar bg-black">
         <div class="container">
             <a class="navbar-brand text-light" href="#">
-                Logo
+                <i class="bi bi-box me-2"></i> ShopEase
             </a>
             <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
                 <span class="navbar-toggler-icon"></span>
@@ -213,11 +213,15 @@
                                         </div>
                                     </div>
 
-                                    <div class=" mt-4 d-flex justify-content-center">
+                                    <div class=" mt-4 d-flex justify-content-center " id="image-input">
                                         <label for="image-1" class="image-label rounded border-danger bg-light p-5">Add
                                             image</label>
                                         <input id="image-1" type="file" name="image-1" accept="image/*" multiple onchange="newFile(1)"
                                             class="border border-black d-none">
+                                        
+                                    </div>
+
+                                    <div class="d-flex justify-content-center mt-3" id="image-msg-1">
                                         <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
                                     </div>
 
@@ -263,6 +267,8 @@
 
             let croppers = []
             let count = 0
+            let cropCount = 0
+            let imageCount = 0
 
             function newFile(id){
                const imageInput = document.getElementById("image-" + id)                           
@@ -270,8 +276,32 @@
 
                 const file = imageInput.files
 
+                let length = (file.length > 5) ? 5 : file.length
+
                 if(file){
-                    for(let i=0; i<file.length; i++){
+                    for(let i=0; i<length; i++){
+
+                        if (!file[i].type.startsWith("image/")) {
+
+                            // Clear wrong file
+                            imageInput.value = "";
+                            
+                            // Show SweetAlert error
+                            Swal.fire({
+                                icon: "error",
+                                title: "Invalid File",
+                                text: `Only image files are accepted`,
+                            });
+
+
+                            return; // Stop further execution
+                        }
+
+                        imageCount++
+
+                        if(imageCount>=5){
+                            document.getElementById(`image-input`).classList.add("d-none")
+                        }
 
                         count+=1
 
@@ -279,10 +309,12 @@
                             <div class="position-relative pb-5" id="imgContainer${count}">
                                 <div class="d-flex gap-3 position-absolute bottom-0 start-50 translate-middle-x">
                                     <button class="btn btn-dark text-light py-1 px-3  " id="cropperBtn${count}" onclick="cropImg(this, ${count}, ${id})">Crop</button>
-                                    <button class="btn btn-danger text-light py-1 px-3 " id="deleteBtn${count}" onclick="deleteImg(this, ${count})">Delete</button>
+                                    
                                 </div>
                             </div>
                         `)
+
+                        // <button class="btn btn-danger text-light py-1 px-3 " id="deleteBtn${count}" onclick="deleteImg(this, ${count})">Delete</button>
 
                         const imgContainer = document.getElementById(`imgContainer${count}`)
 
@@ -353,6 +385,8 @@
 
                 console.log("this is blob during btn click",  croppedBlob)
 
+                cropCount++
+
                 setTimeout(() => {
                     croppers.pop()
                 }, 100);
@@ -372,6 +406,7 @@
                 }
 
                 deleteCount+=1
+                imageCount--
 
                 const grandParent = element.parentElement.parentElement
 
@@ -399,6 +434,7 @@
                 const colorMsg = document.getElementById("colorMsg-1");
                 const quantityMsg = document.getElementById("quantityMsg-1");
                 const priceMsg = document.getElementById("priceMsg-1");
+                const imageMsg = document.getElementById("imageMsg-1")
 
                 if( !ramRegex.test(ram.value) && !storageRegex.test(storage.value) && !colorRegex.test(color.value) && !storageRegex.test(quantity.value) && !priceRegex.test(price.value)){
                     ramMsg.textContent = "invalid ram format"
@@ -461,6 +497,14 @@
                     quantityMsg.textContent = ""
                     priceMsg.textContent = ""
                 }
+
+                if(cropCount<3){
+                 imageMsg.textContent = "minimum 3 cropped images required, maaximum 5"   
+
+                 return
+                }
+
+
 
                 const form = document.getElementById("productForm")
                 console.log(form)

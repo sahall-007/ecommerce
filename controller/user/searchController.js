@@ -73,10 +73,10 @@ const searchResult = async (req, res) => {
             // {$limit: limit},
         ])
 
-        console.log(allProducts)
-        console.log(filter)
-        console.log(toSort)
-        console.log(name)
+        // console.log(allProducts)
+        // console.log(filter)
+        // console.log(toSort)
+        // console.log(name)
 
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})

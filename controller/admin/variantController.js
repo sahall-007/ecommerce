@@ -38,9 +38,9 @@ const addvariantPost = async (req, res) => {
     try{
 
         const { id } = req.params
-        console.log(id)
-        console.log("this is variant body", req.body)
-        console.log("this is variant img files", req.files)
+        // console.log(id)
+        // console.log("this is variant body", req.body)
+        // console.log("this is variant img files", req.files)
 
         let images = {}
         for(let i=0; i<req.files.length; i++){
@@ -56,7 +56,7 @@ const addvariantPost = async (req, res) => {
             }
         }
 
-        console.log(images)
+        // console.log(images)
 
         let { ram, storage, color, quantity, price } = req.body
 
@@ -72,7 +72,7 @@ const addvariantPost = async (req, res) => {
             productId: product._id
         })
 
-        console.log("new variant", newVariant)
+        // console.log("new variant", newVariant)
 
         res.status(200).json({message: "kalapilaaa"})
     }
@@ -87,8 +87,8 @@ const editVariantPage = async (req, res) => {
 
         const variant = await variantSchema.findOne({_id: id})
 
-        console.log(id)
-        console.log(variant)
+        // console.log(id)
+        // console.log(variant)
 
         res.status(200).render('editVariant', { variant, images: variant.image, productId: variant.productId})
     }
@@ -126,8 +126,8 @@ const deleteImg = async (req, res) => {
 const editVariantPost = async (req, res) => {
     try{
         const { id } = req.params
-        console.log(req.files)
-        console.log(req.body)
+        // console.log(req.files)
+        // console.log(req.body)
 
         // ---------------- to update the variant details -------------------
 

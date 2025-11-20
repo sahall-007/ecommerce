@@ -64,7 +64,7 @@
     <nav class="navbar bg-black">
         <div class="container">
             <a class="navbar-brand text-light" href="#">
-                Logo
+                <i class="bi bi-box me-2"></i> ShopEase
             </a>
             <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
                 <span class="navbar-toggler-icon"></span>
@@ -222,6 +222,7 @@
                                         </div>
                                     </div>
 
+                                    
                                     <div class=" mt-4 d-flex justify-content-center">
                                         <label for="image-1" class="image-label rounded border-danger bg-light p-5">Add
                                             image</label>
@@ -229,6 +230,8 @@
                                             class="border border-black d-none">
                                         <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
                                     </div>
+                                    
+                                    
 
                                     <div class="row justify-content-center">
                                         <div class="col-2">
@@ -253,6 +256,7 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
         <script>
+            const images = "<%= images%>"
             const variantId = "<%= variant._id %>"
             const productId = "<%= productId %>"
             const sidebar = document.querySelector('.sidebar');
@@ -290,12 +294,10 @@
                             container.remove()
                         }
                         else{
-                            alert("not working")
                         }
                     })
                 }
                 catch(err){
-                    alert("something went wrong (delete image)")
                     console.log(err)
                 }
             }
@@ -308,6 +310,19 @@
                 const changeImg = document.getElementById(`changeImg${imageIndex}`)
 
                 const file = changeImg.files[0]
+
+                if(!file.type.startsWith("image/")){
+                    changeImg.value = "";
+                            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid File",
+                        text: `Only image files are accepted`,
+                    });
+
+
+                    return;
+                }
 
                 if(file){
                     const reader = new FileReader()
@@ -388,6 +403,21 @@
 
                 if(file){
                     for(let i=0; i<file.length; i++){
+
+                        if (!file[i].type.startsWith("image/")) {
+
+                            // Clear wrong file
+                            imageInput.value = "";
+
+                            // Show SweetAlert error
+                            Swal.fire({
+                                icon: "error",
+                                title: "Invalid File",
+                                text: `${file.name} is not an image file.`,
+                            });
+
+                            return; // Stop further execution
+                        }
 
                         count+=1
 
@@ -613,7 +643,6 @@
                 });
 
                 try{
-                    alert("inside try")
                     const res = await fetch(`/admin/editVariant/${variantId}`, {
                         method: "POST",
                         body: formdata

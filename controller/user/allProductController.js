@@ -9,6 +9,30 @@ const { options } = require('../../routes/user.js')
 const allProducts = async (req, res) => {
     try {
 
+        const referer = req.get("Referer");
+
+        if (referer) {
+            const url = new URL(referer);
+            console.log(url.pathname);  // this gives the path
+        }
+        
+        
+
+        let breadCrumbs
+
+        if(req.get("Referer")=="http://localhost:3000/"){
+            breadCrumbs = [
+                {name: "Home", url: "/"},
+                {name: "All products", url: '/allProducts'}
+            ]
+        }
+        else{
+            breadCrumbs = [
+                {name: "Home", url: "/"},
+                {name: req.get("Referer"), url: req.get("Referer")},
+                {name: "All products", url: '/allProducts'}
+            ]
+        }
         
         const filter = {}
         const toSort = {}
@@ -73,8 +97,8 @@ const allProducts = async (req, res) => {
             {$limit: limit},
         ])
 
-        console.log(filter)
-        console.log(toSort)
+        // console.log(filter)
+        // console.log(toSort)
 
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})

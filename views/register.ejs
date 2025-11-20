@@ -33,25 +33,25 @@
                         <div class="form-field mt-5 mb-4 position-relative">
                             <i class="bi bi-person-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" id="name" type="text" placeholder="Username" name="username">
-                            <p class="text-danger" id="usernameMsg" style="font-size: small;"><%= username %></p>
+                            <p class="text-danger" id="usernameMsg" style="font-size: small;  max-width: 320px;"><%= username %></p>
                         </div>
 
                         <div class="form-field mb-4 position-relative">
                             <i class="bi bi-envelope-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" id="email" type="text" placeholder="Email" name="email">
-                            <p class="text-danger" id="emailMsg" style="font-size: small;"><%= email %></p>
+                            <p class="text-danger" id="emailMsg" style="font-size: small;  max-width: 320px;"><%= email %></p>
                         </div>
 
                         <div class="form-field mb-4 position-relative">
                             <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" id="password" type="password" placeholder="Password" name="password">
-                            <p class="text-danger" id="passMsg" style="font-size: small;"><%= password %></p>
+                            <p class="text-danger" id="passMsg" style="font-size: small;  max-width: 320px;"><%= password %></p>
                         </div>
 
                         <div class="form-field mb-5 position-relative">
                             <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
                             <input class="w-100 pe-5" id="confirmPassword" type="password" placeholder="confirm" name="confirm">
-                            <p class="text-danger" id="confirmPassMsg" style="font-size: small;"><%= confirm %></p>
+                            <p class="text-danger" id="confirmPassMsg" style="font-size: small;  max-width: 320px;"><%= confirm %></p>
                         </div>
 
                         <div>
@@ -102,15 +102,15 @@
             if(!usernameRegex.test(username.value) && !emailRegex.test(email.value) && !passwordRegex.test(password.value) && !confirmPasswordRegex.test(confirmPassword.value)){
                 event.preventDefault()
 
-                usernameMsg.textContent = "Invalid username format"
-                emailMsg.textContent = "Invalid Email format"
-                passMsg.textContent = "Invalid password format"
-                confirmPassMsg.textContent = "Invalid confirm password format"
+                usernameMsg.textContent = "Must be 3 to 15 chars long. should only contain letters"
+                emailMsg.textContent = "Use a email address like john.doe@example.com characters like these are allowed: . _ % + -"
+                passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
             }
             else if(!usernameRegex.test(username.value)){
                 event.preventDefault()
 
-                usernameMsg.textContent = "Invalid username format"
+                usernameMsg.textContent = "Must be 3 to 15 chars long. should only contain letters"
                 emailMsg.textContent = ""
                 passMsg.textContent = ""
                 confirmPassMsg.textContent = ""
@@ -119,7 +119,7 @@
                 event.preventDefault()
 
                 usernameMsg.textContent = ""
-                emailMsg.textContent = "Invalid email format"
+                emailMsg.textContent = "Use a email address like john.doe@example.com characters like these are allowed: . _ % + -"
                 passMsg.textContent = ""      
                 confirmPassMsg.textContent = ""          
             }
@@ -128,7 +128,7 @@
 
                 usernameMsg.textContent = ""
                 emailMsg.textContent = ""
-                passMsg.textContent = "Invalid password format"                  
+                passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"                  
                 confirmPassMsg.textContent = ""
             }
             else if(!confirmPasswordRegex.test(confirmPassword.value)){
@@ -137,7 +137,7 @@
                 usernameMsg.textContent = ""
                 emailMsg.textContent = ""
                 passMsg.textContent = ""                  
-                confirmPassMsg.textContent = "Invalid confirm password format"
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
             }
             else{
                 usernameMsg.textContent = ""

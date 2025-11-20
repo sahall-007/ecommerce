@@ -430,11 +430,40 @@ const searchResult = async (req, res) => {
             return res.render('productManagement', { products: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
-        const product = await productSchema.findOne({name})
+        // const product = await productSchema.findOne({name})
+        const products = await productSchema.aggregate([
+            {$match: {name}},
+            {$lookup: {
+                from: "categories",
+                localField: "categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$lookup: {
+                from: "variants",
+                let: {id: "$_id"},
+                pipeline: [
+                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+                    {$limit: 1},
+                    {$project: {image: 1}}
+                ],
+                as: "variant"
+            }},
+            {$unwind: "$variant"},
+            
+        ])
 
-        let arr = [product]
+        // let arr = [product]
 
-        res.render('productManagement', { products: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+        res.render('productManagement', { products, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }
     catch(err){
         console.log(err)

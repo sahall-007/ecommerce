@@ -50,7 +50,7 @@ router.route('/productDetail/:id')
     .get(middleware.checkSession, userController.productDetail)
 
 router.route('/allProducts')
-    .get(allProducctController.allProducts)
+    .get(middleware.checkSession, allProducctController.allProducts)
 
 router.route('/filter')
     .get(middleware.checkSession, allProducctController.filterPage)
@@ -59,10 +59,10 @@ router.route('/filter')
 // router.route('/search')
 
 router.route('/allProducts/next')
-    .get(allProducctController.nextPage)
+    .get(middleware.checkSession, allProducctController.nextPage)
 
 router.route('/allProducts/prev')
-    .get(allProducctController.prevPage)
+    .get(middleware.checkSession, allProducctController.prevPage)
 
 // forgot password
 router.route('/forgotPassword')
@@ -84,11 +84,14 @@ router.route('/forgotResendOtp')
 
 // search result
 router.route('/search')
-    .get(searchController.searchResult)
+    .get(middleware.checkSession, searchController.searchResult)
     .post(allProducctController.search)
 
 router.route('/searchFilter')
     .post(searchController.searchFilter)
 
+// new arrivals
+router.route('/newArrivals')
+    .get(middleware.checkSession, userController.newArrivals)
 
 module.exports = router

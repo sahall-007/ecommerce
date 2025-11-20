@@ -161,7 +161,7 @@ const otpPost = async (req, res) => {
 const changePassword = async (req, res) => {
     try{
 
-        if(req.session.forgotEmail==null){
+        if(req.session.forgotEmail==null || req.session.forgotEmail==undefined){
             return res.redirect('/login')
         }
         res.render('changePass')

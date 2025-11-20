@@ -31,10 +31,14 @@
           <div class="mb-3">
             <label for="newPassword" class="form-label">New Password</label>
             <input type="password" id="newPassword" class="form-control"  />
+            <p class="text-danger" id="passMsg" style="font-size: small;  max-width: 320px;"></p>
+
           </div>
           <div class="mb-4">
             <label for="confirmPassword" class="form-label">Confirm New Password</label>
             <input type="password" id="confirmPassword" class="form-control" />
+            <p class="text-danger" id="confirmPassMsg" style="font-size: small;  max-width: 320px;"></p>
+
           </div>
           <button id="submit" type="submit" class="btn btn-primary w-100 btn-custom">Update Password</button>
         </form>
@@ -47,12 +51,43 @@
   <script>
     
     const submit = document.getElementById("submit")
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Za-z])[A-za-z0-9!@#$%^&*]{8,15}$/
+    const confirmPasswordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Za-z])[A-za-z0-9!@#$%^&*]{8,15}$/
+
+    const passMsg = document.getElementById("passMsg")
+    const confirmPassMsg = document.getElementById("confirmPassMsg")
 
     submit.addEventListener('click', async (event) => {
         event.preventDefault()
         
         const newPassword = document.getElementById("newPassword")
         const confirmPassword = document.getElementById("confirmPassword")
+
+        if(!passwordRegex.test(newPassword.value) && !confirmPasswordRegex.test(confirmPassword.value)){
+                passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+
+                return 1
+            }
+            else if(!passwordRegex.test(newPassword.value)){
+              passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"                
+              confirmPassMsg.textContent = ""
+
+                return 1
+            }
+            else if(!confirmPasswordRegex.test(confirmPassword.value)){
+                // usernameMsg.textContent = ""
+                passMsg.textContent = ""                  
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+
+                return 1
+            }
+            else{
+                // usernameMsg.textContent = ""
+                passMsg.textContent = ""                
+                confirmPassMsg.textContent = ""
+            }
+
 
         if(newPassword.value != confirmPassword.value){
             swal.fire({
@@ -63,6 +98,8 @@
 
             return 1
         }
+
+        alert("jkd")
 
         const request = await fetch('/changePassword', {
             method: "POST",
