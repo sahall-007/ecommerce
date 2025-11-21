@@ -3,6 +3,8 @@ const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
 
+const logger = require("../../config/logger.js")
+
 
 const searchResult = async (req, res) => {
     try {

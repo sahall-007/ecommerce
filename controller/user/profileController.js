@@ -7,6 +7,8 @@ const env = require('dotenv').config()
 const session = require('express-session')
 const { hasSession } = require('../../middlewares/userAuth.js')
 
+const logger = require("../../config/logger.js")
+
 function generateOtp(){
     const digits = "1234567890"
     let otp = ""
@@ -164,6 +166,7 @@ const changePassword = async (req, res) => {
         if(req.session.forgotEmail==null || req.session.forgotEmail==undefined){
             return res.redirect('/login')
         }
+    
         res.render('changePass')
     }
     catch(err){
@@ -190,6 +193,7 @@ const changePasswordPost = async (req, res) => {
         const updateUserPass = await userSchema.findOneAndUpdate({email}, {$set: {password: hashedPassword}})
 
         req.session.forgotEmail = null
+        req.session.forgotOtp = null
         return res.status(200).json({success: true, message: "successfully changed that password"})
 
     }

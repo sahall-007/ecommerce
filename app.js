@@ -7,7 +7,9 @@ const session = require('express-session')
 const nocache = require('nocache')
 const passport = require('./config/passport.js')
 
+const logger = require("./config/logger.js")
 
+logger.info("server has started")
 
 const app = express()
 

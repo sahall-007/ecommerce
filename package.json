@@ -20,6 +20,7 @@
     "nocache": "^4.0.0",
     "nodemailer": "^7.0.10",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "winston": "^3.18.3"
   }
 }

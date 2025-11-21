@@ -9,6 +9,10 @@ const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
+const logger = require("../../config/logger.js")
+
+// logger.info("server has started")
+
 const salt = 10
 
 // to load the register page
@@ -40,8 +44,8 @@ const loadRegister = async (req, res) => {
         })
     }
     catch (err) {
-        console.log(err)
-        console.log("failed to load the register page!")
+        logger.info(err)
+        logger.info("failed to load the register page!")
         res.status(500).json({success: false, message: "something went wrong (register page)"})
     }
 }
@@ -109,7 +113,7 @@ const registerUser = async (req, res) => {
 
         req.session.userOTP = {
             otp,
-            expiryAt: Date.now() + 30*1000
+            expiryAt: Date.now() + 60*1000
         }
     
         req.session.userData = { username, email, password }
@@ -118,20 +122,21 @@ const registerUser = async (req, res) => {
 
     }
     catch (err) {
-        console.log(err)
-        console.log("failed to register the user!")
+        logger.info(err)
+        logger.info("failed to register the user!")
         res.status(500).json({success: false, message: "something went wrong (reigster post)"})
     }
 }
 
 // to load the login pages
 const loadLogin = async (req, res) => {
+    // logger.info("server has started")
     try {
         res.render('userLogin')
     }
     catch (err) {
-        console.log(err)
-        console.log("failed to load the login page!")
+        logger.error(err)
+        logger.error("failed to load the login page!")
     }
 }
 
@@ -157,8 +162,8 @@ const loginPost = async (req, res) => {
 
     }
     catch(err){
-        console.log(err)
-        console.log("failed to login")
+        logger.error(err)
+        logger.error("failed to login")
         res.status(500).json({success: false, message: "something went wrong (post login)"})
     }
 }
@@ -178,8 +183,8 @@ const loadOtpPage = async (req, res) =>{
         
     }
     catch(err){
-        console.log(err)
-        console.log("failed to get the otp page")
+        logger.info(err)
+        logger.info("failed to get the otp page")
         res.status(500).json({ success: false, message: "something went wrong (otp page)"})
     }
 }
@@ -227,7 +232,7 @@ const verifyOtp = async (req, res) => {
 
 // to resend the otp
 const resendOtp = async (req, res) => {
-    console.log("resend is working ...........")
+    logger.log("resend is working ...........")
     try{
         const { email } = req.session.userData
         
@@ -239,7 +244,7 @@ const resendOtp = async (req, res) => {
 
         req.session.userOTP = {
             otp,
-            expiryAt: Date.now() + 30 * 1000
+            expiryAt: Date.now() + 60 * 1000
         }
         console.log(otp)
 
@@ -357,8 +362,8 @@ const logout = async (req, res) => {
         res.redirect('/login')
     }
     catch(err){
-        console.log(err)
-        console.log("failed to logout")
+        logger.log(err)
+        logger.log("failed to logout")
         res.status(500).json({success: false, message: "something went wrong (user logout)"})
     }
 }
@@ -427,8 +432,8 @@ const productDetail = async (req, res) => {
 
     }
     catch(err){
-        console.log(err)
-        console.log("failed to get the product details page")
+        logger.log(err)
+        logger.log("failed to get the product details page")
         res.status(500).json({success: false, message: "something went wrong (get product details)"})
     }
 }
@@ -499,8 +504,8 @@ const newArrivals = async (req, res) => {
             {$limit: limit},
         ])
 
-        console.log(filter)
-        console.log(toSort)
+        // console.log(filter)
+        // console.log(toSort)
 
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})
@@ -519,8 +524,8 @@ const newArrivals = async (req, res) => {
 
     }
     catch(err){
-        console.log(err)
-        console.log("failed to get new arrivals page")
+        logger.log(err)
+        logger.log("failed to get new arrivals page")
         res.status(500).json({success: false, message: "something went wrong (get new arrivals)"})
     }
 }
