@@ -3,19 +3,21 @@
 
 
 const checkSession = (req, res, next) => {
-    if(req.session.user || req.session.passport){
-        console.log("session exist")
+    if(req.session.user || req.session?.passport?.user){
+        // console.log(req.session.user)
+        // console.log(req.session?.passport?.user)
+        // console.log("session exist")
         next()
     }
     else{
-        console.log("session does not exist")
+        // console.log("session does not exist")
         res.redirect('/login')
     }
 }
 
 const hasSession = (req, res, next) => {
-    if(req.session.user || req.session.passport){
-        console.log("has session")
+    if(req.session.user || req.session?.passport?.user){
+        // console.log("has session")
         res.redirect('/')
     }
     else{

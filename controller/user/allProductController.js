@@ -3,7 +3,7 @@ const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
-const { options } = require('../../routes/user.js')
+const { options } = require('../../routes/user/user.js')
 
 const logger = require("../../config/logger.js")
 

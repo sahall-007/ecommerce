@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Change Email — New Email</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f4f6fb;
+      --card:#ffffff;
+      --accent:#2563eb;
+      --muted:#6b7280;
+      --success:#16a34a;
+      --danger:#dc2626;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);}
+
+    .container{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .card{
+      width:100%;
+      max-width:520px;
+      background:var(--card);
+      border-radius:12px;
+      box-shadow:0 6px 24px rgba(16,24,40,0.08);
+      padding:28px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    label{font-size:13px;color:#111827;margin-bottom:6px;display:block}
+    input{
+      padding:12px 14px;border-radius:8px;border:1px solid #e6e9ef;font-size:15px;outline:none;
+      transition:box-shadow .15s, border-color .15s;
+    }
+    input:focus{box-shadow:0 0 0 4px rgba(37,99,235,0.08);border-color:var(--accent)}
+
+    .btn{padding:10px 14px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:#111827}
+
+    .msg{font-size:14px;padding:12px;border-radius:8px}
+    .msg.success{background:#ecfdf5;color:var(--success);border:1px solid rgba(34,197,94,0.12)}
+    .msg.error{background:#fff5f5;color:var(--danger);border:1px solid rgba(220,38,38,0.08)}
+
+    @media (max-width:420px){
+      .card{padding:18px;border-radius:10px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- NEW EMAIL FORM -->
+    <form method="post" action="/changeEmailUpdate" class="card" id="newEmailForm" novalidate>
+
+      <div>
+        <h1>Enter Your New Email</h1>
+        <p class="mt-2" style="color:var(--muted);">Your OTP was verified successfully.  
+        Please enter your new email address below.</p>
+      </div>
+
+      <div class="">
+        <label for="newEmail">New Email Address</label>
+        <input class="form-control" id="newEmail" name="newEmail" type="email" placeholder="new@example.com" autocomplete="email">
+      </div>
+
+      <div id="feedback" aria-live="polite" style="display:none"></div>
+
+      <div class="actions d-flex gap-2">
+        <button id="submitBtn" type="submit" class="btn btn-primary">Update Email</button>
+        <!-- <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button> -->
+      </div>
+
+    </form>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const form = document.getElementById("newEmailForm");
+    const newEmail = document.getElementById("newEmail");
+    const feedback = document.getElementById("feedback");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const submitBtn = document.getElementById("submitBtn")
+
+    function showMsg(type, text){
+      feedback.style.display = "";
+      feedback.className = "msg " + (type === "error" ? "error" : "success");
+      feedback.textContent = text;
+    }
+
+    function clearMsg(){
+      feedback.style.display = "none";
+      feedback.className = "";
+      feedback.textContent = "";
+    }
+
+    function isValidEmail(value){
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(value.trim());
+    }
+
+    form.addEventListener("submit", async function(e){
+      e.preventDefault();
+      clearMsg();
+
+      if(newEmail.value.trim() === ""){
+        showMsg("error", "Please enter a new email.");
+        return;
+      }
+      if(!isValidEmail(newEmail.value)){
+        showMsg("error", "Please enter a valid email.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending...';
+
+      try{
+        const request = await fetch('/newEmail', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({email: newEmail.value})
+        })
+
+        if(request.status==200){
+          window.location.href = "/newEmailOtp"
+        }
+        else if(request.status==409){
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Email already in use"
+          })
+        }
+      }
+      catch(err){
+        alert("new email error")
+        console.log(err)
+      }
+      
+    });
+
+    cancelBtn.addEventListener("click", () => window.history.back());
+  </script>
+</body>
+</html>

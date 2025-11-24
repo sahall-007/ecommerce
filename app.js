@@ -1,6 +1,6 @@
 const express = require("express")
 const connected = require('./db/connectDB.js')
-const userRoute = require('./routes/user.js')
+const userRoute = require('./routes/user/user.js')
 const adminRoute = require('./routes/admin/admin.js')
 
 const session = require('express-session')
@@ -9,7 +9,7 @@ const passport = require('./config/passport.js')
 
 const logger = require("./config/logger.js")
 
-logger.info("server has started")
+// logger.info("server has started")
 
 const app = express()
 

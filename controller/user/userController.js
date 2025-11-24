@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
-const logger = require("../../config/logger.js")
+const logger = require("../../config/pinoLogger.js")
 
 // logger.info("server has started")
 
@@ -130,7 +130,6 @@ const registerUser = async (req, res) => {
 
 // to load the login pages
 const loadLogin = async (req, res) => {
-    // logger.info("server has started")
     try {
         res.render('userLogin')
     }
@@ -145,18 +144,24 @@ const loginPost = async (req, res) => {
     try{
         const { username, email, password } = req.body
 
-        const userExist = await userSchema.find({email})
+        const userExist = await userSchema.findOne({email})
 
-        if(!email){
+        if(!userExist){
             return res.status(404).json({success: false, message: "create an account first"})
         }
-
-        const isMatch = await bcrypt.compare(password, userExist[0].password)
-        if (!isMatch || userExist[0].email !== email) {
+        
+        const isMatch = await bcrypt.compare(password, userExist.password)
+        if (!isMatch || userExist.email !== email) {
             return res.status(401).json({success: false, message: "invalid email or password"})
         }
+        
+        if(userExist.isListed==false){
+            return res.status(403).json({success: false, message: "You are blocked by the Admin"})
+        }
+        req.session.user = userExist._id
+        
+        logger.info( {userId: req.session.user}, "login post")
 
-        req.session.user = userExist[0]._id
         res.status(200).json({success: true, message: "successfully logged in"})
         // res.redirect('/')
 
@@ -232,7 +237,7 @@ const verifyOtp = async (req, res) => {
 
 // to resend the otp
 const resendOtp = async (req, res) => {
-    logger.log("resend is working ...........")
+    logger.info("resend is working ...........")
     try{
         const { email } = req.session.userData
         
@@ -271,9 +276,6 @@ const resendOtp = async (req, res) => {
 // to get the home page
 const getHomePage = async (req, res) => {
     try{
-
-        console.log("working")
-
         const inOffer = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -327,18 +329,7 @@ const getHomePage = async (req, res) => {
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             {$sample: {size: 10}}
         ])
-
-        // console.log(newArrivals)
-
-        // const newArrivalPrice = await variantSchema.aggregate([
-        //     {$sort: {_id: -1}},
-        //     {limit: 5},
-        //     {$group: [
-        //         {$}
-        //     ]}
-        // ])
-
-        
+  
         
         // const populated = await variantSchema.populate(newArrivals, { path: 'productId'})
 
@@ -362,8 +353,8 @@ const logout = async (req, res) => {
         res.redirect('/login')
     }
     catch(err){
-        logger.log(err)
-        logger.log("failed to logout")
+        logger.fatal(err)
+        logger.fatal("failed to logout")
         res.status(500).json({success: false, message: "something went wrong (user logout)"})
     }
 }
@@ -373,7 +364,7 @@ const productDetail = async (req, res) => {
     try{
         const { id } = req.params
 
-        console.log("working", id)
+        // console.log("working", id)
 
         // const variant = await variantSchema.find({_id: id}).populate('productId')
 

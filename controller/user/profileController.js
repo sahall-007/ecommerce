@@ -1,22 +1,13 @@
-
-
 const userSchema = require('../../model/userSchema.js')
-const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
-const session = require('express-session')
-const { hasSession } = require('../../middlewares/userAuth.js')
+const { Types } = require('mongoose')
 
-const logger = require("../../config/logger.js")
+const logger = require("../../config/pinoLogger.js")
 
 function generateOtp(){
-    const digits = "1234567890"
-    let otp = ""
-    for(let i=0; i<6; i++){
-        otp+=digits[Math.floor(Math.random()*10)]
-    }
-
-    return otp
+    return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 const sendVerificationEmail = async (email, otp) => {
@@ -54,174 +45,155 @@ const sendVerificationEmail = async (email, otp) => {
     }
 }
 
-const forgotPassPage = async (req, res) => {
+const profilePage = async (req, res) => {
     try{
-        res.render('forgotEmail')
+
+        const id = req.session.user || req.session?.passport?.user
+        
+        logger.info(id)
+
+        const user = await userSchema.findOne({_id: id})
+
+        // logger.info(user)
+
+        res.render('user/profile', {user})
     }
     catch(err){
         console.log(err)
-        console.log("failed to get forgot password email page")
-        res.status(500).json({success: false, message: "something went wrong (forgot password email page)"})
+        console.log("failed to get profile page")
+        res.status(500).json({success: false, message: "something went wrong (get profile page)"})
     }
 }
 
-const forgotEmailValidation = async (req, res) => {
+const editProfile = async (req, res) => {
     try{
-        console.log("email validation")
-        const { email } = req.body
-        
-        const finduser = await userSchema.findOne({email})
 
-        if(finduser){
+        const user = await userSchema.findOne({_id: req.session.user})
+        logger.info({user}, "this is user: ")
+        if(!user){
+            return res.status(404).json({success: false, message: "user not found in the database"})
+        }
+
+        const { username, phone } = req.body
+        
+        await userSchema.findByIdAndUpdate({_id: req.session.user}, {username})
+
+        const result = await userSchema.findOne({_id: req.session.user})
+
+        logger.info({result}, "final user")
+
+        res.status(200).json({success: true, message: "success"})
+        // const { username, phone } = req.body
+
+
+
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to edit profile")
+        res.status(500).json({success: false, message: "something went wrong (edit profile post)"})
+    }
+}
+
+const changeEmailPage = async (req, res) => {
+    try{
+        res.render('user/changeEmail')
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to load change email page")
+        res.status(500).json({success: false, message: "something went wrong (change email page)"})
+    }
+}
+
+const changeEmailPost = async (req, res) => {
+    try{
+        const { email } = req.body
+
+        const user = await userSchema.findOne({email})
+
+        if(!user){
+            return res.status(404).json({success: false, message: "email not found in the database"})
+        }
+
+        if(user){
             const otp = generateOtp()
             const emailSent = await sendVerificationEmail(email, otp)
             if(emailSent){
-                req.session.forgotOtp = {
-                    otp,
-                    expiryAt: Date.now() + 30 * 10000
+                req.session.changeEmailOtp = {
+                    otp, 
+                    expiryAt: Date.now() + 60 * 1000
                 }
-                req.session.forgotEmail = email
-                // res.render('forgotPassOtp')
-                console.log("OTP: ", otp)
-                return res.status(200).json({success: true, message: "successfully send otp to the email"})
+                req.session.changingEmail = email
+                logger.info(otp, "OTP: ")
+                return res.status(200).json({success: true, message: "successfully send otp"})
             }
             else{
-                res.json({success: false, message: "failed to send otp, please try again"})
+                res.status(500).json({success: false, message: "failed to send otp, please try again"})
             }
         }
         else{
-            res.render("forgotEmail", {message: "usee with this email does not exist"})
+            res.render('user/changeEmail')
         }
-
     }
     catch(err){
-        res.status(500).json({success: false, message: "page not found"})
+        logger.fatal(err)
+        logger.fatal("failed to post change email")
+        res.status(500).json({success: false, message: "something went wrong (change email post)"})
     }
 }
 
-const otpPage = async (req, res) => {
+const getOtpPage = async (req, res) => {
     try{
-        if(req.session.forgotEmail==null){
-            return res.redirect('/login')
-        }
-        res.render('forgotPassOtp')
+        res.render('user/changeEmailOtp')
     }
     catch(err){
-        console.log(err)
-        console.log("failed to get forgot password otp page")
-        res.status(500).json({success: false, message: "something went wrong (forgot password otp page)"})
+        logger.fatal(err)
+        logger.fatal("failed to get email change OTP page")
+        res.status(500).json({success: false, message: "something went wrong (change email OTP page)"})
     }
 }
 
 const otpPost = async (req, res) => {
     try{
         const { otp } = req.body
-        
-        
-        console.log("this is working - otp: ", otp)
-        console.log("this is forgot otp: ", req.session.forgotOtp)
 
-        if(Date.now() > req.session.forgotOtp.expiryAt){
-            console.log("otp expired------------")
-            return res.status(400).json({success: false, message: "invalid OTP, please try again"})
+        if(Date.now() > req.session.changeEmailOtp.expiryAt){
+            logger.warn("change email otp expired------")
+            return res.status(400).json({success: false, message: "otp expired please resend it and try again"})
         }
-        
-        if(otp == req.session.forgotOtp.otp){
-            
-            const user = req.session.forgotEmail
-            // const hashedPassword = await bcrypt.hash(user.password, salt)
 
-            const userExist = await userSchema.findOne({email: req.session.forgotEmail})
-
-            if(!userExist){
-                res.status(404).json({success: false, message: "Email not found in the database"})
-            }
-
-            // const saveUser = await new userSchema({
-            //     username: user.username,
-            //     email: user.email,
-            //     password: hashedPassword,
-            //     isListed: true
-            // })
-
-            // await saveUser.save()
-            // req.session.user = saveUser._id
-
-            // return res.redirect('/')
-            return res.status(200).json({success: false, message: "OTP verified successfully"})
+        if(otp == req.session.changeEmailOtp.otp){
+            return res.status(200).json({success: true, message: "otp verified successfully"})
         }
         else{
-            res.status(400).json({success: false, message: "invalid OTP, please try again"})
+            res.status(400).json({success: false, message: "invalid otp, please try again"})
         }
     }
     catch(err){
-        console.error("failed to verify otp", err)
-        res.status(500).json({success: false, message: "something went wrong (verify otp)"})
+        logger.fatal(err)
+        logger.fatal("failed to post email change OTP ")
+        res.status(500).json({success: false, message: "something went wrong (change email OTP Post)"})
     }
 }
 
-const changePassword = async (req, res) => {
+const changeEmailresendOtp = async (req, res) => {
     try{
+        const email = req.session.changingEmail
 
-        if(req.session.forgotEmail==null || req.session.forgotEmail==undefined){
-            return res.redirect('/login')
-        }
-    
-        res.render('changePass')
-    }
-    catch(err){
-        console.log(err)
-        console.log("failed to get change password page")
-        res.status(500).json({success: false, message: "something went wrong (change password page)"})
-    }
-}
-
-const changePasswordPost = async (req, res) => {
-
-    console.log("working")
-    try{
-        const { newPass } = req.body
-        const email = req.session.forgotEmail
-        const userExistCheck = await userSchema.findOne({email})
-
-        if(!userExistCheck){
-            return res.status(404).json({success: false, message: "Email not found in the database"})
-        }
-
-        const hashedPassword = await bcrypt.hash(newPass, 10)
-
-        const updateUserPass = await userSchema.findOneAndUpdate({email}, {$set: {password: hashedPassword}})
-
-        req.session.forgotEmail = null
-        req.session.forgotOtp = null
-        return res.status(200).json({success: true, message: "successfully changed that password"})
-
-    }
-    catch(err){
-        console.log(err)
-        console.log("failed to change password Post")
-        res.status(500).json({success: false, message: "something went wrong (change passoword post)"})
-    }
-}
-
-const forgotResendOtp = async (req, res) => {
-    console.log("resend is working ...........")
-    try{
-
-        const email = req.session.forgotEmail
-        
-        if(!email){
-            return res.status(404).json({messsage: "email not found in the session, register again"})
+        const user = await userSchema.findOne({email})
+        if(!user){
+            return res.status(404).json({success: false, message: "user not found"})
         }
 
         const otp = generateOtp()
 
-        req.session.forgotOtp = {
+        req.session.changeEmailOtp = {
             otp,
-            expiryAt: Date.now() + 30 * 10000
+            expiryAt: Date.now() + 60 * 1000
         }
-        console.log(otp)
-
+        logger.info(`resend otp (change email): ${otp}`)
+        
         const emailSent = await sendVerificationEmail(email, otp)
         
         if(emailSent){
@@ -230,23 +202,214 @@ const forgotResendOtp = async (req, res) => {
         else{
             res.status(500).json({success: false, message: "resend OTP failed"})
         }
-        
-        // return res.redirect('/otp')
-    
     }
     catch(err){
-        console.log(err)
-        console.log("failed to resend OTP")
-        res.status(500).json({success: false, message: "something went wrong (resend OTP)"})
+        logger.fatal(err)
+        logger.fatal("failed to resednd change email otp ")
+        res.status(500).json({success: false, message: "something went wrong (resend change email OTP Post)"})
+    }
+}
+
+const newEmailPage = async (req, res) => {
+    try{
+        res.render('user/newEmail')
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get new email changepage ")
+        res.status(500).json({success: false, message: "something went wrong (new email page)"})
+
+    }
+}
+
+const newEmailPost = async (req, res) => {
+    try{
+        const { email } = req.body
+
+        const user = await userSchema.findOne({email})
+
+        if(user){
+            return res.status(409).json({success: false, message: "email already in use, enter another one"})
+        }
+
+        if(!user){
+            req.session.newEmail = email
+            const otp = generateOtp()
+            const emailSent = await sendVerificationEmail(email, otp)
+            if(emailSent){
+                req.session.changeEmailOtp = {
+                    otp, 
+                    expiryAt: Date.now() + 60 * 1000
+                }
+                logger.info(otp, "OTP: ")
+                return res.status(200).json({success: true, message: "successfully send otp"})
+            }
+            else{
+                res.json({success: false, message: "failed to send otp, please try again"})
+            }
+        }
+        // else{
+        //     res.render('user/changeEmail')
+        // }
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to post new email changepage ")
+        res.status(500).json({success: false, message: "something went wrong (new email post)"})
+    }
+}
+
+const newEmailOtpPage = async (req, res) => {
+    try{
+        res.render('user/newEmailotp')
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get new email OTP page")
+        res.status(500).json({success: false, message: "something went wrong (new email OTP page)"})
+    }
+} 
+
+const newEmailOtpPost = async (req, res) => {
+    try{
+        const { otp } = req.body
+
+        if(Date.now() > req.session.changeEmailOtp.expiryAt){
+            logger.warn("change email otp expired------")
+            return res.status(400).json({success: false, message: "otp expired please resend it and try again"})
+        }
+
+        if(otp == req.session.changeEmailOtp.otp){
+            const email = req.session.changingEmail
+            const newEmail = req.session.newEmail
+
+            await userSchema.findOneAndUpdate({email: email}, {$set: {email: newEmail}})
+            return res.status(200).json({success: true, message: "otp verified successfully"})
+        }
+        else{
+            res.status(400).json({success: false, message: "invalid otp, please try again"})
+        }
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to post new email OTP ")
+        res.status(500).json({success: false, message: "something went wrong (new email OTP Post)"})
+    }
+}
+
+const newEmailResendOtp = async (req, res) => {
+    try{
+        const email = req.session.newEmail
+
+        // const user = await userSchema.findOne({email})
+        // if(!user){
+        //     return res.status(404).json({success: false, message: "user not found"})
+        // }
+
+        const otp = generateOtp()
+
+        req.session.changeEmailOtp = {
+            otp,
+            expiryAt: Date.now() + 60 * 1000
+        }
+        logger.info(`resend otp (new email): ${otp}`)
+        
+        const emailSent = await sendVerificationEmail(email, otp)
+        
+        if(emailSent){
+            res.status(200).json({success: true, message: "resend OTP successful"})
+        }
+        else{
+            res.status(500).json({success: false, message: "resend OTP failed"})
+        }
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to resend new email OTP ")
+        res.status(500).json({success: false, message: "something went wrong (resend new email OTP Post)"})
+    }
+}
+
+const updatePassword = async (req, res) => { 
+    try{
+        const { password, newPassword, confirmPassword } = req.body
+        const userId = req.session.user
+
+        logger.warn(userId, "thsi is user id")
+
+        if(newPassword!=confirmPassword){
+            return res.status(400).json({success: false, message: "new password does not match confirm password"})
+        }
+
+        const user = await userSchema.findOne({_id: userId})
+        
+        if(!user){
+            return res.status(404).json({success: false, message: "user not found"})
+        }
+
+        logger.warn(password)
+        logger.warn(user.password)
+
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        if(!isMatch){
+            return res.status(400).json({success: false, message: "Invalid current password"})
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+        logger.warn(hashedPassword)
+
+        await userSchema.findOneAndUpdate({_id: userId}, {$set: {password: hashedPassword}})
+        res.status(200).json({success: true, message: "successfully updated password"})
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to update password ")
+        res.status(500).json({success: false, message: "something went wrong (update password)"})
+    }
+}
+
+const profileImage = async (req, res) => {
+    try{
+        const { id } = req.params
+
+        let user = await userSchema.findOne({_id: id})
+
+        if(!user){
+            return res.status(404).json({success: false, message: "cannot find the user"})
+        }
+
+        let path = req.file.path.replace(/\\/g, '/')
+        logger.info(req.file)
+        logger.info(path)
+
+        await userSchema.findOneAndUpdate({_id: id}, {image: path})
+        res.status(200).json({success: true, message: "successfully added the profile image"})
+
+
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to add profile image")
+        res.status(500).json({success: false, message: "something went wrong (add profile image)"})
     }
 }
 
 module.exports = {
-    forgotPassPage,
-    forgotEmailValidation,
-    otpPage,
+    profilePage,
+    editProfile,
+    changeEmailPage,
+    changeEmailPost,
+    getOtpPage,
     otpPost,
-    changePassword,
-    changePasswordPost,
-    forgotResendOtp
+    changeEmailresendOtp,
+    newEmailPage,
+    newEmailPost,
+    newEmailOtpPage,
+    newEmailOtpPost,
+    newEmailResendOtp,
+    updatePassword,
+    profileImage
 }
+

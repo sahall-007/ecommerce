@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="/cropper/cropper.css" rel="stylesheet">
+    <script src="/cropper/cropper.js"></script>
+    <style>
+        body {
+            background: #f1f4f9;
+            font-family: "Titillium Web", sans-serif;
+        }
+        .sidebar {
+            /* width: 250px; */
+            /* flex-shrink: 0; */
+            background: #fff;
+            /* height: 100vh; */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            /* position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px; */
+        }
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background: #f0f3f7;
+        }
+        .content {
+            /* margin-left: 270px; */
+            padding: 25px;
+        }
+        .cover {
+            background: linear-gradient(135deg, #316BFF, #273BFF);
+            height: 180px;
+            border-radius: 10px;
+        }
+        /* .profile-card {
+            margin-top: -70px;
+        } */
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+    
+        /* Navbar CSS */
+        .navbar { padding: 0.8rem 1rem; }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .navbar .form-control { width: 220px; border-radius: 0.375rem 0 0 0.375rem; }
+        .navbar .btn-outline-secondary { border-radius: 0 0.375rem 0.375rem 0; }
+        .nav-link:hover { color: #0d6efd !important; }
+
+        @media (max-width: 992px) {
+            .sidebar { position: relative; width: 100%; height: auto; box-shadow: none; }
+            .content { margin-left: 0; }
+        }
+        
+            </style>
+</head>
+<body>
+
+  <!-- Added Navbar -->
+  <nav class="navbar navbar-expand-lg bg-black  shadow-sm">
+    <div class="container">
+      <a class="navbar-brand text-light fw-bold d-flex align-items-center" href="#">
+        <i class="bi bi-box me-2"></i> ShopEase
+      </a>
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link text-light active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="/allProducts">Shop List</a></li>
+        </ul>
+
+        <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
+          <!-- Search bar -->
+          
+
+          <!-- Icons -->
+          <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
+            <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+            <a href="#" class="text-light"><i class="bi bi-cart3"></i></a>
+            <a href="#" class="text-light"><i class="bi bi-person-circle"></i></a>
+          </div>
+          
+          <div class="d-flex justify-content-center">
+            <a href="/logout" class="btn btn-outline-light">Logout</a>
+          </div>
+
+        </div>
+        
+      </div>
+    </div>
+  </nav>
+
+    <div class="sidebar d-flex flex-wrap justify-content-around">
+        <a href="/profile">Profile</a>
+        <a href="#">Order history</a>
+        <a href="/address">Billing Address</a>
+        <a href="#">Wallet</a>
+        <a href="#">Wishlist</a>
+        <a href="#">Shopping Cart</a>
+        <a href="#">Coupon</a>                
+    </div>
+
+    <div class="container-fluid">
+        <div class="row ">
+            
+            <div class="content col-12 col-lg-9 mx-auto">
+                <h3 class="mb-4">Profile</h3>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card profile-card mt-3 p-3 text-center">
+
+                            <div class="position-relative d-inline-block mx-auto mb-3">
+                                <% if(user.image){ %>
+                                    <img src="/<%= user.image %>" 
+                                    id="profileImg"
+                                    class="profile-img" 
+                                    alt="Profile"
+                                    style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;">
+                                <% } else{ %>
+                                    <img src="/images/user.png" 
+                                    id="profileImg"
+                                    class="profile-img" 
+                                    alt="Profile"
+                                    style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover;">
+                                <% } %>
+                                
+
+                                <label for="fileInput" 
+                                    class="position-absolute bottom-0  bg-dark end-0 text-white rounded-circle p-2"
+                                    style="cursor: pointer; transform: translate(20%,20%); height: 35px;">
+                                    <i class="bi bi-pencil" id="edit" style="color: white;"></i>
+                                    <i class="bi bi-check-lg d-none" id="crop" onclick='cropImage(this)'></i>
+                                </label>
+
+                                <input name="profileImage" type="file" id="fileInput" class="d-none" accept="image/*" onchange="newFile(1)">
+                            </div>
+
+                            <h5 class="mb-3"><%= user.username %></h5>
+
+                            <div class=" d-flex gap-3 mb-2" style="background-color: #EAF6FE;">
+                                <!-- <img src="/images/rocket.png" alt="" style="width: 50px;"> -->
+                                <div class="ms-3">
+                                    <h1 class="fs-4 text-start mb-0">00</h1>                                
+                                    <h1 class="fs-6 text-start fw-light mb-0">Total orders</h1>                               
+                                </div>
+                            </div>
+
+                            <div class=" d-flex gap-3 mb-2" style="background-color: #EAF7E9;">
+                                <!-- <i class="bi bi-box"></i> -->
+                                <!-- <img src="/images/package.png" class="flex-shrink-0 mx-auto" alt="" style="width: 30px; height: 30px;"> -->
+                                <div class="ms-3">
+                                    <h1 class="fs-4 text-start mb-0">00</h1>                                
+                                    <h1 class="fs-6 text-start fw-light mb-0">Completed orders</h1>                               
+                                </div>
+                            </div>
+
+                            <div class=" d-flex gap-3 mb-2" style="background-color: #FFF3EB;">
+                                <!-- <img src="/images/bill.png" class="flex-shrink-0" alt="" style="width: 45px;"> -->
+                                <div class="ms-3">
+                                    <h1 class="fs-4 text-start mb-0">00</h1>                                
+                                    <h1 class="fs-6 text-start fw-light mb-0">Pending orders</h1>                               
+                                </div>
+                            </div>
+
+                            
+                            <!-- <a href="#" class="btn btn-dark mt-5 mx-auto" style="width: 300px;">View Public Profile</a> -->
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card p-4 mt-3">
+                            <h5 class="mb-3">Account Settings</h5>
+
+                            <!-- User profile -->
+                            <div class="card p-4 mt-3">
+                                <!-- <form> -->
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">User Name</label>
+                                            <input type="text" id="username" class="form-control" value="<%= user.username %>" disabled>
+                                        </div>
+    
+                                        <div class="col-12">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="text" id="phone" class="form-control" value="9778765901" disabled>
+                                        </div>
+    
+                                        <div class="col-12">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="text" class="form-control" value="<%= user.email %>" disabled>
+                                        </div>
+    
+    
+                                        <div class="col-12">
+                                            <div class="row row-cols-1 row-cols-lg-2 justify-content-around">
+                                                <button class="btn btn-dark mt-4" id="editProfile" style="width: 300px;" onclick="editProfile(event)">Edit profile</button>
+                                                <button class="btn btn-dark mt-4 d-none" id="cancelEdit" style="width: 300px;" onclick="cancelEdit(event)">Cancel</button>
+                                                <button class="btn btn-dark mt-4 d-none" id="ConfirmEdit" style="width: 300px;" onclick="ConfirmEdit(event)">Confirm</button>
+                                                <a href="/changeEmail" class="btn btn-dark mt-4" id="changeEmail" style="width: 300px;" >Change Email</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <!-- </form> -->
+                            </div>
+                           
+                            <!--  billing address -->
+                            <div class="card p-4 mt-5">
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-3 fw-bold">Billing Address</h5>
+                                    <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                   
+                                </div>
+                                <div>
+                                    <h1 class="fs-6">Muhammed sahal</h1>
+                                    <h1 class="fs-6">muhammedsahal@gmail.com</h1>
+                                    <h1 class="fs-6">9778765901</h1>
+                                    <h1 class="fs-6 fw-light">Thirundikkal (house), 19th mile , ottapalam-3, palappuram (po)</h1>
+                                    <h1 class="fs-6">679103</h1>
+                                </div>
+                                <button class="btn btn-dark mt-3" style="width: 300px;">Change address</button>
+                            </div>
+
+                            <!-- change password -->
+                            <div class="card p-4 mt-3">
+                                <h5 class="mb-3 fw-bold">Change Password</h5>
+                                <form  id="form">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label">Current password</label>
+                                            <input type="password" value="" id="passowrd" name="password" class="form-control" placeholder="Type here..." >
+                                            <p class="text-danger" id="passMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+    
+                                        <div class="col-12">
+                                            <label class="form-label">New Password</label>
+                                            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Type here..." >
+                                            <p class="text-danger" id="newPassMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+    
+                                        <div class="col-12">
+                                            <label class="form-label">Confirm Password</label>
+                                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" placeholder="Type here..." >
+                                            <p class="text-danger" id="confirmPassMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <!-- <a href="" class="text-decoration-none">Forgot password?</a> -->
+    
+                                        <!-- <div class="col-12"> -->
+                                            <div class="">
+                                                <button type="submit" class="btn btn-dark" id="changePass" style="width: 300px;">Change passowrd</button>
+                                            </div>
+                                        <!-- </div> -->
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>        
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">&copy; 2025 ShopEase. All rights reserved.</p>
+    </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+
+    let userId = "<%= user._id %>"
+
+    function editProfile(event){
+        event.preventDefault()
+
+        const username = document.getElementById("username")
+        const phone = document.getElementById("phone")
+        const editProfile = document.getElementById("editProfile")
+        const cancelEdit = document.getElementById("cancelEdit")
+        const ConfirmEdit = document.getElementById("ConfirmEdit")
+        const changeEmail = document.getElementById("changeEmail")
+
+        username.removeAttribute("disabled")
+        phone.removeAttribute("disabled")
+
+        editProfile.classList.add("d-none")
+        changeEmail.classList.add("d-none")
+        cancelEdit.classList.remove("d-none")
+        ConfirmEdit.classList.remove("d-none")
+    }
+
+    function cancelEdit(event){
+        event.preventDefault()
+
+        const username = document.getElementById("username")
+        const phone = document.getElementById("phone")
+        const editProfile = document.getElementById("editProfile")
+        const cancelEdit = document.getElementById("cancelEdit")
+        const ConfirmEdit = document.getElementById("ConfirmEdit")
+        const changeEmail = document.getElementById("changeEmail")
+
+        username.setAttribute("disabled", true)
+        phone.setAttribute("disabled", true)
+
+        editProfile.classList.remove("d-none")
+        changeEmail.classList.remove("d-none")
+        cancelEdit.classList.add("d-none")
+        ConfirmEdit.classList.add("d-none")
+    }
+
+    async function ConfirmEdit(event){
+        event.preventDefault()
+
+        const username = document.getElementById("username")
+        const phone = document.getElementById("phone")
+
+        try{
+            const request = await fetch('/editProfile', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({username: username.value, phone: phone.value})
+            })
+
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Successfully changed your details",
+                    timer: 2500
+                })
+                .then(() => window.location.reload())                
+            }
+            else{
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to change you details",
+                    timer: 2500
+                })
+            }
+        }
+        catch(err){
+            alert("confirm edit error")
+            console.log(err)
+        }
+
+    }
+
+    let cropper
+    let newCroppedBlobs
+
+    // to add new profile image
+    function newFile(id){
+        const fileInput = document.getElementById("fileInput")
+        const file = fileInput.files[0]
+
+        if(!file.type.startsWith("image/")){
+            fileInput.value = ""
+
+            Swal.fire({
+                icon: "error",
+                title: "Invalid File",
+                text: `Only image files are accepted`,
+            });
+
+            return
+        }
+
+        if(file){
+            const reader = new FileReader()
+
+            reader.onload = (e) => {
+                const img = document.getElementById(`profileImg`)
+                img.src = e.target.result;
+
+                img.onload = function(){
+                    if(cropper){
+                        cropper.destroy()
+                    }
+                    cropper = new Cropper(img, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        preview: '.preview'
+                    })
+                    document.getElementById(`edit`).classList.add("d-none")
+                    document.getElementById(`crop`).classList.remove("d-none")
+
+                }
+                        
+            }
+
+            reader.readAsDataURL(file)
+        }
+    }
+
+    // to crop the profile image
+    async function cropImage(element){
+        event.preventDefault()
+
+        const img = document.getElementById(`profileImg`)
+
+        let croppedCanvas = cropper.getCroppedCanvas()
+        img.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+
+        
+
+        // blob
+        const blobPromise =  new Promise((resolve) => {
+            croppedCanvas.toBlob((blob) => {
+                resolve(blob);
+            }, "image/jpeg");
+        });
+
+        const croppedBlob = await blobPromise;
+
+        // croppedBlob.imageIndex = imageIndex
+        newCroppedBlobs = croppedBlob
+
+        const formdata = new FormData()
+        formdata.append('profileImage', newCroppedBlobs)
+
+        try{
+            const res = await fetch(`/profileImage/${userId}`, {
+                method: "POST",
+                body: formdata
+            })
+            if(res.status==200){
+                document.getElementById(`edit`).classList.remove("d-none")
+                document.getElementById(`crop`).classList.add("d-none")
+                const siblingElement = img.nextElementSibling
+                img.classList.remove("cropper-hidden")
+                siblingElement.classList.add("d-none")
+
+                swal.fire({
+                    title: "Success",
+                    text: "Successfully added the product",
+                    icon: "success",
+                    timer: 30000
+                })
+                
+            }
+            
+        }
+        catch(err){
+            console.log(err)
+        }
+    }
+
+    const form = document.getElementById("form")
+    
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Za-z])[A-za-z0-9!@#$%^&*]{8,15}$/
+
+    const passMsg = document.getElementById("passMsg")
+    const newPassMsg = document.getElementById("newPassMsg")
+    const confirmPassMsg = document.getElementById("confirmPassMsg")
+
+    document.getElementById("changePass").addEventListener('click', async (event) => {
+        event.preventDefault()
+
+        const passowrd = document.getElementById("passowrd")
+        const newPassword = document.getElementById("newPassword")
+        const confirmPassword = document.getElementById("confirmPassword")
+
+        if(!passwordRegex.test(passowrd.value) && !passwordRegex.test(newPassword.value) && !passwordRegex.test(confirmPassword.value)){
+            
+            passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            newPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+
+            return
+        }
+        else if(!passwordRegex.test(passowrd.value)){
+            passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            newPassMsg.textContent = ""
+            confirmPassMsg.textContent = ""
+            return
+        }
+        else if(!passwordRegex.test(newPassword.value)){
+            passMsg.textContent = ""
+            newPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            confirmPassMsg.textContent = ""
+            return
+        }
+        else if(!passwordRegex.test(confirmPassword.value)){
+            passMsg.textContent = ""
+            newPassMsg.textContent = ""
+            confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            
+            return
+        }
+        else{
+            passMsg.textContent = ""
+            newPassMsg.textContent = ""
+            confirmPassMsg.textContent = ""
+
+            if(newPassword.value!=confirmPassword.value){
+                newPassMsg.textContent = "New password and confirm password does not match"       
+                confirmPassMsg.textContent = "New password and confirm password does not match"
+
+                return
+            }
+        }
+
+        try{
+            const request = await fetch('/updatePassword', {
+                method: "POST",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify({
+                    password: passowrd.value,
+                    newPassword: newPassword.value,
+                    confirmPassword: confirmPassword.value
+                })
+            })
+
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Successfully updated password"
+                })
+                passowrd.value = ""
+                newPassword.value = ""
+                confirmPassword.value = ""
+            }
+            else if(request.status==400){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Wrong current password"
+                })
+            }
+        }
+        catch(err){
+            alert("update pass error")
+            console.log("update pass err", err)
+        }
+    })
+
+</script>
+</body>
+</html>

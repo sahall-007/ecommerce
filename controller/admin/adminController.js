@@ -37,7 +37,7 @@ const loginVerify = async (req, res) =>{
         }
 
         req.session.admin = true
-console.log("session created")
+        console.log("session created")
         res.status(200).redirect('/admin/dashboard')
 
     }

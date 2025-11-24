@@ -146,14 +146,21 @@
                         icon: "error"
                     })
                 }
+                else if(res.status==403){
+                    swal.fire({
+                        title: "Error",
+                        text: "You are blocked by the Admin",
+                        icon: "error"
+                    })
+                }
                 else if(res.status==200){
                     window.location.href = "/"
                 }
 
             }
             catch(err){
-                alert("admin login error")
-                console.log("admin login error", err)
+                alert(" login error")
+                console.log(" login error", err)
             }
 
         })

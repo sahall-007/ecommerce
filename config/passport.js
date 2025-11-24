@@ -4,6 +4,8 @@ const googleStrategy = require('passport-google-oauth20').Strategy
 const userSchema = require('../model/userSchema.js')
 const env = require('dotenv').config()
 
+const logger = require('./pinoLogger.js')
+
 
 passport.use(new googleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -14,20 +16,27 @@ passport.use(new googleStrategy({
 async (req, accessToken, refreshToken, profile, done) => {
     try{
         let googleUser = await userSchema.findOne({googleId: profile.id})
+
+        // if(googleUser.isListed==false){
+            
+        // }
         
         if(googleUser){
+            // req.session.user = googleUser._id
+            logger.info("this is google login")
             return done(null, googleUser)
         }
         else{
             googleUser =  new userSchema({
                 username: profile.displayName,
-                email: profile.emails[0].value,
-                googleId: profile.id
+                email: profile.emails[0].value,                
+                googleId: profile.id,
+                isListed: true
             });
             await googleUser.save()
 
-            req.session.user = googleUser._id
-
+            logger.info("this is google register")
+            // req.session.user = googleUser._id
             return done(null, googleUser)
         }
     }
@@ -38,8 +47,7 @@ async (req, accessToken, refreshToken, profile, done) => {
 ));
 
 passport.serializeUser((googleUser, done) => {
-    // req.session.user = googleUser._id
-    done(null, googleUser._id)
+     done(null, googleUser._id)
 });
 
 passport.deserializeUser((id, done) => {
