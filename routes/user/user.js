@@ -12,13 +12,16 @@ const profileRouter = require("./profileRouter.js")
 const googelRouter = require("./googleRouter.js")
 const forgotPassRouter = require("./forgotPassRouter.js")
 const userPageRouter = require("./userPageRouter.js")
-// const addressRouter = require('./addressRouter.js')
+const addressRouter = require('./addressRouter.js')
+const cartRouter = require('./cartRouter.js')
 
 const router = express.Router()
 
+// home page
 router.route('/')
     .get(middleware.checkSession, userController.getHomePage)
 
+// user authentication
 router.route('/register')
     .get(middleware.hasSession, userController.loadRegister)
     .post(userController.registerUser)
@@ -27,6 +30,12 @@ router.route('/login')
     .get(middleware.hasSession, userController.loadLogin)
     .post(userController.loginPost)
     
+// 404 page not found
+// router.route('/pageNotFound')
+//     .get(userController.pageNotFound)
+
+
+
 // otp 
 router.route('/otp')
     .get(middleware.hasSession, userController.loadOtpPage)
@@ -48,8 +57,9 @@ router.use(forgotPassRouter)
 router.use(profileRouter)
 
 // address --------------------------------
-// router.use(addressRouter)
+router.use(addressRouter)
 
-
+// cart --------------------------------
+router.use(cartRouter)
 
 module.exports = router

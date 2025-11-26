@@ -1,4 +1,5 @@
 const userSchema = require('../../model/userSchema.js')
+const addressSchema = require('../../model/addressSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
@@ -53,10 +54,11 @@ const profilePage = async (req, res) => {
         logger.info(id)
 
         const user = await userSchema.findOne({_id: id})
+        const address = await addressSchema.findOne({userId: id})
 
         // logger.info(user)
 
-        res.render('user/profile', {user})
+        res.render('user/profile', {user, address})
     }
     catch(err){
         console.log(err)

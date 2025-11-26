@@ -82,7 +82,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
-          <li class="nav-item"><a class="nav-link text-light active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light active" href="/">Home</a></li>
           <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
           <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
           <li class="nav-item"><a class="nav-link text-light" href="/allProducts">Shop List</a></li>
@@ -95,8 +95,8 @@
           <!-- Icons -->
           <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
             <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
-            <a href="#" class="text-light"><i class="bi bi-cart3"></i></a>
-            <a href="#" class="text-light"><i class="bi bi-person-circle"></i></a>
+            <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
+            <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
           </div>
           
           <div class="d-flex justify-content-center">
@@ -127,7 +127,7 @@
 
                 <div class="row">
                     <div class="col-md-3">
-                        <div class="card profile-card mt-3 p-3 text-center">
+                        <div class="card profile-card mt-3 p-3 text-center sticky-top" style="top: 1rem;">
 
                             <div class="position-relative d-inline-block mx-auto mb-3">
                                 <% if(user.image){ %>
@@ -198,11 +198,13 @@
                                         <div class="col-12">
                                             <label class="form-label">User Name</label>
                                             <input type="text" id="username" class="form-control" value="<%= user.username %>" disabled>
+                                            <p class="text-danger" id="usernameMsg" style="font-size: small; max-width: 320px;"></p>
                                         </div>
     
                                         <div class="col-12">
                                             <label class="form-label">Phone Number</label>
                                             <input type="text" id="phone" class="form-control" value="9778765901" disabled>
+                                            <p class="text-danger" id="phoneMsg" style="font-size: small; max-width: 320px;"></p>
                                         </div>
     
                                         <div class="col-12">
@@ -225,18 +227,31 @@
                            
                             <!--  billing address -->
                             <div class="card p-4 mt-5">
-                                <div class="d-flex justify-content-between">
-                                    <h5 class="mb-3 fw-bold">Billing Address</h5>
-                                    <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                   
-                                </div>
-                                <div>
-                                    <h1 class="fs-6">Muhammed sahal</h1>
-                                    <h1 class="fs-6">muhammedsahal@gmail.com</h1>
-                                    <h1 class="fs-6">9778765901</h1>
-                                    <h1 class="fs-6 fw-light">Thirundikkal (house), 19th mile , ottapalam-3, palappuram (po)</h1>
-                                    <h1 class="fs-6">679103</h1>
-                                </div>
-                                <button class="btn btn-dark mt-3" style="width: 300px;">Change address</button>
+                                <% let gotAddress = false %>
+                                <% if(address?.billingAddress?.length > 0){ %>
+                                    <% address.billingAddress.forEach((ele, index) => { %>
+                                        <% if(ele.isSelected==true){ %>
+                                            <% gotAddress = true %>
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="mb-3 fw-bold">Billing Address</h5>
+                                                <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                   
+                                            </div>
+                                            <div>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                                <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                            </div>
+                                            <a href="/address" class="btn btn-dark mt-3" style="width: 300px;">Change address</a>
+                                        <% } %>  
+                                    <% }) %>                                    
+                                <% } %>
+                                <% if(!gotAddress){ %>
+                                        <a href="/address" class="btn btn-dark" style="width: 300px;">Add address</a>
+                                <% } %>  
+                                
                             </div>
 
                             <!-- change password -->
@@ -331,9 +346,39 @@
     async function ConfirmEdit(event){
         event.preventDefault()
 
+        const usernameRegex = /^(?=.{2,}$)(?!\s+$)[A-Za-z]+(?:[ '.][A-Za-z]+)*$/
+        const phoneRegex = /^(?!\s+$)\d{7,15}$/
+
+        const usernameMsg = document.getElementById("usernameMsg")
+        const phoneMsg = document.getElementById("phoneMsg")
+
         const username = document.getElementById("username")
         const phone = document.getElementById("phone")
 
+        if(!usernameRegex.test(username.value) && !phoneRegex.test(phone.value)){
+            usernameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+            phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+
+            return
+        }
+        else if(!usernameRegex.test(username.value)){
+            usernameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+            phoneMsg.textContent = ""
+
+            return
+        }
+        else if(!phoneRegex.test(phone.value)){
+            usernameMsg.textContent = ""
+            phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+                        
+            return
+        }
+        else{
+            usernameMsg.textContent = ""
+            phoneMsg.textContent = ""
+        }
+        
+        
         try{
             const request = await fetch('/editProfile', {
                 method: "POST",
@@ -453,9 +498,8 @@
 
                 swal.fire({
                     title: "Success",
-                    text: "Successfully added the product",
-                    icon: "success",
-                    timer: 30000
+                    text: "Profile image updated",
+                    icon: "success",                    
                 })
                 
             }

@@ -1,10 +1,5 @@
 const express = require('express')
-const userController = require('../../controller/user/userController.js');
-const allProducctController = require('../../controller/user/allProductController.js')
 const middleware = require('../../middlewares/userAuth.js')
-const passport = require('passport');
-const forgotPassController = require('../../controller/user/forgotPassController.js')
-const searchController = require('../../controller/user/searchController.js');
 const profileController = require('../../controller/user/profileController.js')
 const uploads = require('../../middlewares/multer.js')
 

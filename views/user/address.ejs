@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="/cropper/cropper.css" rel="stylesheet">
+    <script src="/cropper/cropper.js"></script>
+    <style>
+        body {
+            background: #f1f4f9;
+            font-family: "Titillium Web", sans-serif;
+        }
+        .sidebar {
+            /* width: 250px; */
+            /* flex-shrink: 0; */
+            background: #fff;
+            /* height: 100vh; */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            /* position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px; */
+        }
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background: #f0f3f7;
+        }
+        .content {
+            /* margin-left: 270px; */
+            padding: 25px;
+        }
+        .cover {
+            background: linear-gradient(135deg, #316BFF, #273BFF);
+            height: 180px;
+            border-radius: 10px;
+        }
+        /* .profile-card {
+            margin-top: -70px;
+        } */
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+        }
+    
+        /* Navbar CSS */
+        .navbar { padding: 0.8rem 1rem; }
+        .navbar-brand { font-weight: bold; font-size: 1.5rem; }
+        .navbar .form-control { width: 220px; border-radius: 0.375rem 0 0 0.375rem; }
+        .navbar .btn-outline-secondary { border-radius: 0 0.375rem 0.375rem 0; }
+        .nav-link:hover { color: #0d6efd !important; }
+
+        @media (max-width: 992px) {
+            .sidebar { position: relative; width: 100%; height: auto; box-shadow: none; }
+            .content { margin-left: 0; }
+        }
+        
+            </style>
+</head>
+<body>
+
+  <!-- Added Navbar -->
+  <nav class="navbar navbar-expand-lg bg-black  shadow-sm">
+    <div class="container">
+      <a class="navbar-brand text-light fw-bold d-flex align-items-center" href="#">
+        <i class="bi bi-box me-2"></i> ShopEase
+      </a>
+      <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link text-light active" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="/allProducts">Shop List</a></li>
+        </ul>
+
+        <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
+          <!-- Search bar -->
+          
+
+          <!-- Icons -->
+          <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
+            <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+            <a href="cart" class="text-light"><i class="bi bi-cart3"></i></a>
+            <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
+          </div>
+          
+          <div class="d-flex justify-content-center">
+            <a href="/logout" class="btn btn-outline-light">Logout</a>
+          </div>
+
+        </div>
+        
+      </div>
+    </div>
+  </nav>
+
+    <div class=" sidebar d-flex flex-wrap justify-content-around">
+        <a href="/profile" class="p-2">Profile</a>
+        <a href="#" class="p-2">Order history</a>
+        <a href="/address" class="p-2">Billing Address</a>
+        <a href="#" class="p-2">Wallet</a>
+        <a href="#" class="p-2">Wishlist</a>
+        <a href="#" class="p-2">Shopping Cart</a>
+        <a href="#" class="p-2">Coupon</a>                
+    </div>
+
+    <div class="container-fluid container-xl">
+        <!-- <div class="row "> -->
+            
+            <!-- <div class="content col-12 col-lg-9 mx-auto"> -->
+                <h3 class="my-4">Billing Address</h3>
+
+                <div class="row justify-content-center">
+                    <% if(address?.billingAddress?.length > 0){ %>
+                        <% address.billingAddress.forEach((ele, index) => { %>
+                            <% if(ele.isSelected==true){ %>
+                                <div class="col-md-4 ">
+                                    <div class="card p-3 mt-3 sticky-top " style="top: 1rem;">
+                                        <div class="d-flex justify-content-between">
+                                            <h5 class="mb-3 fw-bold">Selected Billing Address</h5>
+                                            <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                   
+                                        </div>
+                                        
+                                        <div>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                            <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                        </div>
+                                        <!-- <button class="btn btn-dark mt-3 w-100">Change address</button> -->
+                                    </div>
+                                </div>
+                            <% } %>  
+                        <% }) %>
+                    <% } %>
+                    
+                    
+
+                    <div class="col-md-8">
+                        <div class="card p-4 mt-3">
+                            <h5 class="mb-3 fw-bold">Add new Address</h5>
+
+                            <!-- add new address -->
+                            <div class="card p-4 mt-3">
+                                <!-- <form> -->
+                                    <div class="row g-3">
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">Full Name</label>
+                                            <input type="text" id="fullname" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="fullnameMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+    
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="number" min="0" id="phone" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="phoneMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+    
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">Email Address</label>
+                                            <input type="text" id="email" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="emailMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">Pincode</label>
+                                            <input type="number" min="0" id="pincode" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="pincodeMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label">Address</label>
+                                            <textarea type="text" id="address" class="form-control" placeholder="Type here"></textarea>
+                                            <p class="text-danger" id="addressMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <div class="col-12 d-flex gap-2">
+                                            <div>
+                                                <label class="form-label" for="home">Home</label>
+                                                <input type="radio" id="home" class="radioBtn" name="addressType" value="Home" checked>
+                                            </div>
+                                            <div>
+                                                <label class="form-label" for="work">Work</label>
+                                                <input type="radio" id="work" class="radioBtn" name="addressType" value="Work">
+                                            </div>
+                                        </div>
+    
+    
+                                        <div class="col-12">
+                                                <button class="btn btn-dark" id="submitBtn" style="width: 300px;">Create address</button>
+                                        </div>
+                                    </div>
+                                <!-- </form> -->
+                            </div>
+
+                            <!-- other billing address -->
+                             <% if(address?.billingAddress?.length > 0){ %>
+                                <h5 class="mt-5 fw-bold">Other Billing Addresses</h5>
+                                <div class="row row-cols-1 row-cols-lg-2">
+                                    <% address.billingAddress.forEach((ele, index) => { %>
+                                    
+                                        <div class="card p-4 mt-3">
+                                            <div class="d-flex justify-content-between">
+                                                <!-- <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                    -->
+                                            </div>
+                                            <div>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                                <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                                <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                            </div>
+                                            <div class="row row-cols-1 row-cols-md-2 justify-content-around">
+                                                <button class="btn btn-dark mt-3" onclick='selectAddress("<%= index %>")' style="width: 100px;">Select</button>
+                                                <button class="btn btn-dark mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
+                                                <button class="btn btn-dark mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
+
+                                            </div>
+                                        </div>
+                                                                       
+                                <% }) %>
+                                </div>                                                        
+                            <% } %>
+                        
+
+                        </div>
+                    </div>
+                </div>        
+            <!-- </div> -->
+        <!-- </div> -->
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p class="mb-0">&copy; 2025 ShopEase. All rights reserved.</p>
+    </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>
+
+    let userId = "<%= address?.userId %>"
+    let addressId = "<%= address?._id %>"
+    
+
+    const submitBtn = document.getElementById("submitBtn")
+
+    const fullnameRegex = /^(?=.{2,}$)(?!\s+$)[A-Za-z]+(?:[ '.][A-Za-z]+)*$/
+    const phoneRegex = /^(?!\s+$)\d{7,15}$/
+    const emailRegex = /^(?!\s+$)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+    const pincodeRegex = /^(?!\s+$)\d{6}$/
+    const addressRegex = /^(?!\s*$).{5,}$/
+
+    const fullnameMsg = document.getElementById("fullnameMsg")
+    const phoneMsg = document.getElementById("phoneMsg")
+    const emailMsg = document.getElementById("emailMsg")
+    const pincodeMsg = document.getElementById("pincodeMsg")
+    const addressMsg = document.getElementById("addressMsg")
+
+    submitBtn.addEventListener('click', async () => {
+        const fullname = document.getElementById("fullname")
+        const phone = document.getElementById("phone")
+        const email = document.getElementById("email")
+        const pincode = document.getElementById("pincode")
+        const address = document.getElementById("address")
+        const addressType = document.querySelector('input[name="addressType"]:checked')
+
+        if(!fullnameRegex.test(fullname.value) && !phoneRegex.test(phone.value) && !emailRegex.test(email.value) && !pincodeRegex.test(pincode.value) && !addressRegex.test(address.value) ){
+            fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+            phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+            emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+            pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+            addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+
+            return
+        }
+        else if(!fullnameRegex.test(fullname.value)){
+            fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+            phoneMsg.textContent = ""
+            emailMsg.textContent = ""
+            pincodeMsg.textContent = ""
+            addressMsg.textContent = ""
+
+            return
+        }
+        else if(!phoneRegex.test(phone.value)){
+            fullnameMsg.textContent = ""
+            phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+            emailMsg.textContent = ""
+            pincodeMsg.textContent = ""
+            addressMsg.textContent = ""
+            
+            return
+        }
+        else if(!emailRegex.test(email.value)){
+            fullnameMsg.textContent = ""
+            phoneMsg.textContent = ""
+            emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+            pincodeMsg.textContent = ""
+            addressMsg.textContent = ""
+            
+            return
+        }
+        else if(!pincodeRegex.test(pincode.value)){
+            fullnameMsg.textContent = ""
+            phoneMsg.textContent = ""
+            emailMsg.textContent = ""
+            pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+            addressMsg.textContent = ""
+            
+            return
+        }
+        else if(!addressRegex.test(address.value)){
+            fullnameMsg.textContent = ""
+            phoneMsg.textContent = ""
+            emailMsg.textContent = ""
+            pincodeMsg.textContent = ""
+            addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+            
+            return
+        }
+        else {
+            fullnameMsg.textContent = ""
+            phoneMsg.textContent = ""
+            emailMsg.textContent = ""
+            pincodeMsg.textContent = ""
+            addressMsg.textContent = ""
+        }
+
+
+
+
+
+        // const fullname = document.getElementById("fullname")
+
+        try{
+            const request = await fetch('/address', {
+                method: "POST",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify({
+                    fullname: fullname.value,
+                    phone: phone.value,
+                    email: email.value,
+                    pincode: pincode.value,
+                    address: address.value,
+                    addressType: addressType.value
+                })
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Successfully added the address"
+                })
+                .then(() => window.location.reload())
+            }
+
+        }
+        catch(err){
+            alert("add new address error")
+            console.log(err)
+        }
+    })
+
+    async function selectAddress(index){
+        try{
+            const request = await fetch('/selectAddress', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({index, addressId})
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "successfully selected new address"
+                })
+                .then(() => window.location.reload())
+            }
+            // else if(request.status==)
+        }
+        catch(err){
+            alert("select address error")
+            console.log(err)
+        }
+    }
+
+    async function deleteAddress(index){
+        try{
+            const request = await fetch('/deleteAddress', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({index, addressId})
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "successfully deleted the address"
+                })
+                .then(() => window.location.reload())
+            }
+            // else if(request.status==)
+        }
+        catch(err){
+            alert("select address error")
+            console.log(err)
+        }
+    }
+    
+    async function editAddress(index) {
+        try{
+            window.location.href = `/editAddress/${index}/${addressId}`
+        }
+        catch(err){
+            alert("edit address error")
+            console.log(err)
+        }
+    }
+</script>
+</body>
+</html>

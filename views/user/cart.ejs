@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shopping Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+            /* background: #f1f4f9; */
+            font-family: "Titillium Web", sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 1.5rem 0;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .quantity-btn {
+            /* width: 36px; */
+            /* height: 36px; */
+            /* display: flex; */
+            /* align-items: center; */
+            /* justify-content: center; */
+            /* font-size: 1.2rem; */
+            /* user-select: none; */
+            cursor: pointer;
+        }
+
+        /* .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 0.375rem;
+        } */
+
+        .subtotal-price {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .btn-proceed {
+            background-color: #ff6d00;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+
+        .btn-proceed:hover {
+            background-color: #e65c00;
+        }
+
+        @media (max-width: 576px) {
+
+            .table th,
+            .table td {
+                font-size: 0.9rem;
+            }
+
+            /* .quantity-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            } */
+/* 
+            .quantity-input {
+                width: 40px;
+            } */
+        }
+
+        .navbar {
+            padding: 0.8rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .navbar .form-control {
+            width: 220px;
+            border-radius: 0.375rem 0 0 0.375rem;
+        }
+
+        .navbar .btn-outline-secondary {
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+
+        .nav-link:hover {
+            color: #0d6efd !important;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                box-shadow: none;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        .sidebar {
+            /* width: 250px; */
+            /* flex-shrink: 0; */
+            background: #fff;
+            /* height: 100vh; */
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            /* position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px; */
+        }
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background: #f0f3f7;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg bg-black shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-light fw-bold d-flex align-items-center" href="#">
+                <i class="bi bi-box me-2"></i> ShopEase
+            </a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link text-light active" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="/allProducts">Shop List</a></li>
+                </ul>
+
+                <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
+                    <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
+                        <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+                        <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
+                        <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <a href="/logout" class="btn btn-outline-light">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
+    <div class=" sidebar d-flex flex-wrap justify-content-around">
+        <a href="/profile" class="">Profile</a>
+        <a href="#" class="">Order history</a>
+        <a href="/address" class="">Billing Address</a>
+        <a href="#" class="">Wallet</a>
+        <a href="#" class="">Wishlist</a>
+        <a href="#" class="">Shopping Cart</a>
+        <a href="#" class="">Coupon</a>                
+    </div>
+
+    <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
+    <div class="main-content">
+        <div class="container py-5">
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-lg-8">
+                    <div class="bg-white rounded-3 shadow-sm">
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0">
+                                <thead class="text-muted border-bottom">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Variant</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th>Subtotal</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% let totalPrice = 0 %>
+                                    <!-- Your items (unchanged) -->
+                                    <% if(cart?.length > 0){ %>
+                                        <% cart.forEach((ele, index) => { %>
+                                            <tr class="cart-item" id="tableRow-<%= index %>">
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="/<%= ele.image %>"
+                                                            alt="<%= ele.product.name %>" class="rounded-3 me-3" width="80">
+                                                        <div>
+                                                            <h6 class="mb-0"><%= ele.product.name %></h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-muted"><%= ele.variant.ram %>|<%= ele.variant.storage %>|<%= ele.variant.color %></td>
+                                                
+                                                <% 
+                                                    let price = Number(ele.variant.price); 
+                                                    let discount = Number(ele.product.discount); 
+                                                    let offAmount = price * (discount / 100); 
+                                                    let finalPrice = Math.floor(price - offAmount);
+                                                %>
+                                                
+                                                <td>&#8377;<%= finalPrice %></td>
+                                                <td>
+                                                    <div class="d-flex align-items-center input-group">
+                                                        <div class="quantity-btn input-group-text bg-dark text-light"
+                                                            onclick='updateQuantity(this, -1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>-</div>
+                                                            <div class="" style="width: 40px;">
+                                                                <input type="text" id="quantity-<%= index %>" class="quantity-input mx-0 form-control text-center px-0 py-2"  value="<%= ele.items.quantity %>" readonly>
+        
+                                                            </div>
+                                                        <div class="quantity-btn  input-group-text bg-dark text-light"
+                                                            onclick='updateQuantity(this, 1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>+</div>
+                                                    </div>
+                                                </td>
+
+                                                <% 
+                                                    
+                                                    let subTotal = finalPrice * ele.items.quantity
+                                                    totalPrice+=subTotal
+
+                                                %>
+
+                                                <td class="subtotal-price" id="subTotal-<%= index %>">&#8377; <%= subTotal %></td>
+                                                <td><i class="bi bi-trash3 text-muted cursor-pointer" onclick='removeProduct("<%= index %>", "<%= ele._id %>")'></i></td>
+                                            </tr>                                        
+                                        <% }) %>
+                                    <% } %>   
+
+                                    <!-- <tr class="cart-item">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="/uploads/image-1-1762305360201-cropped-3.jpeg"
+                                                    alt="MacBook Air" class="rounded-3 me-3" width="80">
+                                                <div>
+                                                    <h6 class="mb-0">Apple MacBook Air</h6>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted">6GB RAM, black</td>
+                                        <td>$999</td>
+                                        <td>
+                                            <div class="d-flex align-items-center input-group">
+                                                <div class="quantity-btn  input-group-text bg-dark text-light"
+                                                    onclick="updateQuantity(this, -1)">-</div>
+                                                    <div class="" style="width: 40px;">
+                                                        <input type="text" class="quantity-input mx-0 form-control text-center  px-0 py-2" value="1" readonly>
+
+                                                    </div>
+                                                <div class="quantity-btn  input-group-text bg-dark text-light"
+                                                    onclick="updateQuantity(this, 1)">+</div>
+                                            </div>
+                                        </td>
+                                        <td class="subtotal-price">$999</td>
+                                        <td><i class="bi bi-trash3 text-muted cursor-pointer"></i></td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="col-lg-4 mt-4 mt-lg-0">
+                    <div class="bg-white rounded-3 shadow-sm p-4 sticky-top" style="top: 1rem;">
+                        <h5 class="mb-4">Price (<%= cart?.length %> items)</h5>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Total Amount:</span>
+                            <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %></span>
+                        </div>
+                        <button class="btn btn-proceed text-white w-100 mt-4">
+                            Proceed to payment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER (always at the bottom) ==================== -->
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <p class="mb-0">© 2025 ShopEase. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function updateQuantity(btn, change, index, cartId, price, quantity) {
+            const input = btn.parentElement.querySelector('.quantity-input');
+
+            if(input.value==1 && change==-1){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "Quantity can't be less then one"
+                })
+                return
+            }            
+            else if(input.value==5 && change==1){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "Quantity can't be more then five"
+                })
+                return
+            }
+            else if(input.value==quantity && change==1){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "Max quantity of the product reached"
+                })
+                return
+            }
+
+
+            try{
+                const request = await fetch('/updateQuantity', {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ change, index, cartId })
+                })
+                if(request.status==200){
+                    const input = btn.parentElement.querySelector('.quantity-input');
+                    let value = parseInt(input.value);
+                    value = Math.max(1, value + change);
+                    input.value = value;
+
+                    document.getElementById(`subTotal-${index}`).innerHTML = `&#8377; ${value*price}`
+
+                    const total = document.querySelectorAll('.subtotal-price')
+                    let res=0
+                    total.forEach(ele => {
+                        res+=Number(ele.innerHTML.slice(1))
+                    })
+                    
+                    document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
+                    
+                }
+            }
+            catch(err){
+                alert("update quantity error")
+                console.log(err)
+            }
+
+            // const input = btn.parentElement.querySelector('.quantity-input');
+            // let value = parseInt(input.value);
+            // value = Math.max(1, value + change);
+            // input.value = value;
+
+            // const row = btn.closest('tr');
+            // const price = parseInt(row.cells[2].textContent.replace('$', ''));
+            // row.cells[4].textContent = '$' + (price * value);
+
+            // updateTotal();
+        }
+
+        let removeIndex, removeCartId
+        async function removeProduct(index, cartId){
+            removeIndex = index
+            removeCartId = cartId
+            
+            swal.fire({
+                icon: "question",
+                title: "Are you sure?",
+                showCancelButton: true,
+                confirmButtonText: "confirm",
+            })
+            .then(async (result) => {
+                if (result.isConfirmed) {
+                    try{
+                        const request = await fetch('/removeProduct', {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({index, cartId})
+                        })
+                        if(request.status==200){
+                            
+                            const row = document.getElementById(`tableRow-${index}`)
+                            if(row) row.remove()
+
+                            const total = document.querySelectorAll('.subtotal-price')
+                            let res=0
+                            total.forEach(ele => {
+                                res+=Number(ele.innerHTML.slice(1))
+                            })
+                            
+                            document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
+                            
+                        }
+                    }   
+                    catch(err){
+                        alert("remove from cart error")
+                        console.log(err)
+                    }
+                }
+            })
+            
+        }
+
+
+
+        // function updateTotal() {
+        //     let total = 0;
+        //     document.querySelectorAll('.subtotal-price').forEach(el => {
+        //         total += parseInt(el.textContent.replace('$', ''));
+        //     });
+        //     document.querySelector('.total-price').textContent = '$' + total;
+        //     document.querySelector('.btn-proceed').previousElementSibling.querySelector('h5').textContent =
+        //         `Price (${document.querySelectorAll('.cart-item').length} items)`;
+        // }
+    </script>
+</body>
+
+</html>

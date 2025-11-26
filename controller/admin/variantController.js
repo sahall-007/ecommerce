@@ -176,8 +176,6 @@ const editVariantPost = async (req, res) => {
                     const deleteVariantImg = await variantSchema.updateOne({_id: id}, {$pull: {image: img.image[index]}})
                     const insertNewImage = await variantSchema.updateOne({_id: id}, {$push: {image: {$each: [path], $position: index}}})
                 }
-                
-            
             }
 
             const productIdOfVariant = await variantSchema.findOne({_id: id}, {productId: 1})

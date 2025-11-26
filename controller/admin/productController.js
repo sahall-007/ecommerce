@@ -124,7 +124,7 @@ console.log(images)
         const categoryDetail = await categorySchema.findOne({name: category}, {name: 1, _id: 1})
         const brandDetail = await brandSchema.findOne({name: brand}, {name: 1, _id: 1})
 
-        console.log(categoryDetail)
+        // console.log(categoryDetail)
 
         if(!categoryDetail){
             return res.stauts(401).json({success: false, message: "cannot find the category"})
@@ -143,21 +143,20 @@ console.log(images)
         let indexOfDash = keys[0].indexOf("-")
 
         for(let i=0; i<totalVariants; i++){
-            console.log("inside of creating new variant")
 
             let imageFieldName
 
             for(let j=0; j<keys.length; j++){
                 if(Number(keys[j].slice(indexOfDash+1)) == i+1){
-                    console.log("before imagefield", imageFieldName, i)
+                    // console.log("before imagefield", imageFieldName, i)
                     imageFieldName = keys[j]
-                    console.log("after imagefield", imageFieldName, i)
+                    // console.log("after imagefield", imageFieldName, i)
                 }
             }
-            console.log("imagefield", imageFieldName)
+            // console.log("imagefield", imageFieldName)
             let variantImage = images[imageFieldName]
 
-            console.log("this is variant image", variantImage)
+            // console.log("this is variant image", variantImage)
 
             await variantSchema.create({
                 ram: ram[i],

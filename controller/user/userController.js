@@ -55,6 +55,17 @@ function generateOtp(){
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+// const pageNotFound = async (req, res) => {
+//     try{
+//         res.render('pageNotFound')
+//     }
+//     catch(err){
+//         logger.fatal(err)
+//         logger.fatal("failed to 404 page")
+//         res.status(500).json({success: false, message: "something went wrong (404 page not found)"})
+//     }
+// }
+
 // to send the OTP to the provided email by the user during sign up
 async function sendVerificationEmail(email, otp){
     try{
@@ -329,6 +340,8 @@ const getHomePage = async (req, res) => {
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             {$sample: {size: 10}}
         ])
+
+        
   
         
         // const populated = await variantSchema.populate(newArrivals, { path: 'productId'})
@@ -522,6 +535,7 @@ const newArrivals = async (req, res) => {
 }
 
 module.exports = {
+    // pageNotFound,
     loadRegister,
     registerUser,
     loadLogin,

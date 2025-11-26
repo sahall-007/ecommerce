@@ -171,8 +171,6 @@ const changePassword = async (req, res) => {
 }
 
 const changePasswordPost = async (req, res) => {
-
-    console.log("working")
     try{
         const { newPass } = req.body
         const email = req.session.forgotEmail
