@@ -14,7 +14,7 @@ const logger = require("../../config/pinoLogger.js")
 
 const cartPage = async (req, res) => {
     try {
-        const id = req.session.user || req.session.passport.user
+        const id = req.session?.user || req.session?.passport?.user
 
         // const cart = await cartSchema.findOne({userId: id})
         const cart = await cartSchema.aggregate([
@@ -42,6 +42,7 @@ const cartPage = async (req, res) => {
                 "product.discount": 1
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
+            
         ])
 
         // console.log(cart)

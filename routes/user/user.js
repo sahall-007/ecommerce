@@ -14,6 +14,7 @@ const forgotPassRouter = require("./forgotPassRouter.js")
 const userPageRouter = require("./userPageRouter.js")
 const addressRouter = require('./addressRouter.js')
 const cartRouter = require('./cartRouter.js')
+const checkoutRouter = require('./checkoutRouter.js')
 
 const router = express.Router()
 
@@ -61,5 +62,8 @@ router.use(addressRouter)
 
 // cart --------------------------------
 router.use(cartRouter)
+
+// checkout --------------------------------
+router.use(checkoutRouter)
 
 module.exports = router

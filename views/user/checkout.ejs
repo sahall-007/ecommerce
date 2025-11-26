@@ -18,12 +18,11 @@
             height: 100%;
             /* background: #f1f4f9; */
             font-family: "Titillium Web", sans-serif;
-            
         }
 
         body {
-            min-height: 100vh;
             display: flex;
+             min-height: 100vh;
             flex-direction: column;
         }
 
@@ -62,12 +61,12 @@
             border-radius: 0.375rem;
         } */
 
-        .subtotal-price {
+        /* .subtotal-price {
             font-weight: 600;
             color: #212529;
         }
 
-        /* .total-price {
+        .total-price {
             font-size: 1.5rem;
             font-weight: 700;
         } */
@@ -157,7 +156,6 @@
         .sidebar a:hover {
             background: #f0f3f7;
         }
-        
     </style>
 </head>
 
@@ -207,14 +205,15 @@
     </div>
 
     <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
-    
+     <% let addressIndex %>
     <% if(cart?.length > 0){ %>
+        
         <div class="main-content">
             <div class="container py-5">
                 <div class="row">
                     <!-- Cart Items -->
                     <div class="col-lg-8">
-                        <div class="bg-white rounded-3 shadow-sm">
+                        <div class="bg-white rounded-3 shadow-sm" id="productTable">
                             <div class="table-responsive">
                                 <table class="table table-borderless align-middle mb-0">
                                     <thead class="text-muted border-bottom">
@@ -229,7 +228,7 @@
                                     </thead>
                                     <tbody>
                                         <% let totalPrice = 0 %>
-                                        
+                                        <% if(cart?.length > 0){ %>
                                             <% cart.forEach((ele, index) => { %>
                                                 <tr class="cart-item" id="tableRow-<%= index %>">
                                                     <td>
@@ -275,57 +274,162 @@
                                                     <td><i class="bi bi-trash3 text-muted cursor-pointer" onclick='removeProduct("<%= index %>", "<%= ele._id %>")'></i></td>
                                                 </tr>                                        
                                             <% }) %>
-                                        
+                                        <% } %>   
 
-                                        <!-- <tr class="cart-item">
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="/uploads/image-1-1762305360201-cropped-3.jpeg"
-                                                        alt="MacBook Air" class="rounded-3 me-3" width="80">
-                                                    <div>
-                                                        <h6 class="mb-0">Apple MacBook Air</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-muted">6GB RAM, black</td>
-                                            <td>$999</td>
-                                            <td>
-                                                <div class="d-flex align-items-center input-group">
-                                                    <div class="quantity-btn  input-group-text bg-dark text-light"
-                                                        onclick="updateQuantity(this, -1)">-</div>
-                                                        <div class="" style="width: 40px;">
-                                                            <input type="text" class="quantity-input mx-0 form-control text-center  px-0 py-2" value="1" readonly>
-
-                                                        </div>
-                                                    <div class="quantity-btn  input-group-text bg-dark text-light"
-                                                        onclick="updateQuantity(this, 1)">+</div>
-                                                </div>
-                                            </td>
-                                            <td class="subtotal-price">$999</td>
-                                            <td><i class="bi bi-trash3 text-muted cursor-pointer"></i></td>
-                                        </tr> -->
                                     </tbody>
                                 </table>
                             </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-3 shadow-sm p-4 d-none" id="editAddress" style="top: 1rem; z-index: 8;">
+                            <h5 class="mb-4">Edit address</h5>
+                            <% if(address?.billingAddress?.length > 0){ %>
+                                <% address.billingAddress.forEach((ele, index) => { %>
+                                    <% if(ele.isSelected==true){ %>
+                                        <% addressIndex = index %>
+                                        <div>
+                                            <div class="row g-3">
+                                                <div class="col-12 col-lg-6">
+                                                    <label class="form-label">Full name</label>
+                                                    <input type="text" id="fullname" class="form-control" value="<%= address?.billingAddress[index].fullname %>">
+                                                    <p class="text-danger" id="fullnameMsg" style="font-size: small; max-width: 320px;"></p>
+                                                </div>
+
+                                                <div class="col-12 col-lg-6">
+                                                    <label class="form-label">phone number</label>
+                                                    <input type="number" min="0" id="phone" class="form-control" value="<%= address?.billingAddress[index].phone %>">
+                                                    <p class="text-danger" id="phoneMsg" style="font-size: small; max-width: 320px;"></p>
+                                                </div>
+
+                                                <div class="col-12 col-lg-6">
+                                                    <label class="form-label">Email address</label>
+                                                    <input type="text" id="email" class="form-control" value="<%= address?.billingAddress[index].email %>">
+                                                    <p class="text-danger" id="emailMsg" style="font-size: small; max-width: 320px;"></p>
+                                                </div>
+
+                                                <div class="col-12 col-lg-6">
+                                                    <label class="form-label">Pincode</label>
+                                                    <input type="number" min="0" id="pincode" class="form-control" value="<%= address?.billingAddress[index].pincode %>">
+                                                    <p class="text-danger" id="pincodeMsg" style="font-size: small; max-width: 320px;"></p>
+                                                </div>
+
+                                                <div class="col-12">
+                                                    <label class="form-label">Address</label>
+                                                    <textarea type="text" id="address" class="form-control"
+                                                    ><%= address?.billingAddress[index].address %></textarea>
+                                                    <p class="text-danger" id="addressMsg" style="font-size: small; max-width: 320px;"></p>
+                                                </div>
+
+                                                <div class="col-12 d-flex gap-2">
+                                                    <div>
+                                                        <label class="form-label" for="home">Home</label>
+                                                        <input type="radio" id="home" class="radioBtn" name="addressType" value="Home"
+                                                            checked>
+                                                    </div>
+                                                    <div>
+                                                        <label class="form-label" for="work">Work</label>
+                                                        <input type="radio" id="work" class="radioBtn" name="addressType" value="Work">
+                                                    </div>
+                                                </div>
+
+
+                                                <div class="col-12">
+                                                    <button class="btn btn-dark" id="submitBtn" onclick='confirmEdit("<%= index %>")'>Edit address</button>
+                                                    <button class="btn btn-primary" id="submitBtn"  onclick='cancelEdit()'>Cancel edit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% } %>  
+                                <% }) %>                                
+                            <% } %>
+
                         </div>
                     </div>
 
                     <!-- Summary -->
                     <div class="col-lg-4 mt-4 mt-lg-0">
-                        <div class="bg-white rounded-3 shadow-sm p-4 sticky-top" style="top: 1rem; z-index: 10;">
-                            <h5 class="mb-3" id="itemCount">Price (<%= cart?.length %> items)</h5>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Total Amount:</span>
-                                <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %></span>
+                        
+                        <!-- address -->
+                        <div class="bg-white rounded-3 shadow-sm p-4  style="top: 1rem; z-index: 8;">
+                            <h5 class="mb-4">Billing address</h5>
+                            <% let addressSelected = false %>
+                            <% if(address?.billingAddress?.length > 0){ %>
+                                <% address.billingAddress.forEach((ele, index) => { %>
+                                    <% if(ele.isSelected==true){ %>
+                                        <% addressSelected = true %>
+                                        <% addressIndex = index %>
+                                        <div>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                            <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                            <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                        </div>
+                                        <div class="row  justify-content-center gap-2">
+                                            <button class="btn btn-dark mt-3 col-8 col-md-5" onclick="location.href='/address'" >Change</button>
+                                            <button class="btn btn-primary mt-3 col-8 col-md-5" onclick='editAddress("<%= index %>")' >Edit</button>
+                                        </div>
+                                        
+                                    <% } %>  
+                                <% }) %>                                
+                            <% } %>
+                            <% if(!addressSelected){ %>
+                                    <button class="btn btn-dark mt-3" onclick="location.href='/address'" >Select address</button>
+                            <% } %>
+                        </div>
+
+                        <!-- order summay -->
+
+                        <div class="bg-white rounded-3 shadow-sm p-4  mt-2"" style="top: 1rem; z-index: 10;">
+                            <h5 class="mb-3" id="itemCount">Coupon code</h5>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="coupon" id="coupon" placeholder="Coupon code" disabled>
+                                <button class="btn btn-dark input-text" >Apply</button>
+
                             </div>
-                            <button class="btn btn-proceed text-white w-100 mt-3"  onclick="location.href='/checkout'">
-                                Checkout
+                            <hr>
+                            <h5 class="mb-3" id="itemCount">Payment Methods</h5>
+                            <ul  style="list-style-type: none;">
+                                <li>
+                                    <input type="radio" name="payment" id="cod" checked>
+                                    <label for="cod" class="fs-6">Cash on delivery</label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="payment" id="wallet" disabled>
+                                    <label for="wallet" class="fs-6">Wallet</label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="payment" id="upi" disabled>
+                                    <label for="upi" class="fs-6">UPI</label>
+                                </li>
+                            </ul>
+                            <hr>
+                            <h5 class="mb-3" id="itemCount">Price (<%= cart?.length %> items)</h5>
+                            <div class="d-flex justify-content-between mb-2">
+                               <span>Sub total:</span>
+                               <span id="" class="total-price">&#8377; <%= totalPrice %>.00</span>
+                           </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <% let couponDiscount = 0 %>
+                                <span>Coupon discount:</span>
+                                <span id="totalPrice" class="total-price">&#8377; <%= couponDiscount %>.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping charge:</span>
+                                <span id="totalPrice" class="total-price">&#8377; 50.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="fw-bold">Total Amount:</span>
+                                <span id="totalPrice" class="total-price text-success fw-bold">&#8377; <%= totalPrice - couponDiscount - 50%>.00</span>
+                            </div>
+
+                            <button class="btn btn-proceed text-white w-100 mt-3">
+                                Place order
                             </button>
                         </div>
                         
                     </div>
-                    
-
                 </div>
             </div>
         </div>
@@ -357,6 +461,11 @@
      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        window.addEventListener("unload", function () {});
+
+        const addressId = "<%= address._id%>"
+        
+
         async function updateQuantity(btn, change, index, cartId, price, quantity) {
             const input = btn.parentElement.querySelector('.quantity-input');
 
@@ -415,16 +524,6 @@
                 console.log(err)
             }
 
-            // const input = btn.parentElement.querySelector('.quantity-input');
-            // let value = parseInt(input.value);
-            // value = Math.max(1, value + change);
-            // input.value = value;
-
-            // const row = btn.closest('tr');
-            // const price = parseInt(row.cells[2].textContent.replace('$', ''));
-            // row.cells[4].textContent = '$' + (price * value);
-
-            // updateTotal();
         }
 
         let removeIndex, removeCartId
@@ -458,14 +557,10 @@
                             //     itemCount+=1
                             //     res+=Number(ele.innerHTML.slice(1))
                             // })
-
-                            // if(itemCount==0){                                
-                            //     window.location.reload()
-                            //     return
-                            // }
                             
                             // document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
-                            // document.getElementById("itemCount").innerHTML = `Price (${itemCount} items)`
+                            // document.getElementById("itemCount").innerText  = `Price (${itemCount} items)`
+
                             window.location.reload()
                             
                         }
@@ -478,18 +573,151 @@
             })
             
         }
+        
+        async function editAddress(index) {
+            try{
+                document.getElementById("productTable").classList.add("d-none")
+                document.getElementById("editAddress").classList.remove("d-none")
 
+                window.location.href = "#editAddress"
+                // window.location.href = `/editAddress/${index}/${addressId}`
+            }
+            catch(err){
+                alert("edit address error")
+                console.log(err)
+            }
+    }
 
+    async function confirmEdit(index) {
+        const fullnameRegex = /^(?=.{2,}$)(?!\s+$)[A-Za-z]+(?:[ '.][A-Za-z]+)*$/
+        const phoneRegex = /^(?!\s+$)\d{7,15}$/
+        const emailRegex = /^(?!\s+$)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+        const pincodeRegex = /^(?!\s+$)\d{6}$/
+        const addressRegex = /^(?!\s*$).{5,}$/
 
-        // function updateTotal() {
-        //     let total = 0;
-        //     document.querySelectorAll('.subtotal-price').forEach(el => {
-        //         total += parseInt(el.textContent.replace('$', ''));
-        //     });
-        //     document.querySelector('.total-price').textContent = '$' + total;
-        //     document.querySelector('.btn-proceed').previousElementSibling.querySelector('h5').textContent =
-        //         `Price (${document.querySelectorAll('.cart-item').length} items)`;
-        // }
+        const fullnameMsg = document.getElementById("fullnameMsg")
+        const phoneMsg = document.getElementById("phoneMsg")
+        const emailMsg = document.getElementById("emailMsg")
+        const pincodeMsg = document.getElementById("pincodeMsg")
+        const addressMsg = document.getElementById("addressMsg")
+
+        const fullname = document.getElementById("fullname")
+            const phone = document.getElementById("phone")
+            const email = document.getElementById("email")
+            const pincode = document.getElementById("pincode")
+            const address = document.getElementById("address")
+            const addressType = document.querySelector('input[name="addressType"]:checked')
+
+            if (!fullnameRegex.test(fullname.value) && !phoneRegex.test(phone.value) && !emailRegex.test(email.value) && !pincodeRegex.test(pincode.value) && !addressRegex.test(address.value)) {
+                fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+                phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+                emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+                pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+                addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+
+                return
+            }
+            else if (!fullnameRegex.test(fullname.value)) {
+                fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+                phoneMsg.textContent = ""
+                emailMsg.textContent = ""
+                pincodeMsg.textContent = ""
+                addressMsg.textContent = ""
+
+                return
+            }
+            else if (!phoneRegex.test(phone.value)) {
+                fullnameMsg.textContent = ""
+                phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+                emailMsg.textContent = ""
+                pincodeMsg.textContent = ""
+                addressMsg.textContent = ""
+
+                return
+            }
+            else if (!emailRegex.test(email.value)) {
+                fullnameMsg.textContent = ""
+                phoneMsg.textContent = ""
+                emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+                pincodeMsg.textContent = ""
+                addressMsg.textContent = ""
+
+                return
+            }
+            else if (!pincodeRegex.test(pincode.value)) {
+                fullnameMsg.textContent = ""
+                phoneMsg.textContent = ""
+                emailMsg.textContent = ""
+                pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+                addressMsg.textContent = ""
+
+                return
+            }
+            else if (!addressRegex.test(address.value)) {
+                fullnameMsg.textContent = ""
+                phoneMsg.textContent = ""
+                emailMsg.textContent = ""
+                pincodeMsg.textContent = ""
+                addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+
+                return
+            }
+            else {
+                fullnameMsg.textContent = ""
+                phoneMsg.textContent = ""
+                emailMsg.textContent = ""
+                pincodeMsg.textContent = ""
+                addressMsg.textContent = ""
+            }
+
+            let testing = "<%= addressIndex %>"
+           let isSelected = "<%= address?.billingAddress[addressIndex].isSelected %>"
+            
+
+            try {
+                const request = await fetch('/editAddress', {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        fullname: fullname.value,
+                        phone: phone.value,
+                        email: email.value,
+                        pincode: pincode.value,
+                        address: address.value,
+                        addressType: addressType.value,
+                        addressId,
+                        index,
+                        isSelected
+                    })
+                })
+                const data = await request.json()
+                if (request.status == 200) {
+                    swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text: "Successfully edited the address"
+                    })
+                    .then(() => window.location.reload())
+                }
+                else if(request.status==404){
+                    console.log(data)
+                    document.body.innerHTML = `${data.html}`
+                }
+
+            }
+            catch (err) {
+                alert("Edit address error")
+                console.log(err)
+            }
+    }
+
+    function cancelEdit(){
+        document.getElementById("productTable").classList.remove("d-none")
+        document.getElementById("editAddress").classList.add("d-none")
+
+        window.location.href = "#productTable"
+    }
+    
     </script>
 </body>
 

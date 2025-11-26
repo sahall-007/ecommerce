@@ -183,8 +183,8 @@
                   <% }) %>
                 </select>
 
-                <button class="btn btn-danger me-3 px-4">Buy Now</button>
-                <button class="btn btn-dark px-4">Add to Cart</button>
+                <!-- <button class="btn btn-danger me-3 px-4">Buy Now</button> -->
+                <button class="btn btn-dark px-4"  onclick='addToCart("<%= variant[0]._id %>")'>Add to Cart</button>
             </div>
 
         </div>
@@ -335,6 +335,33 @@
   function viewProduct(id){
       window.location.href = `/productDetail/${id}`
   }
+
+  async function addToCart(variantId){
+      event.stopPropagation()
+      try{
+        const request = await fetch('/cart', {
+          method: "POST",
+          headers: {"Content-Type": "application/json" },
+          body: JSON.stringify({ variantId })
+        })
+        if(request.status==200){
+          window.location.href = '/cart'
+        }
+        else if(request.status==400){
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "The product is blocked by the Admin"
+          })
+        }
+        // else if(request.status==)
+      }
+      catch(err){
+        alert("add to cart error"),
+        console.log(err)
+      }
+    }
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

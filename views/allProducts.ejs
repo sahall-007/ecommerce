@@ -218,7 +218,7 @@
                             <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
                           </div>
 
-                          <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
+                          <button class="btn btn-outline-primary btn-sm" onclick='addToCart("<%= ele._id %>")'>Add to Cart</button>
                         </div>
                       </div>
                     </div> 
@@ -429,10 +429,36 @@
 
     })
 
-    
+       
     
     function viewProduct(id){
       window.location.href = `/productDetail/${id}`
+    }
+
+    async function addToCart(variantId){
+      event.stopPropagation()
+      try{
+        const request = await fetch('/cart', {
+          method: "POST",
+          headers: {"Content-Type": "application/json" },
+          body: JSON.stringify({ variantId })
+        })
+        if(request.status==200){
+          window.location.href = '/cart'
+        }
+        else if(request.status==400){
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "The product is blocked by the Admin"
+          })
+        }
+        // else if(request.status==)
+      }
+      catch(err){
+        alert("add to cart error"),
+        console.log(err)
+      }
     }
 
   </script>

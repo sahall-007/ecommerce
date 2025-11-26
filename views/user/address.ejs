@@ -230,8 +230,8 @@
                                             </div>
                                             <div class="row row-cols-1 row-cols-md-2 justify-content-around">
                                                 <button class="btn btn-dark mt-3" onclick='selectAddress("<%= index %>")' style="width: 100px;">Select</button>
-                                                <button class="btn btn-dark mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
-                                                <button class="btn btn-dark mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
+                                                <button class="btn btn-danger mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
+                                                <button class="btn btn-primary mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
 
                                             </div>
                                         </div>
@@ -403,26 +403,36 @@
     }
 
     async function deleteAddress(index){
-        try{
-            const request = await fetch('/deleteAddress', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({index, addressId})
-            })
-            if(request.status==200){
-                swal.fire({
-                    icon: "success",
-                    title: "Success",
-                    text: "successfully deleted the address"
-                })
-                .then(() => window.location.reload())
+        swal.fire({
+            icon: "question",
+            title: "Are you sure?",
+            showCancelButton: true,
+            confirmButtonText: "confirm",
+        })
+        .then(async (result) => {
+            if(result.isConfirmed){
+                try{
+                    const request = await fetch('/deleteAddress', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({index, addressId})
+                    })
+                    if(request.status==200){
+                        swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "successfully deleted the address"
+                        })
+                        .then(() => window.location.reload())
+                    }
+                    // else if(request.status==)
+                }
+                catch(err){
+                    alert("select address error")
+                    console.log(err)
+                }
             }
-            // else if(request.status==)
-        }
-        catch(err){
-            alert("select address error")
-            console.log(err)
-        }
+        })
     }
     
     async function editAddress(index) {
