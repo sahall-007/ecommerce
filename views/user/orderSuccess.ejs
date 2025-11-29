@@ -58,11 +58,11 @@
 
             <!-- Order ID -->
             <div class="bg-light rounded-pill d-inline-block px-4 py-2 mb-4">
-                <strong>Order ID:</strong> <%= orderId || '#ORD123456' %>
+                <strong>Order ID: <%= orderId %></strong> 
             </div>
 
             <div class="d-grid d-md-block gap-3">
-                <a href="/orders/<%= orderId || '' %>" class="btn btn-orange text-white px-5 py-3 me-md-3">
+                <a href="/orders" class="btn btn-orange text-white px-5 py-3 me-md-3">
                     <i class="bi bi-receipt me-2"></i>View Order Details
                 </a>
                 <a href="/allProducts" class="btn btn-outline-dark px-5 py-3">

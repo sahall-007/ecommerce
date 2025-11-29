@@ -2,6 +2,8 @@ const express = require("express")
 const connected = require('./db/connectDB.js')
 const userRoute = require('./routes/user/user.js')
 const adminRoute = require('./routes/admin/admin.js')
+const env = require('dotenv').config()
+const PDFDocument = require('pdfkit');
 
 const session = require('express-session')
 const nocache = require('nocache')
@@ -42,8 +44,16 @@ app.set("view engine", "ejs")
 app.use('/', userRoute)
 app.use('/admin', adminRoute)
 
+app.use('/admin', (req, res) => {
+    res.render('pageNotFound')
+})
+
+app.use('/', (req, res) => {
+    res.render('pageNotFound')
+})
+
 connected()
 
-app.listen(3000, () => {
-    console.log("server running on port 3000")
+app.listen(process.env.PORT, () => {
+    console.log(`server running on port ${process.env.PORT}`)
 })

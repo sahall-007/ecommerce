@@ -18,7 +18,7 @@ const addressRouter = require('./addressRouter.js')
 const router = express.Router()
 
 router.route('/cart')
-    .get(cartController.cartPage)
+    .get(middleware.checkSession, cartController.cartPage)
     .post(cartController.cartPost)
 
 router.route('/updateQuantity')

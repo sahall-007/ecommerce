@@ -15,11 +15,11 @@ router.route('/editProfile')
 
 // change email ---------------
 router.route('/changeEmail')
-    .get(profileController.changeEmailPage)
+    .get(middleware.checkSession, profileController.changeEmailPage)
     .post(profileController.changeEmailPost)
 
 router.route('/changeEmailOtp')
-    .get(profileController.getOtpPage)
+    .get(middleware.checkSession, profileController.getOtpPage)
     .post(profileController.otpPost)
 
 router.route('/changeEmailresendOtp')    
@@ -30,7 +30,7 @@ router.route('/newEmail')
     .post(profileController.newEmailPost)
 
 router.route('/newEmailOtp')    
-    .get(profileController.newEmailOtpPage)
+    .get(middleware.checkSession, profileController.newEmailOtpPage)
     .post(profileController.newEmailOtpPost)
 
 router.route('/newEmailResendOtp')

@@ -30,6 +30,7 @@ const checkoutPage = async (req, res) => {
                 as: "variant"
             }},
             {$unwind: "$variant"},
+            {$match: {"variant.quantity": {$gt: 0}}},
             {$lookup: {
                 from: "products",
                 localField: "variant.productId",

@@ -11,6 +11,10 @@ const variantManagement = async (req, res) => {
 
         const variants = await variantSchema.find({productId: id})
 
+        if(variants.length<=0){
+            return res.status(404).render('pageNotFound')
+        }
+
         res.status(200).render('variantManagement', {variants , nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
 
     }

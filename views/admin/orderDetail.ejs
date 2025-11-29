@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shopping Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+            font-family: "Titillium Web", sans-serif;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .cart-item {
+            border-bottom: 1px solid #eee;
+            padding: 1.5rem 0;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .quantity-btn {
+           
+            cursor: pointer;
+        }
+
+        .btn-proceed {
+            background-color: #ff6d00;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+
+        .btn-proceed:hover {
+            background-color: #e65c00;
+        }
+
+        @media (max-width: 576px) {
+
+            .table th,
+            .table td {
+                font-size: 0.9rem;
+            }
+
+            /* .quantity-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            } */
+            /* 
+            .quantity-input {
+                width: 40px;
+            } */
+        }
+
+        .navbar {
+            padding: 0.8rem 1rem;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .navbar .form-control {
+            width: 220px;
+            border-radius: 0.375rem 0 0 0.375rem;
+        }
+
+        .navbar .btn-outline-secondary {
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+
+        .nav-link:hover {
+            color: #0d6efd !important;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                box-shadow: none;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        .sidebar {
+            /* width: 250px; */
+            /* flex-shrink: 0; */
+            background: #fff;
+            /* height: 100vh; */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            /* position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px; */
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            font-size: 15px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #f0f3f7;
+        }
+
+        .timeline-steps {
+            position: relative;
+        }
+
+        .timeline-step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+        }
+
+        .timeline-connector {
+            flex: 1;
+            height: 2px;
+            background: #e0e0e0;
+            margin: 20px 0;
+            position: relative;
+            top: -20px;
+        }
+
+        .timeline-step.completed .timeline-connector {
+            background: #28a745;
+        }
+
+        @media (max-width: 576px) {
+            .timeline-connector {
+                display: none;
+            }
+
+            .timeline-step {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar navbar-expand-lg bg-black shadow-sm">
+        <div class="container">
+            <a class="navbar-brand text-light fw-bold d-flex align-items-center" href="#">
+                <i class="bi bi-box me-2"></i> ShopEase
+            </a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto text-center mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link text-light active" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="#">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="#">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link text-light" href="/allProducts">Shop List</a></li>
+                </ul>
+
+                <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
+                    <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
+                        <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+                        <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
+                        <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <a href="/logout" class="btn btn-outline-light">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+        <% if(order){ %>
+
+            <div class="main-content">
+                <div class="container py-5">
+                    <div class="row">
+                        <!-- Cart Items -->
+                        <div class="col-lg-8">
+                            <!-- Page Title -->
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h2 class="h4 mb-0 text-dark">Order Details</h2>
+                                <a href="/admin/orders" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to Orders
+                                </a>
+                            </div>
+
+                            <!-- Order Summary Card -->
+                            <div class="card border-0 shadow-sm mb-4">
+
+                                <!-- =========== CARD HEADER ========== -->
+                                <div class="card-header bg-dark bg-gradient text-white">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h5 class="mb-0"><%= order.orderId %></h5>
+                                            <small>Placed on <%= new Date(order.placedAt).toLocaleDateString('en-GB', {
+                                                weekday: 'short',
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric'
+                                            }) %></small>
+                                        </div>
+                                        <div class="col-auto">
+                                            <% let textColor = (order.status=="Pending") ? "text-warning" : 
+                                                                (order.status=="Delivered" || "partially delivered") ? "text-success" : 
+                                                                (order.status=="Shipped" || "partially shipped") ? "text-primary" :
+                                                                (order.status=="Cancelled" || "Returned") ? "text-danger" : "text-dark"
+                                            %>
+                                            <!-- <span class="badge bg-light <%= textColor %> fs-6 px-3 py-2 "><%= order.status %> -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-body shadow-sm">
+                                    <div class="row g-4">
+                                        <!-- Order Items -->
+                                        <div class="col-12">
+                                            <h6 class="fw-bold mb-3">Items Ordered</h6>
+                                            
+                                            <!-- ============== ITEM 1==================== -->
+                                            <% if(order?.items.length > 0){ %>
+                                                <% order?.items.forEach((ele, index) => { %>
+                                                    <div class="border rounded-3 p-3 mb-3 bg-light">
+                                                        <% 
+                                                            let status = ele.status || order.status;
+                                                            let btnColor = 
+                                                                status === "Pending" ? "warning" :
+                                                                status === "Delivered" || status === "partially delivered" ? "success" :
+                                                                status === "Shipped" || status === "partially shipped" ? "primary" :
+                                                                status === "Cancelled" || status === "Returned" || status === "Refunded" ? "danger" :
+                                                                "secondary";
+                                                        %>
+                                                        <div class="row align-items-center g-3">
+                                                            <!-- =============== TIME LINE================= -->
+                                                            <div class="col-md-12">
+                                                                <div class="timeline-steps">
+                                                                    <div class="d-flex flex-wrap align-items-center mb-4">
+                                                                        <div class="timeline-step completed">
+                                                                            <div class="timeline-icon bg-success text-white">
+                                                                                <i class="bi bi-check-lg"></i>
+                                                                            </div>
+                                                                            <div class="timeline-label">Order Placed
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="timeline-connector"></div>
+                                                                        <div class="timeline-step completed">
+                                                                            <div class="timeline-icon bg-success text-white">
+                                                                                <% if(status=="Out for delivery" || status=="Shipped" || status=="Delivered"){ %>
+                                                                                    <i class="bi bi-check-lg"></i>
+                                                                                <% } else { %>
+                                                                                    <i class="bi bi-box2"></i>
+                                                                                <% } %> 
+                                                                            </div>
+                                                                            <div class="timeline-label">Out for delivery</div>
+                                                                        </div>
+                                                                        <div class="timeline-connector"></div>
+                                                                        <div class="timeline-step completed">
+                                                                            <div class="timeline-icon bg-success text-white">
+                                                                                <% if(status=="Shipped" || status=="Delivered"){ %>
+                                                                                    <i class="bi bi-check-lg"></i>
+                                                                                <% } else { %>
+                                                                                    <i class="bi bi-truck"></i>
+                                                                                <% } %> 
+                                                                            </div>
+                                                                            <div class="timeline-label">Shipped</div>
+                                                                        </div>
+                                                                        <div class="timeline-connector"></div>
+                                                                        <div class="timeline-step completed">
+                                                                            <div class="timeline-icon bg-success text-white">
+                                                                                <% if(status=="Delivered"){ %>
+                                                                                    <i class="bi bi-check-lg"></i>
+                                                                                <% } else { %>
+                                                                                    <i class="bi bi-house-door"></i>
+                                                                                <% } %> 
+                                                                            </div>
+                                                                            <div class="timeline-label">Delivered</div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-auto">
+                                                                <img src="/<%= ele.image %>" class="rounded" width="80" height="80" alt="Product">
+                                                            </div>
+                                                            <div class="col">
+                                                                <h6 class="mb-1"><%= ele.name %></h6>
+                                                                <small class="text-muted"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></small>
+
+                                                                <% 
+                                                                    let price = Number(ele.price); 
+                                                                    let discount = Number(ele.discount); 
+                                                                    let offAmount = price * (discount / 100); 
+                                                                    let finalPrice = Math.floor(price - offAmount);
+                                                                %>
+
+                                                                <div class="fw-light text-success" style="font-size: small">&#8377; <%= finalPrice %>
+                                                                    <span class="text-decoration-line-through text-danger" style="font-size: smaller">&#8377; <%= ele.price %></span>
+                                                                    <span class="text-success"><%= ele.discount %>% off</span>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- STATUS OF THE ORDER -->
+                                                            <div id="status-<%= index %>" class="col-auto text-end">
+                                                                <% 
+                                                                    
+                                                                    
+                                                                    let bgColor = 
+                                                                        status === "Pending" ? "bg-warning" :
+                                                                        status === "Delivered" || status === "partially delivered" ? "bg-success" :
+                                                                        status === "Shipped" || status === "partially shipped" ? "bg-primary" :
+                                                                        status === "Cancelled" || status === "Returned" || status === "Refunded" ? "bg-danger" :
+                                                                        "bg-secondary";
+                                                                %>
+
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    <!-- Edit Button (only show if not final state) -->
+                                                                    <% if (!["Delivered", "Cancelled", "Returned"].includes(status)) { %>
+                                                                        <button class="btn btn-sm btn-outline-primary edit-status-btn" 
+                                                                                onclick='editStatus("<%= index %>", event)' >
+                                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                                        </button>
+                                                                    <% } %>
+
+                                                                    <!-- Current Status Badge -->
+                                                                    <span class="badge <%= bgColor %> text-white px-3 py-2" style="min-width: 100px; text-align: center;">
+                                                                        <%= status %>
+                                                                    </span>
+
+                                                                </div>
+
+                                                                <!-- Cancel Button (only if not delivered/cancelled) -->
+                                                                <% if (!["Delivered", "Cancelled", "Returned"].includes(status)) { %>
+                                                                    <button class="btn btn-danger btn-sm mt-2"  onclick='cancelOrder("<%= ele._id %>", "<%= order.userId._id %>", event)'>Cancel Order</button>
+                                                                <% } %>
+                                                            </div>
+
+                                                            <!-- Hidden Status Editor (will be shown on click) -->
+                                                            <% if (!["Delivered", "Cancelled", "Returned"].includes(status)) { %>
+                                                                <div id="editor-<%= index %>" class="col-auto text-end d-none" >
+                                                                    <form id="statusUpdateForm-<%= index %>"  class="d-inline statusUpdateForm">
+
+                                                                        <input id="orderItemId" type="hidden" name="orderItemId" value="<%= ele._id || ele.id %>">
+                                                                        <input id="orderId" type="hidden" name="orderId" value="<%= order._id %>">
+                                                                        <input id="index" type="hidden" name="index" value="<%= index %>">
+
+                                                                        <div class="input-group input-group-sm" style="max-width: 300px;">
+                                                                            <select id="newStatus" name="newStatus" class="form-select" required>
+                                                                                <option value="" hidden>-- Select Status --</option>
+                                                                                <option value="Pending" <%= status==='Pending' ? 'selected' : '' %>>Pending</option>
+                                                                                <option value="Out for delivery" <%= status==='Out for delivery' ? 'selected' : '' %>>Out for delivery</option>
+                                                                                <option value="Shipped" <%= status==='Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                                                <option value="Delivered" <%= status==='Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                                                <option value="Cancelled" <%= status==='Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                                                <option value="Returned" <%= status==='Returned' ? 'selected' : '' %>>Returned</option>
+                                                                            </select>
+                                                                            <a href="" class="btn btn-secondary cancel-edit-btn" onclick='cancelEdit("<%= index %>", event)'>Cancel</a>
+                                                                            <button type="submit" class="btn btn-success" onclick='submitNewStatus("<%= index %>", event)'>Save</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            <% } %>
+
+                                                        </div>
+                                                    </div>
+                                                <% }) %>                                        
+                                            <% } %>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- Summary -->
+                        <div class="col-lg-4 mt-5 sticky-top" style="top: 1rem;">
+
+                            
+                            <div class=" sticky-top" style="top: 1rem;">
+                                <!-- address -->
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <h6 class="mb-0">Shipping Address</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-1 fw-semibold"><%= order.billingAddress.fullname %></p>
+                                        <p class="text-muted mb-1"><%= order.billingAddress.phone %></p>
+                                        <p class="text-muted mb-1"><%= order.billingAddress.address %></p>
+                                        <p class="text-muted mb-0"><%= order.billingAddress.pincode %></p>
+                                    </div>
+                                </div>
+    
+                                <!-- order summay -->
+                                <div class="bg-white rounded-3 shadow-sm p-4  mt-2"" style=" top: 1rem; z-index: 10;">
+                                    <h5 class="mb-3" id="itemCount">Coupon code</h5>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="coupon" id="coupon"
+                                            value="Null" disabled>
+                                        <button class="btn btn-dark input-text" disabled>Apply</button>
+    
+                                    </div>
+                                    <hr>
+                                    <h5 class="mb-3" id="itemCount">Payment Methods</h5>
+                                    <ul style="list-style-type: none;">
+                                        <li>
+                                            <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked>
+                                            <label for="cod" class="fs-6"><%= order.paymentMethod %></label>
+                                        </li>                                    
+                                    </ul>
+                                    <hr>
+                                    <h5 class="mb-3" id="itemCount">Price (<%= order?.items?.length %> items)</h5>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Sub total:</span>
+                                        <span id="totalPrice" class="total-price">&#8377; <%= order?.totalPrice %>.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <% let couponDiscount=0 %>
+                                            <span>Coupon discount:</span>
+                                            <span id="couponDiscount" class="total-price">&#8377; <%= couponDiscount %>.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Shipping charge:</span>
+                                        <span id="shippingCharge" class="total-price">&#8377; 50.00</span>
+                                    </div>
+                                    <hr>
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <span class="fw-bold">Total Amount:</span>
+                                        <span id="finalPrice" class="total-price text-success fw-bold">&#8377; <%= order?.totalPrice - couponDiscount + 50 %>.00</span>
+                                    </div>
+    
+                                    
+                                </div>                            
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>        
+        <% } %>
+
+<footer class="bg-dark text-white text-center py-3 mt-auto">
+    <p class="mb-0">© 2025 ShopEase. All rights reserved.</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.addEventListener("unload", function () { });
+
+    function editStatus(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`editor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.add('d-none');
+        editor.classList.remove('d-none');
+    }
+
+    function cancelEdit(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`editor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.remove('d-none');
+        editor.classList.add('d-none');
+    }
+
+    async function submitNewStatus(index, e){
+        e.preventDefault()
+        const form = document.getElementById(`statusUpdateForm-${index}`)
+
+        const formData = new FormData(form);
+        const dataObj = Object.fromEntries(formData.entries());
+
+        try{
+            const res = await fetch("/admin/editStatus", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataObj),
+            })
+            
+            if(res.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Succcessfully updated the status"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(res.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to updated the status"
+                })
+            }
+        }
+        catch(err){
+            alert("update status error")
+            console.log(err)
+        }
+    }
+
+    // const form = document.querySelectorAll(".statusUpdateForm").
+
+    // form.addEventListener('submit', async (event) => {
+    //     event.preventDefault()
+
+    //     const formData = new FormData(form);
+    //     const dataObj = Object.fromEntries(formData.entries());
+
+    //     try{
+    //         const res = await fetch("/admin/editStatus", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //             body: JSON.stringify(dataObj),
+    //         })
+            
+    //         if(res.status==200){
+    //             swal.fire({
+    //                 icon: "success",
+    //                 title: "Success",
+    //                 text: "Succcessfully updated the status"
+    //             })
+    //         }
+    //         else if(res.status==404){
+    //             swal.fire({
+    //                 icon: "error",
+    //                 title: "Error",
+    //                 text: "Failed to updated the status"
+    //             })
+    //         }
+    //     }
+    //     catch(err){
+    //         alert("update status error")
+    //         console.log(err)
+    //     }
+    // })
+    
+    async function cancelOrder(itemId, userId, event) {
+        // alert(itemId)
+        event.preventDefault()
+        try{    
+            const request = await fetch('/admin/cancel', {
+                method: "POST",
+                headers: {"Content-Type": "application/json" },
+                body: JSON.stringify({itemId, userId})
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "This product is cancelled"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(request.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Order not found"
+                })
+            }
+            else if(request.status==400){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "This item is not cancellable"
+                })
+            }
+            else if(request.status==500){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "variant not found"
+                })
+            }
+
+        }
+        catch(err){
+            alert("cancel product error")
+            console.log(err)
+        }
+    }
+    
+</script>
+</body>
+
+</html>

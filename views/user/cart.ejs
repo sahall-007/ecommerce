@@ -198,11 +198,11 @@
     <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
     <div class=" sidebar d-flex flex-wrap justify-content-around">
         <a href="/profile" class="">Profile</a>
-        <a href="#" class="">Order history</a>
+        <a href="/orders" class="">Order history</a>
         <a href="/address" class="">Billing Address</a>
         <a href="#" class="">Wallet</a>
         <a href="#" class="">Wishlist</a>
-        <a href="#" class="">Shopping Cart</a>
+        <a href="/cart" class="">Shopping Cart</a>
         <a href="#" class="">Coupon</a>                
     </div>
 
@@ -238,6 +238,9 @@
                                                                 alt="<%= ele.product.name %>" class="rounded-3 me-3" width="80">
                                                             <div>
                                                                 <h6 class="mb-0"><%= ele.product.name %></h6>
+                                                                <% if(ele.variant.quantity < 1){ %>
+                                                                    <h1 class="text-danger mt-2" style="font-size: small;">out of stock</h1>
+                                                                <% } %>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -252,16 +255,25 @@
                                                     
                                                     <td>&#8377;<%= finalPrice %></td>
                                                     <td>
-                                                        <div class="d-flex align-items-center input-group">
-                                                            <div class="quantity-btn input-group-text bg-dark text-light"
-                                                                onclick='updateQuantity(this, -1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>-</div>
-                                                                <div class="" style="width: 40px;">
-                                                                    <input type="text" id="quantity-<%= index %>" class="quantity-input mx-0 form-control text-center px-0 py-2"  value="<%= ele.items.quantity %>" readonly>
-            
-                                                                </div>
-                                                            <div class="quantity-btn  input-group-text bg-dark text-light"
-                                                                onclick='updateQuantity(this, 1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>+</div>
-                                                        </div>
+                                                        <% if(ele.variant.quantity < 1){ %>
+                                                            <div class="d-flex align-items-center input-group">
+                                                                <div class="quantity-btn input-group-text bg-secondary text-light">-</div>
+                                                                    <div class="" style="width: 40px;">
+                                                                        <input type="text" id="quantity-<%= index %>" class="quantity-input mx-0 form-control text-center px-0 py-2"  value="0" readonly>        
+                                                                    </div>
+                                                                <div class="quantity-btn  input-group-text bg-secondary text-light">+</div>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <div class="d-flex align-items-center input-group">
+                                                                <div class="quantity-btn input-group-text bg-dark text-light"
+                                                                    onclick='updateQuantity(this, -1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>-</div>
+                                                                    <div class="" style="width: 40px;">
+                                                                        <input type="text" id="quantity-<%= index %>" class="quantity-input mx-0 form-control text-center px-0 py-2"  value="<%= ele.items.quantity %>" readonly>                
+                                                                    </div>
+                                                                <div class="quantity-btn  input-group-text bg-dark text-light"
+                                                                    onclick='updateQuantity(this, 1, "<%= index %>", "<%= ele._id %>", "<%= finalPrice %>", "<%= ele.variant.quantity %>")'>+</div>
+                                                            </div>
+                                                        <% } %>
                                                     </td>
 
                                                     <% 

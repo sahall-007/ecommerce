@@ -184,6 +184,17 @@ const loginPost = async (req, res) => {
     }
 }
 
+const guestLogin = async (req, res) => {
+    try{
+        res.redirect('/')
+    }
+    catch(err){
+        logger.error(err)
+        logger.error("failed to login as guest")
+        res.status(500).json({success: false, message: "something went wrong (guest login)"})
+    }
+}
+
 // to load the otp page
 const loadOtpPage = async (req, res) =>{
     try{
@@ -340,13 +351,6 @@ const getHomePage = async (req, res) => {
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             {$sample: {size: 10}}
         ])
-
-        
-  
-        
-        // const populated = await variantSchema.populate(newArrivals, { path: 'productId'})
-
-        // console.log("this is populated offer", populatedOffer)
         
         res.render('home', { newArrivals, inOffer })
     }
@@ -377,10 +381,6 @@ const productDetail = async (req, res) => {
     try{
         const { id } = req.params
 
-        // console.log("working", id)
-
-        // const variant = await variantSchema.find({_id: id}).populate('productId')
-
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(id) }},
             {$lookup: {
@@ -408,6 +408,11 @@ const productDetail = async (req, res) => {
 
         console.log(variant)
 
+        if(variant.length<=0){
+            logger.fatal("condition")
+            return res.status(404).render('pageNotFound')
+        }
+
         const exploreMore = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -426,18 +431,15 @@ const productDetail = async (req, res) => {
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
             {$sample: {size: 10}}
         ])
-        // const populated = await variantSchema.populate(exploreMore, { path: 'productId'})
 
         const variantOptions = await variantSchema.find({productId: variant[0].productDoc._id })
-
-        // console.log("this is variant options", variantOptions)
 
         res.render('productDetail', { variant, exploreMore, variantOptions })
 
     }
     catch(err){
-        logger.log(err)
-        logger.log("failed to get the product details page")
+        logger.fatal(err)
+        logger.fatal("failed to get the product details page")
         res.status(500).json({success: false, message: "something went wrong (get product details)"})
     }
 }

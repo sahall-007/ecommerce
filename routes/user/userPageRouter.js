@@ -8,30 +8,30 @@ const searchController = require('../../controller/user/searchController.js');
 const router = express.Router()
 
 router.route('/')
-    .get(middleware.checkSession, userController.getHomePage)
+    .get(userController.getHomePage)
 
 router.route('/logout')
     .get(userController.logout)
 
 router.route('/productDetail/:id')
-    .get(middleware.checkSession, userController.productDetail)
+    .get(userController.productDetail)
 
 router.route('/allProducts')
-    .get(middleware.checkSession, allProducctController.allProducts)
+    .get(allProducctController.allProducts)
 
 router.route('/filter')
-    .get(middleware.checkSession, allProducctController.filterPage)
+    .get(allProducctController.filterPage)
     .post(allProducctController.filter)
 
 router.route('/allProducts/next')
-    .get(middleware.checkSession, allProducctController.nextPage)
+    .get(allProducctController.nextPage)
 
 router.route('/allProducts/prev')
-    .get(middleware.checkSession, allProducctController.prevPage)
+    .get(allProducctController.prevPage)
 
 // search result
 router.route('/search')
-    .get(middleware.checkSession, searchController.searchResult)
+    .get(searchController.searchResult)
     .post(allProducctController.search)
 
 router.route('/searchFilter')
@@ -39,7 +39,7 @@ router.route('/searchFilter')
 
 // new arrivals
 router.route('/newArrivals')
-    .get(middleware.checkSession, userController.newArrivals)
+    .get( userController.newArrivals)
 
 
 

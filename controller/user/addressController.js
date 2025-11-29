@@ -46,8 +46,8 @@ const addressPage = async (req, res) => {
 
 const addressPost = async (req, res) => {
     try {
-        const { fullname, phone, email, pincode, address, addressType } = req.body
-        const id = req.session.user
+        const { fullname, phone, email, pincode, address, city, state,  addressType } = req.body
+        const id = req.session.user || req.session?.passport?.user
 
         const user = await userSchema.findOne({_id: id})
         if(!user){
@@ -58,13 +58,13 @@ const addressPost = async (req, res) => {
         const userAddress = await addressSchema.findOne({userId: user._id})
 
         if(userAddress){
-            userAddress.billingAddress.push({fullname, phone, email, pincode, address, addressType, isSelected: false})
+            userAddress.billingAddress.push({fullname, phone, email, pincode, address, addressType, city, state, isSelected: false})
             await userAddress.save();
         }
         else{
             const newAddress = new addressSchema({
                 userId: id,
-                billingAddress: [{fullname, phone, email, address, pincode, addressType, isSelected: false}]
+                billingAddress: [{fullname, phone, email, address, pincode, addressType, city, state, isSelected: false}]
             })
             await newAddress.save()
         }
@@ -151,7 +151,7 @@ const editAddressPatch = async (req, res) => {
         logger.info("reached handler")
 
     try{
-        const { fullname, phone, email, pincode, address, addressType, isSelected, addressId, index } = req.body
+        const { fullname, phone, email, pincode, address, city, state, addressType, isSelected, addressId, index } = req.body
         const id = req.session.user
 
         // const user = await userSchema.findOne({_id: id})
@@ -168,7 +168,7 @@ const editAddressPatch = async (req, res) => {
             })
         }
 
-        userAddress.billingAddress[index] = { fullname, phone, email, pincode, address, addressType, isSelected }
+        userAddress.billingAddress[index] = { fullname, phone, email, pincode, address,city, state, addressType, isSelected }
 
         await userAddress.save()
 

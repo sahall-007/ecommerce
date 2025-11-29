@@ -239,7 +239,7 @@
                   <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice2 %></p>
                   <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
                 </div>
-                <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
+                <button class="btn btn-outline-primary btn-sm"  onclick='addToCart("<%= ele._id %>")'>Add  to Cart</button>
               </div>
             </div>
           </div>    
@@ -249,6 +249,7 @@
     </div>
   </section>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/magnifier/jquery.magnify.js" charset="UTF-8"></script>
   <script>
     $(document).ready(function() {
@@ -347,11 +348,18 @@
         if(request.status==200){
           window.location.href = '/cart'
         }
-        else if(request.status==400){
+        else if(request.status==423){
           swal.fire({
             icon: "error",
             title: "Error",
             text: "The product is blocked by the Admin"
+          })
+        }
+        else if(request.status==400){
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "You have reached max quantity limit for this product"
           })
         }
         // else if(request.status==)

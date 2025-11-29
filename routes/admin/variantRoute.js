@@ -20,13 +20,13 @@ router.route('/editVariant/:id')
     .post(uploads.upload.any(), variantController.editVariantPost)
 
 router.route('/deleteImg')
-    .post(variantController.deleteImg)
+    .post(middleware.checkSession, variantController.deleteImg)
 
 router.route('/blockVariant')
-    .patch(variantController.blockVariant)
+    .patch(middleware.checkSession, variantController.blockVariant)
 
 router.route('/unBlockVariant')
-    .patch(variantController.unBlockVariant)
+    .patch(middleware.checkSession, variantController.unBlockVariant)
 
 
 module.exports = router

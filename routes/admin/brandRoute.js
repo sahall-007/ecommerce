@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.route('/addBrand')
     .get(middleware.checkSession, brandController.addBrandPage)
-    .post(brandController.addBrandPost)
+    .post(middleware.checkSession, brandController.addBrandPost)
 
 router.route('/brand')
     .get(middleware.checkSession, brandController.brandManagement)
@@ -16,13 +16,13 @@ router.route('/brand')
 
 router.route('/editBrand/:name')
     .get(middleware.checkSession, brandController.brandEditPage)
-    .post(brandController.brandEditPost)
+    .post(middleware.checkSession, brandController.brandEditPost)
 
 router.route('/blockBrand')
-    .patch(brandController.brandBlock)
+    .patch(middleware.checkSession, brandController.brandBlock)
 
 router.route('/unblockBrand')
-    .patch(brandController.brandUnblock)
+    .patch(middleware.checkSession, brandController.brandUnblock)
 
 // router.route('/deleteBrand')
 //     .delete(brandController.deleteBrand)
@@ -34,10 +34,10 @@ router.route('/brand/prev')
     .get(middleware.checkSession, brandController.prevPage)
 
 router.route('/searchBrand')
-    .post(brandController.searchBrand)
+    .post(middleware.checkSession, brandController.searchBrand)
 
 router.route('/brandSearchResult/:name')
-    .get(brandController.searchResult)
+    .get(middleware.checkSession, brandController.searchResult)
 
 
 module.exports = router

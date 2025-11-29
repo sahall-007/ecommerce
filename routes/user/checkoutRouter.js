@@ -5,7 +5,7 @@ const checkoutController = require('../../controller/user/checkoutController.js'
 const router = express.Router()
 
 router.route('/checkout')
-    .get(checkoutController.checkoutPage)
+    .get(middleware.checkSession, checkoutController.checkoutPage)
 
 
 module.exports = router

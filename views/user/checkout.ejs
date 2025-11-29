@@ -196,16 +196,17 @@
     <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
     <div class=" sidebar d-flex flex-wrap justify-content-around">
         <a href="/profile" class="">Profile</a>
-        <a href="#" class="">Order history</a>
+        <a href="/orders" class="">Order history</a>
         <a href="/address" class="">Billing Address</a>
         <a href="#" class="">Wallet</a>
         <a href="#" class="">Wishlist</a>
-        <a href="#" class="">Shopping Cart</a>
+        <a href="/cart" class="">Shopping Cart</a>
         <a href="#" class="">Coupon</a>                
     </div>
 
     <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
      <% let addressIndex %>
+     <% let addressSelected = false %>
     <% if(cart?.length > 0){ %>
         
         <div class="main-content">
@@ -352,7 +353,7 @@
                         <!-- address -->
                         <div class="bg-white rounded-3 shadow-sm p-4  style="top: 1rem; z-index: 8;">
                             <h5 class="mb-4">Billing address</h5>
-                            <% let addressSelected = false %>
+                            
                             <% if(address?.billingAddress?.length > 0){ %>
                                 <% address.billingAddress.forEach((ele, index) => { %>
                                     <% if(ele.isSelected==true){ %>
@@ -392,15 +393,15 @@
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
                                 <li>
-                                    <input type="radio" name="payment" id="cod" checked>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked>
                                     <label for="cod" class="fs-6">Cash on delivery</label>
                                 </li>
                                 <li>
-                                    <input type="radio" name="payment" id="wallet" disabled>
+                                    <input type="radio" class="paymentMethod" name="payment" id="wallet" disabled>
                                     <label for="wallet" class="fs-6">Wallet</label>
                                 </li>
                                 <li>
-                                    <input type="radio" name="payment" id="upi" disabled>
+                                    <input type="radio" class="paymentMethod" name="payment" id="upi" disabled>
                                     <label for="upi" class="fs-6">UPI</label>
                                 </li>
                             </ul>
@@ -408,23 +409,23 @@
                             <h5 class="mb-3" id="itemCount">Price (<%= cart?.length %> items)</h5>
                             <div class="d-flex justify-content-between mb-2">
                                <span>Sub total:</span>
-                               <span id="" class="total-price">&#8377; <%= totalPrice %>.00</span>
+                               <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %>.00</span>
                            </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <% let couponDiscount = 0 %>
                                 <span>Coupon discount:</span>
-                                <span id="totalPrice" class="total-price">&#8377; <%= couponDiscount %>.00</span>
+                                <span id="couponDiscount" class="total-price">&#8377; <%= couponDiscount %>.00</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping charge:</span>
-                                <span id="totalPrice" class="total-price">&#8377; 50.00</span>
+                                <span id="shippingCharge" class="total-price">&#8377; 50.00</span>
                             </div>
                             <div class="d-flex justify-content-between mt-3">
                                 <span class="fw-bold">Total Amount:</span>
-                                <span id="totalPrice" class="total-price text-success fw-bold">&#8377; <%= totalPrice - couponDiscount - 50%>.00</span>
+                                <span id="finalPrice" class="total-price text-success fw-bold">&#8377; <%= totalPrice - couponDiscount + 50 %>.00</span>
                             </div>
 
-                            <button class="btn btn-proceed text-white w-100 mt-3">
+                            <button class="btn btn-proceed text-white w-100 mt-3" onclick='placeOrder()'>
                                 Place order
                             </button>
                         </div>
@@ -463,7 +464,8 @@
     <script>
         window.addEventListener("unload", function () {});
 
-        const addressId = "<%= address._id%>"
+        const addressId = "<%= address?._id%>"
+        const cartId = "<%= cart[0]?._id %>"
         
 
         async function updateQuantity(btn, change, index, cartId, price, quantity) {
@@ -588,136 +590,171 @@
             }
     }
 
-    async function confirmEdit(index) {
-        const fullnameRegex = /^(?=.{2,}$)(?!\s+$)[A-Za-z]+(?:[ '.][A-Za-z]+)*$/
-        const phoneRegex = /^(?!\s+$)\d{7,15}$/
-        const emailRegex = /^(?!\s+$)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
-        const pincodeRegex = /^(?!\s+$)\d{6}$/
-        const addressRegex = /^(?!\s*$).{5,}$/
+        async function confirmEdit(index) {
+            const fullnameRegex = /^(?=.{2,}$)(?!\s+$)[A-Za-z]+(?:[ '.][A-Za-z]+)*$/
+            const phoneRegex = /^(?!\s+$)\d{7,15}$/
+            const emailRegex = /^(?!\s+$)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/
+            const pincodeRegex = /^(?!\s+$)\d{6}$/
+            const addressRegex = /^(?!\s*$).{5,}$/
 
-        const fullnameMsg = document.getElementById("fullnameMsg")
-        const phoneMsg = document.getElementById("phoneMsg")
-        const emailMsg = document.getElementById("emailMsg")
-        const pincodeMsg = document.getElementById("pincodeMsg")
-        const addressMsg = document.getElementById("addressMsg")
+            const fullnameMsg = document.getElementById("fullnameMsg")
+            const phoneMsg = document.getElementById("phoneMsg")
+            const emailMsg = document.getElementById("emailMsg")
+            const pincodeMsg = document.getElementById("pincodeMsg")
+            const addressMsg = document.getElementById("addressMsg")
 
-        const fullname = document.getElementById("fullname")
-            const phone = document.getElementById("phone")
-            const email = document.getElementById("email")
-            const pincode = document.getElementById("pincode")
-            const address = document.getElementById("address")
-            const addressType = document.querySelector('input[name="addressType"]:checked')
+            const fullname = document.getElementById("fullname")
+                const phone = document.getElementById("phone")
+                const email = document.getElementById("email")
+                const pincode = document.getElementById("pincode")
+                const address = document.getElementById("address")
+                const addressType = document.querySelector('input[name="addressType"]:checked')
 
-            if (!fullnameRegex.test(fullname.value) && !phoneRegex.test(phone.value) && !emailRegex.test(email.value) && !pincodeRegex.test(pincode.value) && !addressRegex.test(address.value)) {
-                fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
-                phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
-                emailMsg.textContent = "enter a valid email address (example: user@example.com)."
-                pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
-                addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+                if (!fullnameRegex.test(fullname.value) && !phoneRegex.test(phone.value) && !emailRegex.test(email.value) && !pincodeRegex.test(pincode.value) && !addressRegex.test(address.value)) {
+                    fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+                    phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+                    emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+                    pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+                    addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
 
-                return
-            }
-            else if (!fullnameRegex.test(fullname.value)) {
-                fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
-                phoneMsg.textContent = ""
-                emailMsg.textContent = ""
-                pincodeMsg.textContent = ""
-                addressMsg.textContent = ""
+                    return
+                }
+                else if (!fullnameRegex.test(fullname.value)) {
+                    fullnameMsg.textContent = "enter your full name using letters only (no numbers or special symbols)"
+                    phoneMsg.textContent = ""
+                    emailMsg.textContent = ""
+                    pincodeMsg.textContent = ""
+                    addressMsg.textContent = ""
 
-                return
-            }
-            else if (!phoneRegex.test(phone.value)) {
-                fullnameMsg.textContent = ""
-                phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
-                emailMsg.textContent = ""
-                pincodeMsg.textContent = ""
-                addressMsg.textContent = ""
+                    return
+                }
+                else if (!phoneRegex.test(phone.value)) {
+                    fullnameMsg.textContent = ""
+                    phoneMsg.textContent = "enter a valid phone number with 7 to 15 digits and no spaces or symbols."
+                    emailMsg.textContent = ""
+                    pincodeMsg.textContent = ""
+                    addressMsg.textContent = ""
 
-                return
-            }
-            else if (!emailRegex.test(email.value)) {
-                fullnameMsg.textContent = ""
-                phoneMsg.textContent = ""
-                emailMsg.textContent = "enter a valid email address (example: user@example.com)."
-                pincodeMsg.textContent = ""
-                addressMsg.textContent = ""
+                    return
+                }
+                else if (!emailRegex.test(email.value)) {
+                    fullnameMsg.textContent = ""
+                    phoneMsg.textContent = ""
+                    emailMsg.textContent = "enter a valid email address (example: user@example.com)."
+                    pincodeMsg.textContent = ""
+                    addressMsg.textContent = ""
 
-                return
-            }
-            else if (!pincodeRegex.test(pincode.value)) {
-                fullnameMsg.textContent = ""
-                phoneMsg.textContent = ""
-                emailMsg.textContent = ""
-                pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
-                addressMsg.textContent = ""
+                    return
+                }
+                else if (!pincodeRegex.test(pincode.value)) {
+                    fullnameMsg.textContent = ""
+                    phoneMsg.textContent = ""
+                    emailMsg.textContent = ""
+                    pincodeMsg.textContent = "enter a valid 6-digit pincode using numbers only"
+                    addressMsg.textContent = ""
 
-                return
-            }
-            else if (!addressRegex.test(address.value)) {
-                fullnameMsg.textContent = ""
-                phoneMsg.textContent = ""
-                emailMsg.textContent = ""
-                pincodeMsg.textContent = ""
-                addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
+                    return
+                }
+                else if (!addressRegex.test(address.value)) {
+                    fullnameMsg.textContent = ""
+                    phoneMsg.textContent = ""
+                    emailMsg.textContent = ""
+                    pincodeMsg.textContent = ""
+                    addressMsg.textContent = "enter a valid address (at least 5 characters, not blank)."
 
-                return
-            }
-            else {
-                fullnameMsg.textContent = ""
-                phoneMsg.textContent = ""
-                emailMsg.textContent = ""
-                pincodeMsg.textContent = ""
-                addressMsg.textContent = ""
-            }
+                    return
+                }
+                else {
+                    fullnameMsg.textContent = ""
+                    phoneMsg.textContent = ""
+                    emailMsg.textContent = ""
+                    pincodeMsg.textContent = ""
+                    addressMsg.textContent = ""
+                }
 
-            let testing = "<%= addressIndex %>"
-           let isSelected = "<%= address?.billingAddress[addressIndex].isSelected %>"
-            
+                let testing = "<%= addressIndex %>"
+                let isSelected = "<%= address?.billingAddress[addressIndex]?.isSelected %>"
+                
 
-            try {
-                const request = await fetch('/editAddress', {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        fullname: fullname.value,
-                        phone: phone.value,
-                        email: email.value,
-                        pincode: pincode.value,
-                        address: address.value,
-                        addressType: addressType.value,
-                        addressId,
-                        index,
-                        isSelected
+                try {
+                    const request = await fetch('/editAddress', {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            fullname: fullname.value,
+                            phone: phone.value,
+                            email: email.value,
+                            pincode: pincode.value,
+                            address: address.value,
+                            addressType: addressType.value,
+                            addressId,
+                            index,
+                            isSelected
+                        })
                     })
+                    const data = await request.json()
+                    if (request.status == 200) {
+                        swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "Successfully edited the address"
+                        })
+                        .then(() => window.location.reload())
+                    }
+                    else if(request.status==404){
+                        console.log(data)
+                        document.body.innerHTML = `${data.html}`
+                    }
+
+                }
+                catch (err) {
+                    alert("Edit address error")
+                    console.log(err)
+                }
+        }
+
+        function cancelEdit(){
+            document.getElementById("productTable").classList.remove("d-none")
+            document.getElementById("editAddress").classList.add("d-none")
+
+            window.location.href = "#productTable"
+        }
+        
+        async function placeOrder(){
+            const totalPrice = Number(document.getElementById("totalPrice").textContent.slice(2))
+            const finalPrice = Number(document.getElementById("finalPrice").textContent.slice(2))
+            const couponDiscount = Number(document.getElementById("couponDiscount").textContent.slice(2))
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')
+
+            let isSelected = <%= addressSelected %>;
+
+
+            if(!isSelected){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Select an address before placing order"
+                    
                 })
-                const data = await request.json()
-                if (request.status == 200) {
-                    swal.fire({
-                        icon: "success",
-                        title: "Success",
-                        text: "Successfully edited the address"
-                    })
-                    .then(() => window.location.reload())
-                }
-                else if(request.status==404){
-                    console.log(data)
-                    document.body.innerHTML = `${data.html}`
-                }
-
+                return
             }
-            catch (err) {
-                alert("Edit address error")
+
+            // alert("working")
+            try{
+                const request = await fetch('/placeOrder', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ addressId, cartId, totalPrice, finalPrice, couponDiscount, paymentMethod })
+                })
+                if(request.status==200){
+                    window.location.href = "/orderSuccess"
+                }
+            }
+            catch(err){
+                alert('place order error')
                 console.log(err)
             }
-    }
-
-    function cancelEdit(){
-        document.getElementById("productTable").classList.remove("d-none")
-        document.getElementById("editAddress").classList.add("d-none")
-
-        window.location.href = "#productTable"
-    }
-    
+        }
     </script>
 </body>
 

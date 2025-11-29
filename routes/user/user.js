@@ -15,12 +15,14 @@ const userPageRouter = require("./userPageRouter.js")
 const addressRouter = require('./addressRouter.js')
 const cartRouter = require('./cartRouter.js')
 const checkoutRouter = require('./checkoutRouter.js')
+const orderRouter = require('./orderRouter.js')
+const invoiceRoute = require('./invoice.js')
 
 const router = express.Router()
 
 // home page
-router.route('/')
-    .get(middleware.checkSession, userController.getHomePage)
+// router.route('/')
+//     .get(middleware.checkSession, userController.getHomePage)
 
 // user authentication
 router.route('/register')
@@ -65,5 +67,16 @@ router.use(cartRouter)
 
 // checkout --------------------------------
 router.use(checkoutRouter)
+
+// order ------------------------------
+router.use(orderRouter)
+
+// invoice ------------------------------
+router.use(invoiceRoute)
+
+// router.use((req, res) => {
+//     res.render('pageNotFound')
+// })
+
 
 module.exports = router

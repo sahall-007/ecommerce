@@ -22,7 +22,7 @@ router.route('/deleteAddress')
     .post(addressController.deleteAddress)
 
 router.route('/editAddress/:index/:addressId')
-    .get(addressController.editAddressPage)
+    .get(middleware.checkSession, addressController.editAddressPage)
 
 router.route('/editAddress')
     .patch(addressController.editAddressPatch)

@@ -111,11 +111,11 @@
 
     <div class=" sidebar d-flex flex-wrap justify-content-around">
         <a href="/profile" class="p-2">Profile</a>
-        <a href="#" class="p-2">Order history</a>
+        <a href="/orders" class="p-2">Order history</a>
         <a href="/address" class="p-2">Billing Address</a>
         <a href="#" class="p-2">Wallet</a>
         <a href="#" class="p-2">Wishlist</a>
-        <a href="#" class="p-2">Shopping Cart</a>
+        <a href="/cart" class="p-2">Shopping Cart</a>
         <a href="#" class="p-2">Coupon</a>                
     </div>
 
@@ -183,6 +183,18 @@
                                             <label class="form-label">Pincode</label>
                                             <input type="number" min="0" id="pincode" class="form-control" placeholder="Type here">
                                             <p class="text-danger" id="pincodeMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">City</label>
+                                            <input type="text" min="0" id="city" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="cityMsg" style="font-size: small; max-width: 320px;"></p>
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <label class="form-label">State</label>
+                                            <input type="text" min="0" id="state" class="form-control" placeholder="Type here">
+                                            <p class="text-danger" id="stateMsg" style="font-size: small; max-width: 320px;"></p>
                                         </div>
 
                                         <div class="col-12">
@@ -280,6 +292,8 @@
         const email = document.getElementById("email")
         const pincode = document.getElementById("pincode")
         const address = document.getElementById("address")
+        const city = document.getElementById("city")
+        const state = document.getElementById("state")
         const addressType = document.querySelector('input[name="addressType"]:checked')
 
         if(!fullnameRegex.test(fullname.value) && !phoneRegex.test(phone.value) && !emailRegex.test(email.value) && !pincodeRegex.test(pincode.value) && !addressRegex.test(address.value) ){
@@ -345,11 +359,6 @@
         }
 
 
-
-
-
-        // const fullname = document.getElementById("fullname")
-
         try{
             const request = await fetch('/address', {
                 method: "POST",
@@ -360,6 +369,8 @@
                     email: email.value,
                     pincode: pincode.value,
                     address: address.value,
+                    city: city.value,
+                    state: state.value,
                     addressType: addressType.value
                 })
             })

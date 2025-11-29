@@ -57,13 +57,9 @@ const cartPage = async (req, res) => {
 }
 
 const cartPost = async(req, res) => {
-    // logger.info("handler is hitting")
     try{
         const { variantId } = req.body
-        const id = req.session.user || req.session.passport.user
-
-        // logger.info({variantId})
-        // logger.info({id})
+        const id = req.session.user || req.session?.passport?.user
 
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(variantId)}},
@@ -90,30 +86,51 @@ const cartPost = async(req, res) => {
             {$unwind: "$brand"}
         ])
 
-        // logger.info({variant})
-
         if(variant.length<=0){
-            logger.fatal("variant length 0")
             return res.status(404).render('pageNotFound', (err, html) => {
                 return res.json({html})
             })
         }
         if(variant[0].isListed==false ||  variant[0]?.productDoc.isListed==false || variant[0]?.categoryDoc.isListed==false || variant[0]?.brand.isListed==false){
             logger.fatal("blocked")
-            return res.status(400).json({success: false, message: "this product is blocked"})
+            return res.status(423).json({success: false, message: "this product is blocked"})
         }
         
         const cart = await cartSchema.findOne({userId: id})
-        // logger.warn({cart}, "cart")
 
         let variantExist = false
         if(cart && cart?.items?.length >= 0){
-            cart.items.forEach(ele => {
-                if(ele.variantId==variantId){
-                    variantExist = true
-                    ele.quantity += 1                    
+
+            for(let i=0; i<cart.items.length; i++){
+
+                if(cart.items[i].variantId==variantId ){
+                    
+                    if(cart.items[i].quantity < 5){
+                        logger.fatal("here is second problem")
+                        variantExist = true
+                        cart.items[i].quantity += 1             
+                    }
+                    else{
+                        logger.fatal(cart.items[i].quantity)
+                        logger.fatal("here is first problem")
+                        return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
+                    }
                 }
-            })
+            }
+            // cart.items.forEach(ele => {
+            //     if(ele.variantId==variantId && ele.quantity < 5){
+            //         logger.fatal("here is first problem")
+
+            //         variantExist = true
+            //         ele.quantity += 1                    
+            //     }
+            //     else{
+            //         logger.fatal(ele.quantity)
+            //         logger.fatal("here is second problem")
+            //         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})
+                    
+            //     }
+            // })
             if(!variantExist){
                 cart.items.push({variantId, quantity: 1})
             }
@@ -145,7 +162,7 @@ const updateQuantity = async (req, res) => {
     
         const cart = await cartSchema.findOne({_id: cartId})
 
-        console.log(cart)
+        // console.log(cart)
 
         cart.items[index].quantity+=Number(change)
     

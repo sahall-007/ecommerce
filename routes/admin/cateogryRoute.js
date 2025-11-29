@@ -10,13 +10,13 @@ router.route('/category')
     
 router.route('/addCategory')
     .get(middleware.checkSession, categoryController.addCategoryPage)
-    .post(categoryController.addCategoryPost)
+    .post(middleware.checkSession, categoryController.addCategoryPost)
 
 router.route('/blockCategory')
-    .patch(categoryController.blockCategory)
+    .patch(middleware.checkSession, categoryController.blockCategory)
 
 router.route('/unBlockCategory')
-    .patch(categoryController.unBlockCategory)
+    .patch(middleware.checkSession, categoryController.unBlockCategory)
 
 // router.route('/deleteCategory')    
 //     .delete(categoryController.deleteCategory)
@@ -28,14 +28,14 @@ router.route('/category/prev')
     .get(middleware.checkSession, categoryController.prevPage)
 
 router.route('/searchCategory')
-    .post(categoryController.searchCategory)
+    .post(middleware.checkSession, categoryController.searchCategory)
 
 router.route('/catSearchResult/:name')
     .get(middleware.checkSession, categoryController.searchResult)
 
 router.route('/editCategory/:name')
     .get(middleware.checkSession, categoryController.editCategoryPage)
-    .post(categoryController.editCategoryPost)
+    .post(middleware.checkSession, categoryController.editCategoryPost)
 
 
 module.exports = router
