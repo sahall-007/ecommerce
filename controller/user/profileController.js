@@ -69,26 +69,25 @@ const profilePage = async (req, res) => {
 
 const editProfile = async (req, res) => {
     try{
+        const id = req.session.user || req.session?.passport?.user
+        const user = await userSchema.findOne({_id: id})
 
-        const user = await userSchema.findOne({_id: req.session.user})
-        logger.info({user}, "this is user: ")
         if(!user){
             return res.status(404).json({success: false, message: "user not found in the database"})
         }
 
         const { username, phone } = req.body
+
+        const phoneCount = await userSchema.find({phone}).countDocuments()
+
+        logger.fatal(phoneCount, "this is phone count")
+        if(user?.phone!=phone &&  phoneCount>=3){
+            return res.status(400).json({success: false, message: "max number of this phone number alrady exist"})
+        }
         
-        await userSchema.findByIdAndUpdate({_id: req.session.user}, {username})
-
-        const result = await userSchema.findOne({_id: req.session.user})
-
-        logger.info({result}, "final user")
+        await userSchema.findByIdAndUpdate({_id: id}, {username, phone})
 
         res.status(200).json({success: true, message: "success"})
-        // const { username, phone } = req.body
-
-
-
     }
     catch(err){
         logger.fatal(err)

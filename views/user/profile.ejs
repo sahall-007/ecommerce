@@ -203,7 +203,7 @@
     
                                         <div class="col-12">
                                             <label class="form-label">Phone Number</label>
-                                            <input type="text" id="phone" class="form-control" value="9778765901" disabled>
+                                            <input type="text" id="phone" class="form-control" value="<%= user?.phone || "9995551111" %>" disabled>
                                             <p class="text-danger" id="phoneMsg" style="font-size: small; max-width: 320px;"></p>
                                         </div>
     
@@ -394,6 +394,14 @@
                     timer: 2500
                 })
                 .then(() => window.location.reload())                
+            }
+            else if(request.status==400){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Max number of this phone number exist, chose another number",
+                    
+                })
             }
             else{
                 swal.fire({

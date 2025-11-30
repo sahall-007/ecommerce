@@ -454,7 +454,16 @@
     async function cancelOrder(itemId, userId, event) {
         // alert(itemId)
         event.preventDefault()
-        try{    
+
+        swal.fire({
+            icon: "question",
+            title: "Are you sure",
+            showCancelButton: true,
+            confirmButtonText: "confirm",
+        })
+        .then(async (result) => {
+            if(result.isConfirmed){
+                try{    
             const request = await fetch('/cancel', {
                 method: "POST",
                 headers: {"Content-Type": "application/json" },
@@ -495,6 +504,8 @@
             alert("cancel product error")
             console.log(err)
         }
+            }
+        })        
     }
     
     async function returnOrder(itemId, userId, event){
@@ -507,6 +518,7 @@
             confirmButtonText: "confirm",
         })
         .then(async (result) => {
+            if (result.isConfirmed) {
             try{
                 const request = await fetch('/return', {
                     method: "POST",
@@ -547,6 +559,7 @@
                 alert("return product error")
                 console.log(err)
             }
+        }
         })
        
     }
