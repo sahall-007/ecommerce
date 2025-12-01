@@ -8,6 +8,9 @@ const router = express.Router()
 router.route('/orders')
     .get(middleware.checkSession, orderController.orderManagement)
 
+router.route('/orders/:page')
+    .get(middleware.checkSession, orderController.pagination)
+
 router.route('/orderDetail/:orderId')
     .get(middleware.checkSession,  orderController.adminOrderDetailPage)
 

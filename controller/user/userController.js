@@ -21,7 +21,7 @@ const loadRegister = async (req, res) => {
 
         if(req.session.matchPass==false){
             req.session.matchPass = true
-            return res.status(409).render('register', {confirm: "Password doesn't match, Try again", 
+            return res.status(409).render('user/register', {confirm: "Password doesn't match, Try again", 
                                                        username: null,
                                                        email: null,
                                                        password: null
@@ -30,14 +30,14 @@ const loadRegister = async (req, res) => {
 
         if(req.session.userExist==true){
             req.session.userExist = false
-            return res.status(409).render('register', {email: "Email already in use, Try again",
+            return res.status(409).render('user/register', {email: "Email already in use, Try again",
                                                        username: null,                                                
                                                        password: null,
                                                        confirm: null
             })
         }
 
-        res.render('register', {confirm: null,
+        res.render('user/register', {confirm: null,
                                 username: null,
                                 email: null,
                                 password: null
@@ -142,7 +142,7 @@ const registerUser = async (req, res) => {
 // to load the login pages
 const loadLogin = async (req, res) => {
     try {
-        res.render('userLogin')
+        res.render('user/userLogin')
     }
     catch (err) {
         logger.error(err)
@@ -198,14 +198,8 @@ const guestLogin = async (req, res) => {
 // to load the otp page
 const loadOtpPage = async (req, res) =>{
     try{
-        // if(req.session.resend==true){
-        //     req.session.userOTP = 654321
-        //     req.session.resend = false
-        //     return res.render('otp', { otp: req.session.userOTP })    
-        // }
-        // req.session.userOTP = 123456
         console.log(req.session.userOTP)
-        res.render('otp', { otp: req.session.userOTP })
+        res.render('user/otp', { otp: req.session.userOTP })
 
         
     }
@@ -352,7 +346,7 @@ const getHomePage = async (req, res) => {
             {$sample: {size: 10}}
         ])
         
-        res.render('home', { newArrivals, inOffer })
+        res.render('user/home', { newArrivals, inOffer })
     }
     catch(err){
         console.log(err)
@@ -434,7 +428,7 @@ const productDetail = async (req, res) => {
 
         const variantOptions = await variantSchema.find({productId: variant[0].productDoc._id })
 
-        res.render('productDetail', { variant, exploreMore, variantOptions })
+        res.render('user/productDetail', { variant, exploreMore, variantOptions })
 
     }
     catch(err){
@@ -518,15 +512,15 @@ const newArrivals = async (req, res) => {
 
         if(allProducts.length < limit){
             req.session.filter = null
-            return res.status(200).render('newArrivals', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         if(limit>=variantCount){
             req.session.filter = null
             console.log("inside condition")
-            return res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         req.session.filter = null
-        res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     }
     catch(err){

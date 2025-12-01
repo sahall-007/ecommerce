@@ -107,15 +107,15 @@ const allProducts = async (req, res) => {
 
         if(allProducts.length < limit){
             req.session.filter = null
-            return res.status(200).render('allProducts', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/allProducts', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         if(limit>=variantCount){
             req.session.filter = null
             console.log("inside condition")
-            return res.status(200).render('allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         req.session.filter = null
-        res.status(200).render('allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/allProducts', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     } 
     catch (err) {
@@ -261,10 +261,10 @@ const filterPage = async (req, res) => {
         ])
 
         if(limit >= variantCount){
-            return res.status(200).render('allProducts', { allProducts: products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/allProducts', { allProducts: products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
-        res.status(200).render('allProducts', { allProducts: sample, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/allProducts', { allProducts: sample, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
 
     }
@@ -374,10 +374,10 @@ const nextPage = async (req, res) => {
         const brand = await brandSchema.find({isListed: true}, {name: 1})
 
         if(pageNo * limit + limit >= variantCount){
-            res.render('allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('user/allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('user/allProducts', { allProducts, category, brand, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
 
     }
@@ -420,8 +420,10 @@ const prevPage = async (req, res) => {
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
             {$sample: {size: limit}}
         ])
+        const category = await categorySchema.find({isListed: true}, {name: 1})
+        const brand = await brandSchema.find({isListed: true}, {name: 1})
 
-        res.render( 'allProducts', { allProducts, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+        res.render( 'user/allProducts', { allProducts, category, brand, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
 
     }
     catch(err){

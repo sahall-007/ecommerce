@@ -27,11 +27,11 @@ router.route('/unblockBrand')
 // router.route('/deleteBrand')
 //     .delete(brandController.deleteBrand)
 
-router.route('/brand/next')
-    .get(middleware.checkSession, brandController.nextPage)
+router.route('/brand/:page')
+    .get(middleware.checkSession, brandController.pagination)
 
-router.route('/brand/prev')
-    .get(middleware.checkSession, brandController.prevPage)
+// router.route('/brand/prev')
+//     .get(middleware.checkSession, brandController.prevPage)
 
 router.route('/searchBrand')
     .post(middleware.checkSession, brandController.searchBrand)

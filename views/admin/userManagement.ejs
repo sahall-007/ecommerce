@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brand Management</title>
+    <title>Admin home page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -71,73 +71,14 @@
 
 
     <div class="d-flex gap-5 m-5">
-        <div class=" d-inline-block border border-secondary text-secondary rounded sidebar align-self-start py-3">
-            <div class="">
-
-                <div onclick="location.href='/admin/dashboard'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
-                </div>
-
-                <div onclick="location.href='/admin/product'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
-                </div>
-
-                <div onclick="location.href='/admin/category'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
-                </div>
-
-                <div onclick="location.href='/admin/orders'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Order</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Coupon</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Transactions</a>
-                </div>
-
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
-                </div>
-
-                <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
-                </div>
-            </div>
-
-            <div class="my-5">
-                <div class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
-                </div>
-                <div onclick="location.href='/admin/userManagement'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                    <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
-                </div>
-            </div>
-
-            <div>
-                
-                <div onclick="location.href='/admin/logout'" class="test ps-2 pb-3 px-3 py-1">
-                    <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                    <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
-                </div>
-            </div>
+        <div class=" d-inline-block border border-secondary rounded text-secondary sidebar align-self-start py-3">
+            
+            <%- include("../partials/admin/sidebarLinks.ejs") %>
 
         </div>
         <div class="card flex-fill position-relative">
             <div class="card-header">
-                <h1 class="text-center">Brand Management</h1>
+                <h1 class="text-center">User Management</h1>
 
                 <div class="container">
                     <div class="row justify-content-between my-5">
@@ -150,14 +91,14 @@
                         <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
                     </div>
 
-                    <form action="/admin/searchBrand" class="col-4 align-self-start d-flex gap-2" method="post">
-                        <input class="form-control me-2 " name="name" type="search" placeholder="Search" aria-label="Search" />
+                    <form action="/admin/searchUser" class="col-4 align-self-start d-flex gap-2" method="post">
+                        <input class="form-control me-2 " name="username" type="search" placeholder="Search" aria-label="Search" />
                         <button class="btn btn-outline-success" type="submit">Search</button>
                     </form>
 
                     <div class="col-2 d-flex justify-content-end  align-self-start">
-                        <a role="button" href="/admin/addBrand"
-                            class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">Add new</a>
+                        <a role="button" href="/admin/addUser"
+                            class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">New User</a>
                     </div>
 
                 </div>
@@ -167,38 +108,31 @@
             <div class="card-body">
                 <div class="">
 
-                    <% if (brands) { %>
+                    <% if (users) { %>
                         <table class="table table-striped">
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th> Name </th>
-                                    <th> Added </th>
-                                    <th> sold </th>
-                                    <th> stock </th>
+                                    <th> Username </th>
+                                    <th> Email </th>
+                                    <!-- <th> phone </th> -->
                                     <th> Status </th>
                                     <th> Actions </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <% brands.forEach((brand, index) => { %>
-
+                                <% users.forEach((user, index)=> { %>
+                                    <!-- <% var userListed = user; %> -->
                                     <tr>
                                         <td><%= index+1 %></td>
                                         <td class="py-1">
-                                            <%= brand.name %>
+                                            <%= user.username %>
                                         </td>
                                         <td>
-                                            <%= brand.createdAt.toISOString().split("T")[0] %>
+                                            <%= user.email %>
                                         </td>
-                                        <td>
-                                            100
-                                        </td>
-                                        <td>
-                                            50
-                                        </td>
-
-                                        <% if(brand.isListed) { %>
+                                        <!-- <td><% user.phone %></td> -->
+                                        <% if(user.isListed) { %>
                                             <td class="text-success">Active</td>
                                         <% } else{ %>
                                             <td class="text-danger">blocked</td>
@@ -206,13 +140,17 @@
 
                                         <td>
                                             <div class="d-flex gap-4 ">
-
-                                                <a class="actions" href="/admin/editBrand/<%= brand.name %>" onclick='editCategory("<%= brand._id%>")' ><i class="bi bi-pencil"></i></a>
-                                                <% if(brand.isListed) { %>
-                                                    <a class="actions block-btn"  onclick='block("<%= brand._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+                                                <div id="userdetail" data-test=<%= user %>></div>
+                                                <!-- <% var userListed = user.isListed %> -->
+                                                
+                                                <% if(user.isListed) { %>
+                                                    <a class="actions block-btn"  onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+                                                    <!-- <a class="actions d-none unblock-btn-on-block" id="" data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a> -->
                                                 <% } else{ %>
-                                                    <a class="actions " onclick='unBlock("<%= brand._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                    <a class="actions " onclick='unBlock("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                    <!-- <a class="actions d-none" id="block-btn-on-unblock" onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a> -->
                                                 <% } %>
+                                                <a class="actions" onclick='deleteUser("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
                                             </div>
                                         </td>
                                     </tr>
@@ -226,13 +164,14 @@
             </div>
 
                 <div class="mb-4 mx-auto">
-                    <a href="/admin/brand/prev?page=<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
-                    <a href="/admin/brand/next?page=<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+                    <a href="/admin/userManagement/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
+                    <a href="/admin/userManagement/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
                 </div>
 
         </div>
     </div>
 
+    <!-- <div class="card d-inline-block px-5 position-fixed top-50 start-50 translate-middle"> -->
 <!----------------------  delete modal  ----------------------->
     <div class="modal fade" id="deleteModal">
         <div class="modal-dialog">
@@ -245,7 +184,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmDelete()"  data-bs-dismiss="modal">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmDelete()">Confirm</button>
                     </div>
                 </div>
 
@@ -287,7 +226,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmUnBlock()" data-bs-dismiss="modal">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmUnBlock()">Confirm</button>
                     </div>
                 </div>
 
@@ -296,7 +235,7 @@
     </div>
 
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
 
         const sidebar = document.querySelector('.sidebar');
@@ -315,11 +254,8 @@
             });
         });
 
-        let editId, blockId, unBlockId, deleteId
 
-        // function editCategory(id){
-        //     window.location.href = `/admin/unBlock/${id}`
-        // }
+        let blockId, unBlockId, deleteId
 
         function block(id){
             blockId = id
@@ -329,54 +265,56 @@
             unBlockId = id
         }
 
-        function deleteBrand(id){
+        function deleteUser(id){
             deleteId = id
         }
 
         async function confirmBlock(){
-            const res = await fetch('/admin/blockBrand', {
+            console.log("its hitting.........")
+            const res = await fetch('/admin/blockUser', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: blockId })
             })
-            swal.fire({
-                title: "successfully blocked the Brand",
-                icon: "success",
-                timer: 1500
-            })
             .then(() => window.location.reload())
+
+    
+            // const block = document.querySelectorl("block-btn")
+            // const unblock = document.querySelectorAll("unblock-btn") 
+            // const unblockOnBlock = document.querySelector("unblock-btn-on-block") 
+
+            // console.log("user has been blocked")
+            // console.log(res.status)
+            // const data = await res.json()
+
+
+
+            // block.classList.add("d-none")
+            // unblockOnBlock.classList.remove("d-none")
+            // unblock.classList.remove("d-none")
+
+
         }
 
         async function confirmUnBlock(){
             console.log("un block confirm")
-            const res = await fetch('/admin/unblockBrand', {
+            const res = await fetch('/admin/unBlockUser', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: unBlockId })
-            })
-            swal.fire({
-                title: "successfully unblocked the Brand",
-                icon: "success",
-                timer: 1500
             })
             .then(() => window.location.reload())
         }
 
         async function confirmDelete(){
             console.log("delte confirm")
-            const res = await fetch('/admin/deleteBrand', {
+            const res = await fetch('/admin/deleteUser', {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: deleteId })
             })
-            swal.fire({
-                title: "successfully deleted the Brand",
-                icon: "success",
-                timer: 1500
-            })                
             .then(() => window.location.reload())
         }
-        
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

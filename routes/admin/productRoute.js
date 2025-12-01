@@ -29,11 +29,11 @@ router.route('/unblockProduct')
 router.route('/deleteProduct')
     .delete(middleware.checkSession, productController.deleteProduct)
 
-router.route('/product/next')
-    .get(middleware.checkSession, productController.nextPage)
+router.route('/product/:page')
+    .get(middleware.checkSession, productController.pagination)
 
-router.route('/product/prev')
-    .get(middleware.checkSession, productController.prevPage)
+// router.route('/product/prev')
+//     .get(middleware.checkSession, productController.prevPage)
 
 router.route('/searchProduct')
     .post(middleware.checkSession, productController.searchProduct)

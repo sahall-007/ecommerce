@@ -21,11 +21,11 @@ router.route('/unBlockCategory')
 // router.route('/deleteCategory')    
 //     .delete(categoryController.deleteCategory)
 
-router.route('/category/next')
-    .get(middleware.checkSession, categoryController.nextPage)
+router.route('/category/:page')
+    .get(middleware.checkSession, categoryController.pagination)
 
-router.route('/category/prev')
-    .get(middleware.checkSession, categoryController.prevPage)
+// router.route('/category/prev')
+//     .get(middleware.checkSession, categoryController.prevPage)
 
 router.route('/searchCategory')
     .post(middleware.checkSession, categoryController.searchCategory)

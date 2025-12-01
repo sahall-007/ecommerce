@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Variant Management</title>
+    <title>Brand Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -70,80 +69,20 @@
         </div>
     </nav>
 
-
     <div class="container px-0 mt-5">
         <div class="row row-cols-1 justify-content-between">
-            <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
-                <div class="">
-
-                    <div onclick="location.href='/admin/dashboard'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/product'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/category'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/orders'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Order</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Coupon</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Transactions</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
-                    </div>
-                </div>
-
-                <div class="my-5">
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
-                    </div>
-                    <div onclick="location.href='/admin/userManagement'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
-                    </div>
-                </div>
-
-                <div>
-                    
-                    <div onclick="location.href='/admin/logout'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                        <a class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
-                    </div>
-                </div>
-
+            <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+            
             </div>
             <div class="card col col-md-8 col-lg-9  px-0 mx-3">
                 <div class="card-header">
-                    <h1 class="text-center">Variant Management</h1>
-
+                    <h1 class="text-center">Brand Management</h1>
+            
                     <div class="container">
                         <div class="row justify-content-between my-5">
-
+            
                         <div class="col-3 d-flex justify-content-around border-bottom border-3 align-self-start pb-1 user-status">
                             <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">All
                             </h1>
@@ -151,73 +90,69 @@
                             </h1>
                             <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
                         </div>
-
-                        <!-- <form action="" class="col-4 align-self-start d-flex gap-2" method="post">
+            
+                        <form action="/admin/searchBrand" class="col-4 align-self-start d-flex gap-2" method="post">
                             <input class="form-control me-2 " name="name" type="search" placeholder="Search" aria-label="Search" />
                             <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form> -->
-
+                        </form>
+            
                         <div class="col-2 d-flex justify-content-end  align-self-start">
-                            <a role="button" href="/admin/addVariant/<%= variants[0].productId %>"
+                            <a role="button" href="/admin/addBrand"
                                 class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">Add new</a>
                         </div>
-
+            
                     </div>
                     </div>
                     
                 </div>
                 <div class="card-body">
                     <div class="">
-
-                        <% if (variants) { %>
+            
+                        <% if (brands) { %>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
-                                        <th> RAM </th>
-                                        <th> Storage </th>
-                                        <th> Color </th>
-                                        <th> Quantity </th>
-                                        <th> Price </th>
-                                        <th> status </th>
+                                        <th> Name </th>
+                                        <th> Added </th>
+                                        <th> stock </th>
+                                        <th> Status </th>
                                         <th> Actions </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% variants.forEach((variant, index) => { %>
-
+                                    <% brands.forEach((brand, index) => { %>
+            
                                         <tr>
                                             <td><%= index+1 %></td>
                                             <td class="py-1">
-                                                <%= variant.ram %>
+                                                <%= brand.name %>
                                             </td>
                                             <td>
-                                                <%= variant.storage %>
+                                                <%= new Date(brand.createdAt).toLocaleDateString('en-GB', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric',
+                                                }) %>
                                             </td>
                                             <td>
-                                                <%= variant.color%>
+                                                50
                                             </td>
-                                            <td>
-                                                <%= variant.quantity %>
-                                            </td>
-                                            <td>
-                                                <%= variant.price %>
-                                            </td>
-
-                                            <% if(variant.isListed) { %>
+            
+                                            <% if(brand.isListed) { %>
                                                 <td class="text-success">Active</td>
                                             <% } else{ %>
                                                 <td class="text-danger">blocked</td>
                                             <% } %>
-
+            
                                             <td>
                                                 <div class="d-flex gap-4 ">
-
-                                                    <a class="actions"   onclick='editCategory("<%= variant._id%>")' ><i class="bi bi-pencil"></i></a>
-                                                    <% if(variant.isListed) { %>
-                                                        <a class="actions block-btn"  onclick='block("<%= variant._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+            
+                                                    <a class="actions" href="/admin/editBrand/<%= brand.name %>" onclick='editCategory("<%= brand._id%>")' ><i class="bi bi-pencil"></i></a>
+                                                    <% if(brand.isListed) { %>
+                                                        <a class="actions block-btn"  onclick='block("<%= brand._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
                                                     <% } else{ %>
-                                                        <a class="actions " onclick='unBlock("<%= variant._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                        <a class="actions " onclick='unBlock("<%= brand._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
                                                     <% } %>
                                                 </div>
                                             </td>
@@ -230,18 +165,18 @@
                         <% } %>
                     </div>
                 </div>
-
-                    <div class="mb-4 mx-auto">
-                        <a href="/admin/product/prev?page=<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
-                        <a href="/admin/product/next?page=<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
-                    </div>
-
+            
+                <div class="mb-4 mx-auto">
+                    <a href="/admin/brand/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
+                    <a href="/admin/brand/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+                </div>
+            
             </div>
+        </div>
     </div>
-    </div>
+   
+    
 
-
-    <!-- <div class="card d-inline-block px-5 position-fixed top-50 start-50 translate-middle"> -->
 <!----------------------  delete modal  ----------------------->
     <div class="modal fade" id="deleteModal">
         <div class="modal-dialog">
@@ -254,7 +189,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmDelete()">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmDelete()"  data-bs-dismiss="modal">Confirm</button>
                     </div>
                 </div>
 
@@ -296,7 +231,7 @@
                         <button class="border-0 rounded px-3 py-1 bg-black text-light"
                             data-bs-dismiss="modal">Cancel</button>
                         <button class="border-0 rounded px-3 py-1 text-light"
-                            style="background-color: #EF6627;" onclick="confirmUnBlock()">Confirm</button>
+                            style="background-color: #EF6627;" onclick="confirmUnBlock()" data-bs-dismiss="modal">Confirm</button>
                     </div>
                 </div>
 
@@ -305,8 +240,9 @@
     </div>
 
     
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+
         const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
 
@@ -323,14 +259,11 @@
             });
         });
 
-
         let editId, blockId, unBlockId, deleteId
 
-        async function editCategory(id){
-            event.stopPropagation();
-            window.location.href = `/admin/editVariant/${id}`
-           
-        }
+        // function editCategory(id){
+        //     window.location.href = `/admin/unBlock/${id}`
+        // }
 
         function block(id){
             blockId = id
@@ -338,48 +271,56 @@
 
         function unBlock(id){
             unBlockId = id
-            console.log(id)
         }
 
-        function deleteCategory(id){
+        function deleteBrand(id){
             deleteId = id
         }
 
         async function confirmBlock(){
-            // alert("its hitting.........")
-            const res = await fetch('/admin/blockVariant', {
+            const res = await fetch('/admin/blockBrand', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: blockId })
+            })
+            swal.fire({
+                title: "successfully blocked the Brand",
+                icon: "success",
+                timer: 1500
             })
             .then(() => window.location.reload())
         }
 
         async function confirmUnBlock(){
-            // alert("un block confirm")
-            const res = await fetch('/admin/unBlockVariant', {
+            console.log("un block confirm")
+            const res = await fetch('/admin/unblockBrand', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: unBlockId })
+            })
+            swal.fire({
+                title: "successfully unblocked the Brand",
+                icon: "success",
+                timer: 1500
             })
             .then(() => window.location.reload())
         }
 
         async function confirmDelete(){
             console.log("delte confirm")
-            const res = await fetch('/admin/deleteProduct', {
+            const res = await fetch('/admin/deleteBrand', {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: deleteId })
             })
+            swal.fire({
+                title: "successfully deleted the Brand",
+                icon: "success",
+                timer: 1500
+            })                
             .then(() => window.location.reload())
         }
-
-        async function productInfo(id){
-            window.location.href = `/admin/variant/${id}`
-        }
-
-
+        
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

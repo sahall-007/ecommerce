@@ -5,6 +5,8 @@ const productSchema = require('../../model/productSchema.js')
 const { castObject } = require('../../model/userSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 
+const logger = require('../../config/pinoLogger.js')
+
 const productManagement = async (req, res) => { 
     try{
         const productCount = await productSchema.countDocuments()
@@ -42,10 +44,10 @@ const productManagement = async (req, res) => {
         ])
 
         if (limit >= productCount) {
-            return res.render('productManagement', { products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.render('admin/productManagement', { products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
-        res.status(200).render('productManagement', { products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('admin/productManagement', { products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
     }
     catch(err){
         console.log(err)
@@ -60,7 +62,7 @@ const addProductPage = async (req, res) => {
         const brand = await brandSchema.find().sort({_id: -1})
         // console.log(category)
 
-        res.status(200).render('addProduct', { category, brand })
+        res.status(200).render('admin/addProduct', { category, brand })
     }
     catch(err){
         console.log(err)
@@ -189,7 +191,7 @@ const editProductPage = async (req, res) => {
 
         console.log(product)
         
-        res.render('editProduct', { product, category, brand })
+        res.render('admin/editProduct', { product, category, brand })
     }
     catch(err){
         console.log(err)
@@ -281,9 +283,9 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-const nextPage = async (req, res) => {
+const pagination = async (req, res) => {
     try{
-        const { page } = req.query
+        const { page } = req.params
         
         const pageNo = Number(page)
         const limit = 5
@@ -292,7 +294,6 @@ const nextPage = async (req, res) => {
             return res.redirect('/admin/product')
         }
         const productCount = await productSchema.countDocuments()
-        // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
         const products = await productSchema.aggregate([
             {$lookup: {
@@ -325,76 +326,77 @@ const nextPage = async (req, res) => {
             {$limit: limit}
         ])
 
-        console.log(pageNo * limit + limit)
-        console.log(productCount)
+        logger.info(pageNo * limit + limit)
+        logger.info(productCount)
 
         if(pageNo * limit + limit >= productCount){
-            res.render('productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('admin/productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('admin/productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
     }
     catch(err){
-        console.log(err)
-        console.log("failed to go to the next page")
-        res.status(500).json({success: false, message: "something went wrong (product next page)"})
+        logger.fatal(err)
+        logger.fatal("failed to go to the pagination page")
+        res.status(500).json({success: false, message: "something went wrong (product pagination page)"})
     }
 }
 
-const prevPage = async (req, res) => {
-    try{
-        const { page } = req.query
+// const prevPage = async (req, res) => {
+//     try{
+//         const { page } = req.query
 
-        const pageNo = Number(page)
-        const limit = 5
+//         const pageNo = Number(page)
+//         const limit = 5
 
-        if(pageNo==0){
-            return res.status(200).redirect('/admin/product')
-        }
+//         if(pageNo==0){
+//             return res.status(200).redirect('/admin/product')
+//         }
 
-        // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+//         // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        const products = await productSchema.aggregate([
-            {$lookup: {
-                from: "categories",
-                localField: "categoryId",
-                foreignField: "_id",
-                as: "category"
-            }},
-            {$unwind: "$category"},
-            {$lookup: {
-                from: "brands",
-                localField: "brandId",
-                foreignField: "_id",
-                as: "brand"
-            }},
-            {$unwind: "$brand"},
-            {$lookup: {
-                from: "variants",
-                let: {id: "$_id"},
-                pipeline: [
-                    {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
-                    {$limit: 1},
-                    {$project: {image: 1}}
-                ],
-                as: "variant"
-            }},
-            {$unwind: "$variant"},
-            {$sort: {_id: -1}},
-            {$skip: limit*pageNo},
-            {$limit: limit}
-        ])
+//         const products = await productSchema.aggregate([
+//             {$lookup: {
+//                 from: "categories",
+//                 localField: "categoryId",
+//                 foreignField: "_id",
+//                 as: "category"
+//             }},
+//             {$unwind: "$category"},
+//             {$lookup: {
+//                 from: "brands",
+//                 localField: "brandId",
+//                 foreignField: "_id",
+//                 as: "brand"
+//             }},
+//             {$unwind: "$brand"},
+//             {$lookup: {
+//                 from: "variants",
+//                 let: {id: "$_id"},
+//                 pipeline: [
+//                     {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
+//                     {$limit: 1},
+//                     {$project: {image: 1}}
+//                 ],
+//                 as: "variant"
+//             }},
+//             {$unwind: "$variant"},
+//             {$sort: {_id: -1}},
+//             {$skip: limit*pageNo},
+//             {$limit: limit}
+//         ])
+        
 
-        res.status(200).render('productManagement', { products, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+//         res.status(200).render('admin/productManagement', { products, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
 
-    }
-    catch(err){
-        console.log(err)
-        console.log("failed to get previous page")
-        res.status(500).json({success: false, message: "something went wrong, (products prev page)"})
-    }
-}
+//     }
+//     catch(err){
+//         console.log(err)
+//         console.log("failed to get previous page")
+//         res.status(500).json({success: false, message: "something went wrong, (products prev page)"})
+//     }
+// }
 
 const searchProduct = async (req, res) => {
     try{
@@ -426,7 +428,7 @@ const searchResult = async (req, res) => {
         const { name } = req.params
 
         if(name=="null"){
-            return res.render('productManagement', { products: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+            return res.render('admin/productManagement', { products: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
         // const product = await productSchema.findOne({name})
@@ -462,7 +464,7 @@ const searchResult = async (req, res) => {
 
         // let arr = [product]
 
-        res.render('productManagement', { products, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+        res.render('admin/productManagement', { products, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }
     catch(err){
         console.log(err)
@@ -480,8 +482,8 @@ module.exports = {
     blockProduct,
     unblockProduct,
     deleteProduct,
-    nextPage,
-    prevPage,
+    pagination,
+    // prevPage,
     searchProduct,
     searchResult
 

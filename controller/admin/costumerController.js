@@ -14,10 +14,10 @@ const loadUserManagement = async (req, res) => {
         const users = await userSchema.find().sort({_id: -1}).limit(5)
 
         if (limit >= userCount) {
-            return res.render('userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.render('admin/userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         
-        res.status(200).render('userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('admin/userManagement', { users: users, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
     }
     catch(err){
         console.log(err)
@@ -28,7 +28,7 @@ const loadUserManagement = async (req, res) => {
 
 const addUserPage = async (req, res) => {
     try{
-        res.render('addUser')
+        res.render('admin/addUser')
     }
     catch(err){
         console.log(err)
@@ -115,11 +115,10 @@ const deleteUser = async (req, res) => {
     }
 }
 
-const nextPage = async (req, res) => {
+const pagination = async (req, res) => {
     
-    console.log("next handler hit")
     try{
-        const { page } = req.query
+        const { page } = req.params
         
         const pageNo = Number(page)
         const limit = 5
@@ -133,44 +132,44 @@ const nextPage = async (req, res) => {
         console.log(userCount)
 
         if(pageNo * limit + limit >= userCount){
-            res.render('userManagement', { users: users, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('admin/userManagement', { users: users, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('userManagement', { users: users, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('admin/userManagement', { users: users, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
 
     }
     catch(err){
         console.log(err)
-        console.log("failed to retrieve next page")
-        res.status(500).json({message: "something went wrong, (user next page)"})
+        console.log("failed to retrieve pagination page")
+        res.status(500).json({message: "something went wrong, (user pagination page)"})
     }
 }
 
-const prevPage = async (req, res) => {
+// const prevPage = async (req, res) => {
 
-    console.log("prev handler hit.........")
-    try{
-        const { page } = req.query
+//     console.log("prev handler hit.........")
+//     try{
+//         const { page } = req.query
 
-        const pageNo = Number(page)
-        const limit = 5
+//         const pageNo = Number(page)
+//         const limit = 5
 
-        if(pageNo==0){
-            return res.redirect('/admin/userManagement')
-        }
+//         if(pageNo==0){
+//             return res.redirect('/admin/userManagement')
+//         }
 
-        const users = await userSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+//         const users = await userSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        res.render('userManagement', { users, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+//         res.render('admin/userManagement', { users, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
 
-    }
-    catch(err){
-        console.log(err)
-        console.log("failed to get previous page")
-        res.status(500).json({message: "something went wrong, (user prev page)"})
-    }
-}
+//     }
+//     catch(err){
+//         console.log(err)
+//         console.log("failed to get previous page")
+//         res.status(500).json({message: "something went wrong, (user prev page)"})
+//     }
+// }
 
 const searchUser = async (req, res) => {
     console.log("search handler is hit")
@@ -204,14 +203,14 @@ const searchResult = async (req, res) => {
         const { username } = req.params
 
         if(username=="null"){
-            return res.render('userManagement', { users: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+            return res.render('admin/userManagement', { users: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
         const user = await userSchema.findOne({username})
 
         let arr = [user]
 
-        res.render('userManagement', { users: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+        res.render('admin/userManagement', { users: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }
     catch(err){
         console.log(err)
@@ -227,8 +226,8 @@ module.exports = {
     blockUser,
     unBlockUser,
     deleteUser,
-    nextPage,
-    prevPage,
+    pagination,
+    // prevPage,
     searchUser,
     searchResult
 }

@@ -5,10 +5,11 @@ const adminSchema = require('../../model/adminSchema.js')
 const bcrypt = require("bcrypt")
 // const userSchema = require('../../model/userSchema.js')
 
+const logger = require('../../config/pinoLogger.js')
 
 const loadLogin = async (req, res) => {
     try{
-        res.status(200).render('login')
+        res.status(200).render('admin/login')
     }
     catch(err){
         console.log(err)
@@ -49,7 +50,7 @@ const loginVerify = async (req, res) =>{
 
 const loadDashboard = async (req, res) => {
     try{
-        res.render('adminHome')
+        res.render('admin/adminHome')
     }
     catch(err){
         console.log(err)

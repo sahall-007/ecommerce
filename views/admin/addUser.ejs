@@ -72,67 +72,8 @@
         <div class="row row-cols-1 justify-content-between">
             <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0"
                 style="padding-bottom: -100px;">
-                <div class="">
-
-                    <div  onclick="location.href='/admin/dashboard'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/product'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Product</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/category'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Category</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Order</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Coupon</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Transactions</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Offer</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
-                    </div>  
-                </div>
-
-                <div class="my-5">
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Admins</h1>
-                    </div>
-                    <div  onclick="location.href='/admin/userManagement'"class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                        <h1  class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">customers</h1>
-                    </div>
-                </div>
-
-                <div>
-                    
-                    <div onclick="location.href='/admin/logout'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 px-3 pb-3 ms-3 mb-0">Logout</h1>
-                    </div>
-                </div>
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
 
             </div>
             <div class="card col col-md-9  px-0 mx-3">

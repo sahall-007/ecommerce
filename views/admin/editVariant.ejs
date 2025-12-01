@@ -78,74 +78,15 @@
         <div class="row row-cols-1 justify-content-between">
             <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0"
                 style="padding-bottom: -100px;">
-                <div class="">
-
-                    <div onclick="location.href='/admin/dashboard'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Dashboard</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/product'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Product</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/category'"  class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Category</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Order</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Coupon</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Transactions</h1>
-                    </div>
-
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Offer</h1>
-                    </div>
-
-                    <div onclick="location.href='/admin/brand'"  class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
-                </div>
-                </div>
-
-                <div class="my-5">
-                    <div class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">Admins</h1>
-                    </div>
-                    <div onclick="location.href='/admin/userManagement'"  class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 pb-3 px-3 py-1 ms-3 mb-0">customers</h1>
-                    </div>
-                </div>
-
-                <div>
-                    
-                    <div onclick="location.href='/admin/logout'" class="test ps-2">
-                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                        <h1 class="fs-6 px-3 pb-3 ms-3 mb-0">Logout</h1>
-                    </div>
-                </div>
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
 
             </div>
-            <div class="card col col-md-9  px-0 mx-3">
+            <div class="card col col-md-9  px-0 mx-3" id="card">
 
                 <div class="card-body" style="background-color: #edededb8;">
                     <div class="">
-                        <h1 class="text-center m-b5">Add variant</h1>
+                        <h1 class="text-center m-b5">Edit variant</h1>
                     </div>
                     <form id="productForm" >
                         <div class="container">
@@ -154,41 +95,41 @@
                             <div class="col col-md-10 col-lg-8 ">
 
                                 <div class="border border-dark rounded-0 pt-2 pb-3">
-                                    <h1 class="fs-6 fw-normal text-secondary  ps-2">Add variant</h1>
+                                    <h1 class="fs-6 fw-normal text-secondary  ps-2">Edit variant</h1>
 
                                     <div class="row row-cols-1 row-cols-lg-3 mx-2">
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="ram">RAM</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="ram" type="text"
-                                                id="ram-1" placeholder="Type here">
+                                                id="ram-1" placeholder="Type here" value="<%= variant.ram %>">
                                             <p class="text-danger" id="ramMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="storage">Storage</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="storage"
-                                                type="text" id="storage-1" placeholder="Type here">
+                                                type="text" id="storage-1" placeholder="Type here" value="<%= variant.storage %>">
                                             <p class="text-danger" id="storageMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3">
                                             <label class="d-block mb-1 fs-5" for="color">Color</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="color"
-                                                type="text" id="color-1" placeholder="Type here">
+                                                type="text" id="color-1" placeholder="Type here" value="<%= variant.color %>">
                                             <p class="text-danger" id="colorMsg-1" style="font-size: small;"></p>
                                         </div>
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="quantity">Quantity</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="quantity" type="number"
-                                                id="quantity-1" placeholder="Type here">
+                                                id="quantity-1" placeholder="Type here"  value="<%= variant.quantity %>">
                                             <p class="text-danger" id="quantityMsg-1" style="font-size: small;"></p>
                                         </div>
 
                                         <div class="col col-md-4 mt-3 ">
                                             <label class="d-block mb-1 fs-5" for="price">Price</label>
                                             <input class="form-control border-dark rounded-0 p-2" name="price"
-                                                type="text" id="price-1" placeholder="Type here">
+                                                type="text" id="price-1" placeholder="Type here"  value="<%= variant.price %>">
                                             <p class="text-danger" id="priceMsg-1" style="font-size: small;"></p>
                                         </div>
 
@@ -202,28 +143,36 @@
                                             <!--------------------- images container----------------- -->
 
 
-
-
                                     </div>
 
                                     <div class="container mt-5">
                                         <div class="row row-cols-1  g-4" id="imageRow-1">
+                                            <% images.forEach((image, index) => { %>
+                                            
+                                                <div class="position-relative pb-5" id="imgContainer<%= index %>">
+                                                    <img id="image<%= index %>" class="w-100 imageContainer" src="/<%= image %>" alt="">
+                                                    <div class="d-flex gap-3 position-absolute bottom-0 start-50 translate-middle-x">
+                                                        <button class="btn btn-dark text-light py-1 px-3 d-none " id="cropperButton<%= index %>" onclick='cropImage(this, "<%= index %>")'>Crop</button>
+                                                        <button class="btn btn-danger text-light py-1 px-3  " id="deleteButton<%= index %>" onclick='deleteImage(this, "<%= variant._id %>", "<%= index %>")'>Delete</button>
+                                                        <label class="btn btn-warning text-light py-1 px-3" id="changeButton<%= index %>" for="changeImg<%= index %>">Change</label>
+                                                        <input type="file" id="changeImg<%= index %>"  accept="image/*" class="d-none" onchange='changeImg("<%= index %>")'>
+                                                    </div>
+                                                </div>
 
-
+                                            <% }) %>
                                         </div>
                                     </div>
 
-                                    <div class=" mt-4 d-flex justify-content-center " id="image-input">
+                                    
+                                    <div class=" mt-4 d-flex justify-content-center">
                                         <label for="image-1" class="image-label rounded border-danger bg-light p-5">Add
                                             image</label>
                                         <input id="image-1" type="file" name="image-1" accept="image/*" multiple onchange="newFile(1)"
                                             class="border border-black d-none">
-                                        
-                                    </div>
-
-                                    <div class="d-flex justify-content-center mt-3" id="image-msg-1">
                                         <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
                                     </div>
+                                    
+                                    
 
                                     <div class="row justify-content-center">
                                         <div class="col-2">
@@ -248,7 +197,9 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
         <script>
-            const editId = "<%= editId %>"
+            const images = "<%= images%>"
+            const variantId = "<%= variant._id %>"
+            const productId = "<%= productId %>"
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
 
@@ -265,10 +216,124 @@
                 });
             });
 
+            // document.addEventListener('DOMContentLoaded', () => {
+                
+            // })
+            async function deleteImage(element, variantId, imageIndex) {
+
+                const container = element.parentElement.parentElement
+
+                try{
+
+                    const data = await fetch('/admin/deleteImg', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ variantId, imageIndex})
+                    })
+                    .then((res) => {
+                        if(res.ok){
+                            container.remove()
+                        }
+                        else{
+                        }
+                    })
+                }
+                catch(err){
+                    console.log(err)
+                }
+            }
+
+            // to change the image
+            let changeImgCropper;
+
+            function changeImg(imageIndex) {
+                // alert("working")
+                const changeImg = document.getElementById(`changeImg${imageIndex}`)
+
+                const file = changeImg.files[0]
+
+                if(!file.type.startsWith("image/")){
+                    changeImg.value = "";
+                            
+                    Swal.fire({
+                        icon: "error",
+                        title: "Invalid File",
+                        text: `Only image files are accepted`,
+                    });
+
+                    return;
+                }
+
+                if(file){
+                    const reader = new FileReader()
+                    
+                    reader.onload = (e) => {
+                        const img = document.getElementById(`image${imageIndex}`)
+                        img.src = e.target.result;
+
+                        img.onload = function(){
+                            changeImgCropper = new Cropper(img, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                preview: '.preview'
+                            })
+                            document.getElementById(`cropperButton${imageIndex}`).classList.remove("d-none")
+                            document.getElementById(`deleteButton${imageIndex}`).classList.add("d-none")
+                            document.getElementById(`changeButton${imageIndex}`).classList.add("d-none")
+                        }
+                        
+                    }
+                    
+                    reader.readAsDataURL(file)
+
+                }
+            }
+            
+            let newCroppedBlobs = []
+
+
+            // to crop the nely added image
+            async function cropImage(element, imageIndex){
+                event.preventDefault()
+
+                const img = document.getElementById(`image${imageIndex}`)
+                console.log(imageIndex)
+                // console.log(img)
+
+                let croppedCanvas = changeImgCropper.getCroppedCanvas()
+                img.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+
+                const siblingElement = img.nextElementSibling
+
+                img.classList.remove("cropper-hidden")
+                siblingElement.classList.add("d-none")
+
+
+                // blob
+                const blobPromise =  new Promise((resolve) => {
+                    croppedCanvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, "image/jpeg");
+                });
+
+                const croppedBlob = await blobPromise;
+
+                croppedBlob.imageIndex = imageIndex
+                newCroppedBlobs.push(croppedBlob)
+
+                console.log("newcroppedblobs after pushing", newCroppedBlobs)
+
+                setTimeout(() => {
+                    croppers.pop()
+                }, 100)
+
+            }
+            
+            
+
+            
             let croppers = []
             let count = 0
-            let cropCount = 0
-            let imageCount = 0
 
             function newFile(id){
                const imageInput = document.getElementById("image-" + id)                           
@@ -276,47 +341,37 @@
 
                 const file = imageInput.files
 
-                let length = (file.length > 5) ? 5 : file.length
-
                 if(file){
-                    for(let i=0; i<length; i++){
+                    for(let i=0; i<file.length; i++){
 
                         if (!file[i].type.startsWith("image/")) {
 
                             // Clear wrong file
                             imageInput.value = "";
-                            
+
                             // Show SweetAlert error
                             Swal.fire({
                                 icon: "error",
                                 title: "Invalid File",
-                                text: `Only image files are accepted`,
+                                text: `${file.name} is not an image file.`,
                             });
 
-
                             return; // Stop further execution
-                        }
-
-                        imageCount++
-
-                        if(imageCount>=5){
-                            document.getElementById(`image-input`).classList.add("d-none")
                         }
 
                         count+=1
 
                         imageRow.insertAdjacentHTML('beforeend', `
-                            <div class="position-relative pb-5" id="imgContainer${count}">
+                            <div class="position-relative pb-5" id="imgContainer-${count}">
                                 <div class="d-flex gap-3 position-absolute bottom-0 start-50 translate-middle-x">
                                     <button class="btn btn-dark text-light py-1 px-3  " id="cropperBtn${count}" onclick="cropImg(this, ${count}, ${id})">Crop</button>
                                     
                                 </div>
                             </div>
                         `)
+                                    // <button class="btn btn-danger text-light py-1 px-3 " id="deleteBtn${count}" onclick="deleteImg(this, ${count})">Delete</button>
 
-                        // <button class="btn btn-danger text-light py-1 px-3 " id="deleteBtn${count}" onclick="deleteImg(this, ${count})">Delete</button>
-
-                        const imgContainer = document.getElementById(`imgContainer${count}`)
+                        const imgContainer = document.getElementById(`imgContainer-${count}`)
 
                         const reader = new FileReader()
 
@@ -346,12 +401,12 @@
             }
 
             let deleteCount = 0
-            let croppedBlobs = [];
+            let extraCroppedBlobs = [];
 
-            // to crop the image
+            // to crop the extra added image
             async function cropImg(element, id, variantNumber) {
                 event.preventDefault()
-                console.log("cropper array during btn click", croppers)
+                // console.log("cropper array during btn click", croppers)
                 const closeImg = element.parentElement.parentElement.querySelector("img")
 
                 let croppedCanvas;
@@ -381,18 +436,16 @@
                 const croppedBlob = await blobPromise;
 
                 croppedBlob.variant = variantNumber
-                croppedBlobs.push(croppedBlob)
+                extraCroppedBlobs.push(croppedBlob)
 
-                console.log("this is blob during btn click",  croppedBlob)
-
-                cropCount++
+                console.log("this is blob during btn click",  extraCroppedBlobs)
 
                 setTimeout(() => {
                     croppers.pop()
                 }, 100);
             }
 
-            // to delete the image
+            // to delete the extra added image
             function deleteImg(element, id){
                 event.preventDefault()
 
@@ -406,7 +459,6 @@
                 }
 
                 deleteCount+=1
-                imageCount--
 
                 const grandParent = element.parentElement.parentElement
 
@@ -417,11 +469,11 @@
             document.getElementById("submit").addEventListener('click', async () => {
                 event.preventDefault()
 
-                const ramRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
-                const storageRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
-                const colorRegex = /^\s*[A-Za-z]+([ -]?[A-Za-z]+)*\s*$/
-                const quantityRegex = /^\s*\d+\s*$/
-                const priceRegex = /^\s*\d+(\.\d{1,2})?\s*$/;
+                const ramRegex = /^(?=.*\S)\s*\d+\s*(GB|gb|MB|mb|TB|tb)\s*$/;
+                const storageRegex = /^(?=.*\S)\s*\d+\s*(GB|gb|MB|mb|TB|tb)\s*$/;
+                const colorRegex = /^(?=.*\S)\s*[A-Za-z]+(?:[ -][A-Za-z]+)*\s*$/;
+                const quantityRegex = /^(?=.*\S)\s*\d+\s*$/;
+                const priceRegex = /^(?=.*\S)\s*\d+(?:\.\d{1,2})?\s*$/;
 
                 const ram = document.getElementById("ram-1")
                 const storage = document.getElementById("storage-1")
@@ -434,59 +486,76 @@
                 const colorMsg = document.getElementById("colorMsg-1");
                 const quantityMsg = document.getElementById("quantityMsg-1");
                 const priceMsg = document.getElementById("priceMsg-1");
-                const imageMsg = document.getElementById("imageMsg-1")
 
                 if( !ramRegex.test(ram.value) && !storageRegex.test(storage.value) && !colorRegex.test(color.value) && !storageRegex.test(quantity.value) && !priceRegex.test(price.value)){
+                    
                     ramMsg.textContent = "invalid ram format"
                     storageMsg.textContent = "invalid storage format"
                     colorMsg.textContent = "invalid color format"
                     quantityMsg.textContent = "invalid quantity format"
                     priceMsg.textContent = "invalid price format"
+
+                    window.location.href = "#card"
 
                     return 1
                 }
                 else if(!ramRegex.test(ram.value)){
+
                     ramMsg.textContent = "invalid ram format"
                     storageMsg.textContent = ""
                     colorMsg.textContent = ""
                     quantityMsg.textContent = ""
                     priceMsg.textContent = ""
 
+                    window.location.href = "#card"
+
                     return 1
                 }
                 else if(!storageRegex.test(storage.value)){
+
                     ramMsg.textContent = ""
                     storageMsg.textContent = "invalid storage format"
                     colorMsg.textContent = ""
                     quantityMsg.textContent = ""
                     priceMsg.textContent = ""
 
+                    window.location.href = "#card"
+
                     return 1
                 }
                 else if(!colorRegex.test(color.value)){
+
                     ramMsg.textContent = ""
                     storageMsg.textContent = ""
                     colorMsg.textContent = "invalid color format"
                     quantityMsg.textContent = ""
                     priceMsg.textContent = ""
 
+                    window.location.href = "#card"
+
                     return 1
                 }
                 else if(!quantityRegex.test(quantity.value)){
+
                     ramMsg.textContent = ""
                     storageMsg.textContent = ""
                     colorMsg.textContent = ""
                     quantityMsg.textContent = "invalid quantity format"
                     priceMsg.textContent = ""
 
+                    window.location.href = "#card"
+
                     return 1
                 }
                 else if(!priceRegex.test(price.value)){
+
                     ramMsg.textContent = ""
                     storageMsg.textContent = ""
                     colorMsg.textContent = ""
                     quantityMsg.textContent = ""
                     priceMsg.textContent = "invalid price format"
+
+                    window.location.href = "#card"
 
                     return 1
                 }
@@ -498,47 +567,44 @@
                     priceMsg.textContent = ""
                 }
 
-                if(cropCount<3){
-                 imageMsg.textContent = "minimum 3 cropped images required, maaximum 5"   
-
-                 return
-                }
-
-
-
                 const form = document.getElementById("productForm")
                 console.log(form)
                 const formdata = new FormData(form)
 
-                console.log("blob duirng publish", croppedBlobs)
+                console.log("blob duirng publish", extraCroppedBlobs)
 
-                croppedBlobs.forEach((blob, index) => {
-                    formdata.append(`image-${blob.variant}`, blob, `cropped-${index}.jpeg`);
+                newCroppedBlobs.forEach((blob, index) => {
+                    console.log("this is blob during loop", blob)
+                    formdata.append(`image-${blob.imageIndex}`, blob, `cropped-${index}.jpeg`);
+                });
+
+                extraCroppedBlobs.forEach((blob, index) => {
+                    formdata.append(`image-${index}`, blob, `extraNewImage.jpeg`);
                 });
 
                 try{
-                    const res = await fetch(`/admin/addVariant/${editId}`, {
+                    const res = await fetch(`/admin/editVariant/${variantId}`, {
                         method: "POST",
                         body: formdata
                     })
                     .then((res) => {
-                        if(res.ok){
+                        if(res.status==200){
                             swal.fire({
                                 title: "Success",
-                                text: "Successfully added the product",
+                                text: "Successfully edited the variant",
                                 icon: "success",
                                 timer: 30000
                             })
-                            .then(() => window.location.href = `/admin/variant/${editId}` )
+                            .then(() => window.location.href = `/admin/variant/${productId}` )
                         }
                         else{
                             swal.fire({
                                 title: "Error",
-                                text: "Failed to added the product",
+                                text: "Failed to edited the variant",
                                 icon: "error",
                                 timer: 30000
                             })
-                            .then(() => window.location.href = `/admin/variant/${editId}`)
+                            .then(() => window.location.href = `/admin/variant/${productId}`)
                         }
                     })
                 }

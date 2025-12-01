@@ -50,7 +50,7 @@ const sendVerificationEmail = async (email, otp) => {
 
 const forgotPassPage = async (req, res) => {
     try{
-        res.render('forgotEmail')
+        res.render('user/forgotEmail')
     }
     catch(err){
         console.log(err)
@@ -84,7 +84,7 @@ const forgotEmailValidation = async (req, res) => {
             }
         }
         else{
-            res.render("forgotEmail", {message: "user with this email does not exist"})
+            res.render("user/forgotEmail", {message: "user with this email does not exist"})
         }
 
     }
@@ -98,7 +98,7 @@ const otpPage = async (req, res) => {
         if(req.session.forgotEmail==null){
             return res.redirect('/login')
         }
-        res.render('forgotPassOtp')
+        res.render('user/forgotPassOtp')
     }
     catch(err){
         console.log(err)
@@ -161,7 +161,7 @@ const changePassword = async (req, res) => {
             return res.redirect('/login')
         }
     
-        res.render('changePass')
+        res.render('user/changePass')
     }
     catch(err){
         console.log(err)

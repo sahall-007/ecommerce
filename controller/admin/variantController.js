@@ -15,7 +15,7 @@ const variantManagement = async (req, res) => {
             return res.status(404).render('pageNotFound')
         }
 
-        res.status(200).render('variantManagement', {variants , nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        res.status(200).render('admin/variantManagement', {variants , nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
 
     }
     catch(err){
@@ -29,7 +29,7 @@ const addvariantPage = async (req, res) => {
     try {
         const { id } = req.params
 
-        res.status(200).render('addVariant', { editId: id})
+        res.status(200).render('admin/addVariant', { editId: id})
     } 
     catch (err) {
         console.log(err)    
@@ -94,7 +94,7 @@ const editVariantPage = async (req, res) => {
         // console.log(id)
         // console.log(variant)
 
-        res.status(200).render('editVariant', { variant, images: variant.image, productId: variant.productId})
+        res.status(200).render('admin/editVariant', { variant, images: variant.image, productId: variant.productId})
     }
     catch(err){
         console.log(err)
