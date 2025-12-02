@@ -85,7 +85,7 @@
 
           <!-- Icons -->
           <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
-            <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+            <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
             <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
             <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
           </div>
@@ -102,6 +102,9 @@
 
     </div>
   </nav>
+
+
+  <% let inWishlist=false %>
 
   <!-- <div class="container mt-3" >
     <ol class="breadcrumb">
@@ -221,9 +224,24 @@
 
                           <button class="btn btn-outline-primary btn-sm"  onclick='addToCart("<%= ele._id %>")'>Add to Cart</button>
                         </div>
-                      </div>
-                    </div> 
-                  <% } %>           
+                        <% if (wishlist?.items) { %>
+                          <% wishlist.items.forEach((item, index)=> { %>
+                            <% if (String(item.variantId)==String(ele._id)) { %>
+                              <% inWishlist=true %>
+                              <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                              <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 " onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                            <% } %>
+                          <% }) %>
+                          <% if (!inWishlist) { %>
+                            <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                            <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none" onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                          <% } %>
+                          <% }else{ %>
+                            <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4" onclick='addNewtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                          <% } %>
+                              </div>
+                            </div> 
+                          <% } %>           
                 <% }) %>
               
               </div>
@@ -459,12 +477,116 @@
       }
     }
 
-
-    
-    
     function viewProduct(id){
       window.location.href = `/productDetail/${id}`
     }
+
+    async function addtoWishList(variantId, element) {
+      event.stopPropagation()
+
+      try {
+        const request = await fetch('/wishlist', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ variantId })
+        })
+        if (request.status == 200) {
+          const nextEle = element.nextElementSibling
+          element.classList.add("d-none")
+          nextEle.classList.remove("d-none")
+        }
+        if (request.status == 423) {
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "The product is blocked by the Admin"
+          })
+        }
+        else if (request.status == 400) {
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "You have reached max quantity limit for this product"
+          })
+        }
+        else if (request.status == 404) {
+          swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "user not found in the database"
+          })
+        }
+      }
+      catch (err) {
+        alert("add to cart error"),
+          console.log(err)
+      }
+    }
+
+    async function removeFromWishlist(variantId, element) {
+      event.stopPropagation()
+      try {
+        const request = await fetch('/removefromWishlist', {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ variantId })
+        })
+        if (request.status == 200) {
+          const notInWishlist = element.parentElement.querySelector(".notInWishlist")
+          notInWishlist.classList.remove("d-none")
+          element.classList.add("d-none")
+        }
+      }
+      catch (err) {
+        alert("remove from cart error")
+        console.log(err)
+      }
+
+    }
+
+    async function addNewtoWishList(variantId, element) {
+        event.stopPropagation()
+        try {
+          const request = await fetch('/wishlist', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ variantId })
+          })
+          if (request.status == 200) {
+            window.location.reload()
+          }
+          else if (request.status == 423) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "The product is blocked by the Admin"
+            })
+          }
+          else if (request.status == 400) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "You have reached max quantity limit for this product"
+            })
+          }
+          else if (request.status == 404) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "user not found in the database"
+            })
+          }
+        }
+        catch (err) {
+          alert("add to cart error"),
+            console.log(err)
+        }
+      }
+
+
+
+    
+    
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

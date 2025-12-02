@@ -69,7 +69,7 @@
 
           <!-- Icons -->
           <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3">
-            <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+            <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
             <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
             <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
           </div>]
@@ -87,19 +87,17 @@
 
 
 
-  <!-- Hero Section -->
+
   <section class="my-2">
     <div class="container-sm hero">
       <img src="/images/category/msi.jpeg" class="w-100" alt="">
-        <!-- <div>
-            <h1>Discover the Best Deals Online</h1>
-            <p class="lead">Shop smart, save more — your favorite products await!</p>
-            <a href="#featured" class="btn btn-primary btn-lg mt-3">Shop Now</a>
-        </div> -->
     </div>
   </section>
 
-  <!-- Featured Products -->
+
+  <% let inWishlist=false %>
+
+  <!--===================== NEW ARRIVALS ========================= -->
   <section id="featured" class="bg-light pb-5">
     <div class="container-sm">
         <div class="d-flex justify-content-between">
@@ -110,7 +108,7 @@
         <% newArrivals.forEach(ele => { %>
           <% if(ele.categoryDoc.isListed && ele.productDoc.isListed && ele.isListed  && ele.brand.isListed){ %>
             <div class="col" onclick='viewProduct("<%= ele._id %>")'>
-              <div class="card product-card border border-0 shadow-sm">
+              <div class="card product-card border border-0 shadow-sm position-relative" >
                 <img src="<%= ele.image[0] %>" class="card-img-top">
                 <div class="card-body text-center">
                   <h6 class=""><%= ele.productDoc.name %></h6>
@@ -133,6 +131,21 @@
 
                   <button class="btn btn-outline-primary btn-sm" onclick='addToCart("<%= ele._id %>")'>Add to Cart</button>
                 </div>
+                <% if (wishlist?.items) { %>
+                  <% wishlist.items.forEach((item, index)=> { %>
+                    <% if (String(item.variantId)==String(ele._id)) { %>
+                      <% inWishlist=true %>
+                      <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                      <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 " onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                    <% } %>
+                  <% }) %>
+                  <% if (!inWishlist) { %>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none" onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                  <% } %>
+                  <% }else{ %>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4" onclick='addNewtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                  <% } %>
               </div>
             </div> 
           <% } %>           
@@ -153,7 +166,7 @@
         <% inOffer.forEach(ele => { %>
           <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
             <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
-              <div class="card product-card border border-0 shadow-sm">
+              <div class="card product-card border border-0 shadow-sm position-relative">
                 <img src="<%= ele.image[0] %>" class="card-img-top">
                 <div class="card-body text-center">
                   <h6 class=""><%= ele.productDoc.name %></h6>
@@ -172,6 +185,21 @@
                   </div>
                   <button class="btn btn-outline-primary btn-sm" onclick='addToCart("<%= ele._id %>")'>Add to Cart</button>
                 </div>
+                <% if (wishlist?.items?.length> 0) { %>
+                  <% wishlist.items.forEach((item, index)=> { %>
+                    <% if (String(item.variantId)==String(ele._id)) { %>
+                      <% inWishlist=true %>
+                      <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                      <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 " onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                    <% } %>
+                  <% }) %>
+                  <% if (!inWishlist) { %>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 notInWishlist" onclick='addtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4 d-none" onclick='removeFromWishlist("<%= ele._id %>", this)' style="color: tomato;"></i>
+                  <% } %>
+                  <% }else{ %>
+                    <i class="bi bi-heart-fill position-absolute top-0 end-0 mt-3 me-3 fs-4" onclick='addNewtoWishList("<%= ele._id %>", this)' style="color: grey;"></i>
+                  <% } %>
               </div>
             </div>  
           <% } %>        
@@ -226,6 +254,114 @@
         console.log(err)
       }
     }
+
+    async function addtoWishList(variantId, element) {
+        event.stopPropagation()
+
+        try {
+          const request = await fetch('/wishlist', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ variantId })
+          })
+          if (request.status == 200) {
+            const nextEle = element.nextElementSibling
+            element.classList.add("d-none")
+            nextEle.classList.remove("d-none")
+          }
+          if (request.status == 423) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "The product is blocked by the Admin"
+            })
+          }
+          else if (request.status == 400) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "You have reached max quantity limit for this product"
+            })
+          }
+          else if (request.status == 404) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "user not found in the database"
+            })
+          }
+        }
+        catch (err) {
+          alert("add to cart error"),
+            console.log(err)
+        }
+      }
+
+    async function removeFromWishlist(variantId, element) {
+        event.stopPropagation()
+        try {
+          const request = await fetch('/removefromWishlist', {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ variantId })
+          })
+          if (request.status == 200) {
+            const notInWishlist = element.parentElement.querySelector(".notInWishlist")
+            notInWishlist.classList.remove("d-none")
+            element.classList.add("d-none")
+          }
+        }
+        catch (err) {
+          alert("remove from cart error")
+          console.log(err)
+        }
+
+      }
+
+    async function addNewtoWishList(variantId, element) {
+        event.stopPropagation()
+        try {
+          const request = await fetch('/wishlist', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ variantId })
+          })
+          if (request.status == 200) {
+            window.location.reload()
+          }
+          else if (request.status == 423) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "The product is blocked by the Admin"
+            })
+          }
+          else if (request.status == 400) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "You have reached max quantity limit for this product"
+            })
+          }
+          else if (request.status == 404) {
+            swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "user not found in the database"
+            })
+          }
+        }
+        catch (err) {
+          alert("add to cart error"),
+            console.log(err)
+        }
+      }
+
+
+
+
+
+
 
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

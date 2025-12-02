@@ -125,7 +125,7 @@ const orderPost = async (req, res) => {
         })
         req.session.orderId = newOrder._id
 
-        await cartSchema.findOneAndDelete({_id: cartId}, {$set: {items: []}})
+        await cartSchema.findOneAndUpdate({_id: cartId}, {$set: {items: []}})
         await variantSchema.bulkWrite(bulkOp)
     
         logger.info("order success")

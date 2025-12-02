@@ -1,24 +1,17 @@
 
-const userSchema = require('../../model/userSchema.js')
-const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
-const categorySchema = require('../../model/categorySchema.js')
-const brandSchema = require('../../model/brandSchema.js')
-const cartSchema = require('../../model/cartSchema.js')
 const wishlistSchema = require('../../model/wishlistSchema.js')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
-const env = require('dotenv').config()
+const cartSchema = require('../../model/cartSchema.js')
 const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
+const userSchema = require('../../model/userSchema.js')
 
-const cartPage = async (req, res) => {
+const wishlistPage = async (req, res) => {
     try {
         const id = req.session?.user || req.session?.passport?.user
 
-        // const cart = await cartSchema.findOne({userId: id})
-        const cart = await cartSchema.aggregate([
+        const wishlist = await wishlistSchema.aggregate([
             {$match: {userId: new Types.ObjectId(id)}},
             {$unwind: "$items"},
             {$lookup: {
@@ -46,20 +39,26 @@ const cartPage = async (req, res) => {
             
         ])
 
-
-        res.status(200).render('user/cart', {cart})
+        res.status(200).render('user/wishlist', {wishlist})
     } 
     catch (err) {
         logger.fatal(err)
-        logger.fatal("failed to get cart page")
-        res.status(500).json({success: false, message: "something went wrong (cart page)"})
+        logger.fatal("failed to get wishlist page")
+        res.status(500).json({success: false, message: "something went wrong (wishlist page)"})
     }
 }
 
-const cartPost = async(req, res) => {
+const wishlistPost = async(req, res) => {
     try{
         const { variantId } = req.body
         const id = req.session.user || req.session?.passport?.user
+        
+        const user = await userSchema.findOne({_id: id})
+        logger.fatal(id)
+        if(!user){
+            return res.status(404).json({success: false, message: "user not found"})
+        }
+
 
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(variantId)}},
@@ -96,49 +95,23 @@ const cartPost = async(req, res) => {
             return res.status(423).json({success: false, message: "this product is blocked"})
         }
         
-        const cart = await cartSchema.findOne({userId: id})
-
-        let variantExist = false
-        if(cart && cart?.items?.length >= 0){
-
-            for(let i=0; i<cart.items.length; i++){
-
-                if(cart.items[i].variantId==variantId ){
-                    
-                    if(cart.items[i].quantity < 5){
-                        logger.fatal("here is second problem")
-                        variantExist = true
-                        cart.items[i].quantity += 1             
-                    }
-                    else{
-                        logger.fatal(cart.items[i].quantity)
-                        logger.fatal("here is first problem")
-                        return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
-                    }
-                }
-            }
-            if(!variantExist){
-                cart.items.push({variantId, quantity: 1})
-            }
-            await cart.save()
-        }
-        else{
-            const newCart = new cartSchema({
-                userId: id,
-                items: [{variantId, quantity: 1}]
-            })
-            await newCart.save()
-        }
-
         const wishlist = await wishlistSchema.findOne({userId: id})
-        wishlist.items = wishlist.items.filter(ele => 
-            !ele.variantId.equals(variantId)
-        )
 
-        await wishlist.save()
-
-        
-        return res.status(200).json({success: true, message: "successfully added the product to cart"})
+        if(wishlist){
+            logger.fatal("pushed to already existing wishlist")
+            wishlist.items.push({variantId})
+            await wishlist.save()
+        }    
+        else{
+            logger.fatal("new wishlist created")
+            const newWishlist = new wishlistSchema({
+                userId: id,
+                items: [{variantId}]
+            })
+            await newWishlist.save()
+        }
+        logger.fatal("success fully created whishlist")
+        return res.status(200).json({success: true, message: "successfully added the product to wishlist"})
     }
     catch(err){
         logger.fatal(err)
@@ -173,13 +146,21 @@ const updateQuantity = async (req, res) => {
 
 const removeProduct = async (req, res) => {
     try{
-        const { index, cartId } = req.body
+        const { variantId } = req.body
+        logger.fatal({variantId}, "wishlist remove Id")
+        
+        
+        const userId = req.session.user || req.session?.passport?.user
 
-        await cartSchema.findOneAndUpdate({_id: cartId}, {$unset: {[`items.${index}`]: 1}})
-        await cartSchema.findOneAndUpdate({_id: cartId}, {$pull: {items: null}})
+        const wishlist = await wishlistSchema.findOne({userId})
 
+        // to remove the variant from the wishlist collection
+        wishlist.items = wishlist.items.filter(ele => String(ele.variantId) != String(variantId))
+        await wishlist.save()
+        
 
-        res.status(200).json({success: true, message: "successfully removed the product from cart"})
+        logger.fatal("successfulyy removed the variant from the wishlist")
+        res.status(200).json({success: true, message: "successfully removed the product from wishlist"})
 
     }
     catch(err){
@@ -189,9 +170,55 @@ const removeProduct = async (req, res) => {
     }
 }
 
+const moveAllToCart = async (req, res) => {
+    try{
+        const { wishlistId } = req.body
+        
+        const id = req.session.user || req.session?.passport?.user
+
+        const wishlist = await wishlistSchema.findOne({_id: wishlistId})
+        if(!wishlist){
+            return res.status(404).json({success: false, message: "wishlist not found in the database"})
+        }
+
+        const cart = await cartSchema.findOne({userId: wishlist.userId})
+        
+        for(let ele1 in cart.items){
+            for(let ele2 in wishlist.items){
+                if(String(cart.items[ele1].variantId) == String(wishlist.items[ele2].variantId)){
+                    if(cart.items[ele1].quantity >= 5){
+                        wishlist.items.splice(ele2, 1)
+                    }
+                    else{
+                        wishlist.items.splice(ele2, 1)
+                        cart.items[ele1].quantity+=1
+                    }
+                }
+            }
+        }
+
+        let result = wishlist.items.concat(cart.items)
+
+        cart.items = result
+        await cart.save()
+
+        await wishlistSchema.findOneAndUpdate({_id: wishlistId}, {$set: {items: []}})
+
+        res.status(200).json({success: true, message: "successfully moved all the products to the cart"})
+
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to to move all to cart from wishlist")
+        res.status(500).json({success: false, message: "something went wrong (move all to cart from wishlist)"})
+    }
+}
+
+
 module.exports = {
-    cartPage,
-    cartPost,
+    wishlistPage,
+    wishlistPost,
     updateQuantity,
-    removeProduct
+    removeProduct,
+    moveAllToCart
 }

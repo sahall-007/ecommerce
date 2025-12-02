@@ -13,7 +13,7 @@ router.route('/')
 router.route('/logout')
     .get(userController.logout)
 
-router.route('/productDetail/:id')
+router.route('/productDetail/:productId')
     .get(userController.productDetail)
 
 router.route('/allProducts')
@@ -23,11 +23,11 @@ router.route('/filter')
     .get(allProducctController.filterPage)
     .post(allProducctController.filter)
 
-router.route('/allProducts/next')
-    .get(allProducctController.nextPage)
+router.route('/allProducts/:page')
+    .get(allProducctController.pagination)
 
-router.route('/allProducts/prev')
-    .get(allProducctController.prevPage)
+// router.route('/allProducts/:prev')
+//     .get(allProducctController.prevPage)
 
 // search result
 router.route('/search')

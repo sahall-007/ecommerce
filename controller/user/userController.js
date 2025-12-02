@@ -4,6 +4,7 @@ const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
+const wishlistSchema = require('../../model/wishlistSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
@@ -54,17 +55,6 @@ const loadRegister = async (req, res) => {
 function generateOtp(){
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
-// const pageNotFound = async (req, res) => {
-//     try{
-//         res.render('pageNotFound')
-//     }
-//     catch(err){
-//         logger.fatal(err)
-//         logger.fatal("failed to 404 page")
-//         res.status(500).json({success: false, message: "something went wrong (404 page not found)"})
-//     }
-// }
 
 // to send the OTP to the provided email by the user during sign up
 async function sendVerificationEmail(email, otp){
@@ -292,6 +282,7 @@ const resendOtp = async (req, res) => {
 // to get the home page
 const getHomePage = async (req, res) => {
     try{
+        const userId = req.session.user || req.session?.passport?.user
         const inOffer = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -345,8 +336,10 @@ const getHomePage = async (req, res) => {
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
             {$sample: {size: 10}}
         ])
+
+        const wishlist = await wishlistSchema.findOne({userId})
         
-        res.render('user/home', { newArrivals, inOffer })
+        res.render('user/home', { newArrivals, inOffer, wishlist })
     }
     catch(err){
         console.log(err)
@@ -373,10 +366,11 @@ const logout = async (req, res) => {
 // to get the product detail page
 const productDetail = async (req, res) => {
     try{
-        const { id } = req.params
+        const userId = req.session.user || req. session?.passport?.user
+        const { productId } = req.params
 
         const variant = await variantSchema.aggregate([
-            {$match: {_id: new Types.ObjectId(id) }},
+            {$match: {_id: new Types.ObjectId(productId) }},
             {$lookup: {
                 from: "products",
                 localField: "productId",
@@ -399,8 +393,6 @@ const productDetail = async (req, res) => {
             }},
             {$unwind: "$brand"}
         ])
-
-        console.log(variant)
 
         if(variant.length<=0){
             logger.fatal("condition")
@@ -426,9 +418,11 @@ const productDetail = async (req, res) => {
             {$sample: {size: 10}}
         ])
 
+        const wishlist = await wishlistSchema.findOne({userId})
+
         const variantOptions = await variantSchema.find({productId: variant[0].productDoc._id })
 
-        res.render('user/productDetail', { variant, exploreMore, variantOptions })
+        res.render('user/productDetail', { variant, exploreMore, variantOptions, wishlist })
 
     }
     catch(err){
@@ -440,6 +434,7 @@ const productDetail = async (req, res) => {
 
 const newArrivals = async (req, res) => {
     try{
+        const userId = req.session.user || req.session?.passport?.user
         const filter = {}
         const toSort = {}
 
@@ -504,23 +499,21 @@ const newArrivals = async (req, res) => {
             {$limit: limit},
         ])
 
-        // console.log(filter)
-        // console.log(toSort)
-
+        const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})
 
         if(allProducts.length < limit){
             req.session.filter = null
-            return res.status(200).render('user/newArrivals', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         if(limit>=variantCount){
             req.session.filter = null
             console.log("inside condition")
-            return res.status(200).render('user/newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         req.session.filter = null
-        res.status(200).render('user/newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     }
     catch(err){
