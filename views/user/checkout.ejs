@@ -385,15 +385,23 @@
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked> 
                                     <label for="cod" class="fs-6">Cash on delivery</label>
                                 </li>
+                                <% if(wallet?.balance >= totalPrice){ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" id="wallet" >
+                                        <label for="wallet" class="fs-6">Wallet</label>
+                                    </li>
+                                <% }else{ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" id="wallet" disabled>
+                                        <label for="wallet" class="fs-6">Wallet</label>
+                                    </li>
+                                <% } %>
+                                
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="payment" id="wallet" disabled>
-                                    <label for="wallet" class="fs-6">Wallet</label>
-                                </li>
-                                <li>
-                                    <input type="radio" class="paymentMethod" name="payment" id="upi" disabled>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="upi" disabled>
                                     <label for="upi" class="fs-6">UPI</label>
                                 </li>
                             </ul>
@@ -710,6 +718,15 @@
                     icon: "error",
                     title: "Error",
                     text: "Select an address before placing order"
+                    
+                })
+                return
+            }
+            if(!paymentMethod){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Select an payment method before placing order"
                     
                 })
                 return

@@ -79,6 +79,7 @@ router.use(invoiceRoute)
 // wishlist -----------------------------------
 router.use(wishlistRouter)
 
-
+// wallet ----------------------------------
+router.use(walletRouter)
 
 module.exports = router

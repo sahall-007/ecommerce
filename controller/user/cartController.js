@@ -63,9 +63,6 @@ const cartPage = async (req, res) => {
             
         ])
 
-        console.log(cart)
-
-
         res.status(200).render('user/cart', {cart})
     } 
     catch (err) {
@@ -129,12 +126,10 @@ const cartPost = async(req, res) => {
                 if(cart.items[i].variantId==variantId ){
                     
                     if(cart.items[i].quantity < 5){
-                        logger.fatal("here is second problem")
                         variantExist = true
                         cart.items[i].quantity += 1             
                     }
                     else{
-                        logger.fatal(cart.items[i].quantity)
                         logger.fatal("here is first problem")
                         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
                     }
@@ -177,8 +172,6 @@ const updateQuantity = async (req, res) => {
         const id = req.session.user || req.session?.passport?.user
     
         const cart = await cartSchema.findOne({_id: cartId})
-
-        // console.log(cart)
 
         cart.items[index].quantity+=Number(change)
     

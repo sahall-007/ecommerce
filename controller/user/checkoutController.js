@@ -1,17 +1,10 @@
 
-const userSchema = require('../../model/userSchema.js')
-const productSchema = require('../../model/productSchema.js')
-const variantSchema = require('../../model/variantSchema.js')
-const categorySchema = require('../../model/categorySchema.js')
-const brandSchema = require('../../model/brandSchema.js')
 const cartSchema = require('../../model/cartSchema.js')
 const addressSchema = require('../../model/addressSchema.js')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
-const env = require('dotenv').config()
 const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
+const walletSchema = require('../../model/walletSchema.js')
 
 
 const checkoutPage = async (req, res) => {
@@ -51,10 +44,11 @@ const checkoutPage = async (req, res) => {
                 foreignField: "_id",
                 as: "brand"
             }},
-            {$unwind: "$brand"},            
+            {$unwind: "$brand"},        
             {$addFields: {
                 discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
             }},
+
             {$project: {
                 image: {$arrayElemAt: ["$variant.image", 0]},
                 items: 1,
@@ -65,9 +59,14 @@ const checkoutPage = async (req, res) => {
             {$addFields: {"variant.image": "$$REMOVE"}},
         ])
 
+        const wallet = await walletSchema.findOne({userId: id})
+        if(!wallet){
+            return res.status(404).json({success: false, message: "wallet not found in the database"})
+        }
+
         const address = await addressSchema.findOne({userId: id})
 
-        res.render('user/checkout', {cart, address})
+        res.render('user/checkout', {cart, address, wallet})
     }
     catch(err){
         logger.fatal(err)

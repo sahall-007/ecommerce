@@ -12,45 +12,11 @@ const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
+const walletSchema = require('../../model/walletSchema.js')
 
 // logger.info("server has started")
 
 const salt = 10
-
-// to load the register page
-const loadRegister = async (req, res) => {
-    try {
-
-        if(req.session.matchPass==false){
-            req.session.matchPass = true
-            return res.status(409).render('user/register', {confirm: "Password doesn't match, Try again", 
-                                                       username: null,
-                                                       email: null,
-                                                       password: null
-            })
-        }
-
-        if(req.session.userExist==true){
-            req.session.userExist = false
-            return res.status(409).render('user/register', {email: "Email already in use, Try again",
-                                                       username: null,                                                
-                                                       password: null,
-                                                       confirm: null
-            })
-        }
-
-        res.render('user/register', {confirm: null,
-                                username: null,
-                                email: null,
-                                password: null
-        })
-    }
-    catch (err) {
-        logger.info(err)
-        logger.info("failed to load the register page!")
-        res.status(500).json({success: false, message: "something went wrong (register page)"})
-    }
-}
 
 // to generate OTP
 function generateOtp(){
@@ -88,11 +54,48 @@ async function sendVerificationEmail(email, otp){
     }
 }
 
+// to load the register page
+const loadRegister = async (req, res) => {
+    try {
+
+        if(req.session.matchPass==false){
+            req.session.matchPass = true
+            return res.status(409).render('user/register', {confirm: "Password doesn't match, Try again", 
+                                                       username: null,
+                                                       email: null,
+                                                       password: null
+            })
+        }
+
+        if(req.session.userExist==true){
+            req.session.userExist = false
+            return res.status(409).render('user/register', {email: "Email already in use, Try again",
+                                                       username: null,                                                
+                                                       password: null,
+                                                       confirm: null
+            })
+        }
+
+        res.render('user/register', {confirm: null,
+                                username: null,
+                                email: null,
+                                password: null
+        })
+    }
+    catch (err) {
+        logger.info(err)
+        logger.info("failed to load the register page!")
+        res.status(500).json({success: false, message: "something went wrong (register page)"})
+    }
+}
+
 // to validate the register details from the user
 const registerUser = async (req, res) => {
     try {
 
-        const { username, email, password, confirm } = req.body
+        const { username, email, password, confirm, referral } = req.body
+
+        // console.log(req.body)
 
         if(password!=confirm){
             req.session.matchPass = false
@@ -118,7 +121,9 @@ const registerUser = async (req, res) => {
             expiryAt: Date.now() + 60*1000
         }
     
-        req.session.userData = { username, email, password }
+        req.session.userData = { username, email, password, referral }
+
+        console.log("this is userdata", req.session.userData)
 
         res.redirect('/otp')
 
@@ -160,6 +165,23 @@ const loginPost = async (req, res) => {
         if(userExist.isListed==false){
             return res.status(403).json({success: false, message: "You are blocked by the Admin"})
         }
+
+        const wishlist = await wishlistSchema.findOne({userId: userExist._id})
+        if(!wishlist){
+            await wishlistSchema.create({
+                userId: userExist._id,
+                items: []
+            })
+        }
+
+        const wallet = await walletSchema.findOne({userId: userExist._id})
+        if(!wallet){
+            await walletSchema.create({
+                userId: userExist._id,
+            })
+        }
+        
+
         req.session.user = userExist._id
         
         logger.info( {userId: req.session.user}, "login post")
@@ -206,7 +228,6 @@ const verifyOtp = async (req, res) => {
     try{
         const { otp } = req.body
         
-        
         console.log("this is working - otp: ", otp)
         console.log("this is session: ", req.session.userOTP)
 
@@ -230,7 +251,28 @@ const verifyOtp = async (req, res) => {
             })
 
             await saveUser.save()
-            req.session.user = saveUser._id
+            req.session.user = saveUser._id        
+            
+            // creating a wishlist for the user
+            await wishlistSchema.create({
+                userId: saveUser._id,
+                items: []
+            })
+            
+            // creating a wallet for the user based on the referral code the user enter
+            const userWithReferralCode = await userSchema.findOne({referral: user.referral})
+            if(userWithReferralCode){
+                await walletSchema.create({
+                    balance: 10000,
+                    userId: saveUser._id,
+                })
+                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
+            }
+            else{
+                await walletSchema.create({
+                    userId: saveUser._id,
+                })
+            }
 
             return res.redirect('/')
         }

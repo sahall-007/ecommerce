@@ -150,8 +150,8 @@
                             <h5 class="mb-3"><%= user.username %></h5>
                             
                             <div class="input-group my-3">
-                                <input class="form-control" type="text" value="<%= user.referral %>" readonly>
-                                <button class="btn btn-outline-secondary" type="button">Copy</button>
+                                <input class="form-control border border-secondary" id="referral" type="text" value="<%= user.referral %>" disabled>
+                                <button class="btn btn-outline-secondary" type="button"  onclick="copyBtn()">Copy</button>
                             </div>
 
                             <div class=" d-flex gap-3 mb-2" style="background-color: #EAF6FE;">
@@ -301,6 +301,15 @@
 <script>
 
     let userId = "<%= user._id %>"
+
+    function copyBtn(){
+        const referral = document.getElementById("referral")
+
+        referral.select();
+        referral.setSelectionRange(0, 99999);
+
+        navigator.clipboard.writeText(referral.value);
+    }
 
     function editProfile(event){
         event.preventDefault()
