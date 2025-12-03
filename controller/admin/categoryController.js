@@ -36,8 +36,6 @@ const addCategoryPost = async(req, res) => {
     try{
         let { name, status } = req.body
 
-        
-
         const existCategory = await categorySchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
         if(existCategory){

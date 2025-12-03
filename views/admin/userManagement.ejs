@@ -60,107 +60,110 @@
     <%- include("../partials/admin/navbar.ejs") %>
 
 
-    <div class="d-flex gap-5 m-5">
-        <div class=" d-inline-block border border-secondary rounded text-secondary sidebar align-self-start py-3">
-            
-            <%- include("../partials/admin/sidebarLinks.ejs") %>
-
-        </div>
-        <div class="card flex-fill position-relative">
-            <div class="card-header">
-                <h1 class="text-center">User Management</h1>
-
-                <div class="container">
-                    <div class="row justify-content-between my-5">
-
-                    <div class="col-3 d-flex justify-content-around border-bottom border-3 align-self-start pb-1 user-status">
-                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">All
-                        </h1>
-                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Blocked
-                        </h1>
-                        <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
-                    </div>
-
-                    <form action="/admin/searchUser" class="col-4 align-self-start d-flex gap-2" method="post">
-                        <input class="form-control me-2 " name="username" type="search" placeholder="Search" aria-label="Search" />
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
-
-                    <div class="col-2 d-flex justify-content-end  align-self-start">
-                        <a role="button" href="/admin/addUser"
-                            class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">New User</a>
-                    </div>
-
-                </div>
-                </div>
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
                 
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+        
             </div>
-            <div class="card-body">
-                <div class="">
-
-                    <% if (users) { %>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th> Username </th>
-                                    <th> Email </th>
-                                    <!-- <th> phone </th> -->
-                                    <th> Status </th>
-                                    <th> Actions </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% users.forEach((user, index)=> { %>
-                                    <!-- <% var userListed = user; %> -->
+            <div class="card col col-md-8 col-lg-9  px-0 mx-3">
+                <div class="card-header">
+                    <h1 class="text-center">User Management</h1>
+        
+                    <div class="container">
+                        <div class="row justify-content-between my-5">
+        
+                        <div class="col-3 d-flex justify-content-around border-bottom border-3 align-self-start pb-1 user-status">
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">All
+                            </h1>
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Blocked
+                            </h1>
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
+                        </div>
+        
+                        <form action="/admin/searchUser" class="col-4 align-self-start d-flex gap-2" method="post">
+                            <input class="form-control me-2 " name="username" type="search" placeholder="Search" aria-label="Search" />
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+        
+                        <div class="col-2 d-flex justify-content-end  align-self-start">
+                            <a role="button" href="/admin/addUser"
+                                class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">New User</a>
+                        </div>
+        
+                    </div>
+                    </div>
+                    
+                </div>
+                <div class="card-body">
+                    <div class="">
+        
+                        <% if (users) { %>
+                            <table class="table table-striped">
+                                <thead>
                                     <tr>
-                                        <td><%= index+1 %></td>
-                                        <td class="py-1">
-                                            <%= user.username %>
-                                        </td>
-                                        <td>
-                                            <%= user.email %>
-                                        </td>
-                                        <!-- <td><% user.phone %></td> -->
-                                        <% if(user.isListed) { %>
-                                            <td class="text-success">Active</td>
-                                        <% } else{ %>
-                                            <td class="text-danger">blocked</td>
-                                        <% } %>
-
-                                        <td>
-                                            <div class="d-flex gap-4 ">
-                                                <div id="userdetail" data-test=<%= user %>></div>
-                                                <!-- <% var userListed = user.isListed %> -->
-                                                
-                                                <% if(user.isListed) { %>
-                                                    <a class="actions block-btn"  onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
-                                                    <!-- <a class="actions d-none unblock-btn-on-block" id="" data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a> -->
-                                                <% } else{ %>
-                                                    <a class="actions " onclick='unBlock("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
-                                                    <!-- <a class="actions d-none" id="block-btn-on-unblock" onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a> -->
-                                                <% } %>
-                                                <a class="actions" onclick='deleteUser("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
-                                            </div>
-                                        </td>
+                                        <th>No.</th>
+                                        <th> Username </th>
+                                        <th> Email </th>
+                                        <!-- <th> phone </th> -->
+                                        <th> Status </th>
+                                        <th> Actions </th>
                                     </tr>
-                                <% }) %>
-                            </tbody>
-                        </table>
-                    <% } else { %>
-                        <h1 class="text-center mt-5"> There is no data</h1>
-                    <% } %>
+                                </thead>
+                                <tbody>
+                                    <% users.forEach((user, index)=> { %>
+                                        <!-- <% var userListed = user; %> -->
+                                        <tr>
+                                            <td><%= index+1 %></td>
+                                            <td class="py-1">
+                                                <%= user.username %>
+                                            </td>
+                                            <td>
+                                                <%= user.email %>
+                                            </td>
+                                            <!-- <td><% user.phone %></td> -->
+                                            <% if(user.isListed) { %>
+                                                <td class="text-success">Active</td>
+                                            <% } else{ %>
+                                                <td class="text-danger">blocked</td>
+                                            <% } %>
+        
+                                            <td>
+                                                <div class="d-flex gap-4 ">
+                                                    <div id="userdetail" data-test=<%= user %>></div>
+                                                    <!-- <% var userListed = user.isListed %> -->
+                                                    
+                                                    <% if(user.isListed) { %>
+                                                        <a class="actions block-btn"  onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+                                                        <!-- <a class="actions d-none unblock-btn-on-block" id="" data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a> -->
+                                                    <% } else{ %>
+                                                        <a class="actions " onclick='unBlock("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                        <!-- <a class="actions d-none" id="block-btn-on-unblock" onclick='block("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a> -->
+                                                    <% } %>
+                                                    <a class="actions" onclick='deleteUser("<%= user._id%>")' data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="bi bi-trash"></i></a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <h1 class="text-center mt-5"> There is no data</h1>
+                        <% } %>
+                    </div>
                 </div>
+        
+                    <div class="mb-4 mx-auto">
+                        <a href="/admin/userManagement/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
+                        <a href="/admin/userManagement/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+                    </div>
+        
             </div>
-
-                <div class="mb-4 mx-auto">
-                    <a href="/admin/userManagement/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
-                    <a href="/admin/userManagement/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
-                </div>
-
         </div>
     </div>
-
+    
+    
     <!-- <div class="card d-inline-block px-5 position-fixed top-50 start-50 translate-middle"> -->
 <!----------------------  delete modal  ----------------------->
     <div class="modal fade" id="deleteModal">

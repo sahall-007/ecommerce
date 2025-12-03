@@ -109,15 +109,7 @@
     </div>
   </nav>
 
-    <div class="sidebar d-flex flex-wrap justify-content-around">
-        <a href="/profile">Profile</a>
-        <a href="/orders">Order history</a>
-        <a href="/address">Billing Address</a>
-        <a href="#">Wallet</a>
-        <a href="#">Wishlist</a>
-        <a href="/cart">Shopping Cart</a>
-        <a href="#">Coupon</a>                
-    </div>
+    <%- include("../partials/user/userQuickLinks.ejs") %>
 
     <div class="container-fluid">
         <div class="row ">
@@ -156,6 +148,11 @@
                             </div>
 
                             <h5 class="mb-3"><%= user.username %></h5>
+                            
+                            <div class="input-group my-3">
+                                <input class="form-control" type="text" value="<%= user.referral %>" readonly>
+                                <button class="btn btn-outline-secondary" type="button">Copy</button>
+                            </div>
 
                             <div class=" d-flex gap-3 mb-2" style="background-color: #EAF6FE;">
                                 <!-- <img src="/images/rocket.png" alt="" style="width: 50px;"> -->

@@ -7,6 +7,7 @@ const brandSchema = require('../../model/brandSchema.js')
 const wishlistSchema = require('../../model/wishlistSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const rndm = require('rndm')
 const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
@@ -218,12 +219,14 @@ const verifyOtp = async (req, res) => {
             
             const user = req.session.userData
             const hashedPassword = await bcrypt.hash(user.password, salt)
+            var referral = rndm.base62(10)
 
             const saveUser = await new userSchema({
                 username: user.username,
                 email: user.email,
                 password: hashedPassword,
-                isListed: true
+                isListed: true,
+                referral
             })
 
             await saveUser.save()

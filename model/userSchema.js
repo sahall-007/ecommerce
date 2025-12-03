@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     password: String,
     phone: Number,
-    gender: String,
+    referral: String,
     image: String,
     isListed: Boolean,
     googleId: {

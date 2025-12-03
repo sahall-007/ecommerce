@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer adding page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        body{
+            overflow-x: hidden;
+        }
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+
+        .actions {
+            color: #151414;
+        }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }        
+    </style>
+</head>
+
+<body onclick="bodyClick()">
+
+    <!-- //  ========== NAVBAR ========== -->
+
+    <%- include("../partials/admin/navbar.ejs") %>
+
+
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0"
+                style="padding-bottom: -100px;">
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+
+            </div>
+            <div class="card col-10 col-md-8 col-lg-9  px-0 mx-3 main-content" >
+
+                <div class="card-body" style="background-color: #edededb8;">
+                    <div class="">
+                        <h1 class="text-center m-b5">Add new Offer</h1>
+                    </div>
+                    <form action="/admin/addOffer" method="post" id="form">
+                        <div class="container">
+                            <div class="row justify-content-center ">
+
+                                <div class="col-12 col-lg-7 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="product" class="form-label mb-2 fs-5">Search Product</label>                                        
+                                        <div style="position: relative ; padding: 0px;;">
+                                            <input autocomplete="off" id="search" class="form-control rounded w-100" name="product" type="search" oninput="searchFilter()" placeholder="Search..." aria-label="Search" />
+                                            <div class="p-3 d-none bg-dark text-light" id="searchResult"
+                                                style="position: absolute; top: 100%; left: 0; width: 100%; background: white; border-top: none; border-radius: 5px; overflow-y: auto; z-index: 999;">
+                                            </div>
+                                        </div>
+                                        <p class="text-danger" id="productMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                                <!-- ======= PRODUCT NAME CHECKBOX ======= -->
+                                <div class="col-12 col-lg-7 mt-3 d-none" id="checkbox-container">
+                                    <div class="row align-items-center position-relative">                                      
+                                        <div class="" id="product-container">                                                                                    
+                                            
+                                        </div>
+                                        <p class="text-danger" id="productMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                                
+
+                                <div class="col-12 col-lg-7 my-3">
+                                    <div class="row align-items-center">
+                                        <label class="d-block mb-2 fs-5" for="category">Category name</label>
+                                        <select class="form-select rounded p-2" id="category" name="category" required>
+                                            <option value="" hidden>Select category</option>
+                                            <% category.forEach(ele => { %>
+                                                <option value="<%= ele.name %>"><%= ele.name %></option>
+                                            <%})%>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-12 col-lg-7 my-3">
+                                    <div class="row align-items-center">
+                                        <label class="d-block mb-2 fs-5" for="brand">Brand name</label>
+                                        <select class="form-select rounded p-2" id="brand" name="brand" required>
+                                            <option value="" hidden>Select brand</option>
+                                            <% brand.forEach(ele => { %>
+                                                <option value="<%= ele.name %>"><%= ele.name %></option>
+                                            <%})%>
+                                        </select>
+                                    </div>
+                                </div>
+                               
+                                <div class="col-12 col-lg-7 my-3">
+                                    <div class="row align-items-center">
+                                        <label for="discount" class="form-label">Discount</label>                                    
+                                        <input class="form-control w-100 pe-5 bg-white rounded" id="discount"
+                                            type="number" placeholder="Type here" max="100" name="discount" >
+                                        <p class="text-danger" id="discountMsg" style="font-size: small;"></p>                                        
+                                    </div>
+                                </div>
+
+                         
+
+                                <div class="col-lg-7 d-flex justify-content-end my-4 gap-3">
+                                    <a href="/admin/offer" role="button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
+                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" id="submitBtn" style="background-color: #EF6627;">Add</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+    </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+            const searchResult = document.getElementById("searchResult")
+
+            async function searchFilter(){
+
+                searchResult.innerHTML = ""
+
+                if(search.value==""){
+                    searchResult.innerHTML = ""
+                    searchResult.classList.add("d-none")
+                    return 0
+                }
+                
+                if(search.value==" "){
+                    search.value = null
+                    return 1
+                }
+
+                const result = await fetch('/admin/productSearch', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({search: search.value})
+                })
+
+                
+                const data = await result.json()
+
+                searchResult.classList.remove("d-none")
+
+                if(!data.product.length){
+                    searchResult.classList.add("d-none")
+                }
+
+                for(let i=0; i<data.product.length; i++){
+                    searchResult.insertAdjacentHTML('beforeend', `
+                        <div class="">
+                            <div class=" target text-decoration-none text-light d-flex justify-content-between  align-items-center">
+                                <p class="mb-0 product-name">${data.product[i].name}</p>
+                                <img src="/${data.product[i].variant.image[0]}" style="max-width: 40px; max-height: 40px">
+                            </div>
+                            <hr class="m-1">
+                        </div>
+                    `)
+                    const targets = document.getElementsByClassName('target');
+                        
+                    targets[i].addEventListener('click', function(){
+
+                        document.getElementById("checkbox-container").classList.remove("d-none")
+
+                        const productName = targets[i].querySelector(".product-name").textContent;
+
+                        document.getElementById("product-container").insertAdjacentHTML('beforeend', `
+                        <div>
+                            <input class="product-names" name="product" value="${productName}" type="checkbox" id="product-${i}" checked>
+                            <label for="product-${i}">${productName}</label>
+                        </div>
+                        `)
+
+                    })
+                }    
+                    
+            }
+
+            function bodyClick(){
+                document.getElementById("searchResult").classList.add("d-none")
+            }
+
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
+
+            document.getElementById("submitBtn").addEventListener('click', async (event) => {
+                
+                event.preventDefault()
+
+                const discountRegex = /^(100|[1-9]?[0-9])$/;
+                const discountMsg = document.getElementById("discountMsg")
+                
+                const productName = document.querySelectorAll('input[name="product"]:checked')
+                const category = document.getElementById("category")
+                const brand = document.getElementById("brand")
+                const discount = document.getElementById("discount")
+
+                if(!discountRegex.test(discount.value)){
+                    discountMsg.textContent = "Enter a valid numbetween 1 to 100"
+                    return
+                }
+                else{
+                    discountMsg.textContent = ""
+                }
+
+                const product = Array.from(productName).map(ele => ele.value)
+                console.log(productName)
+
+                try{
+                    // alert(category.value)
+                    const result = await fetch('/admin/addOffer', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ product, category: category.value, brand: brand.value, discount: discount.value })
+                    })
+                    if(result.status==200){
+                        swal.fire({
+                            icon: "success",
+                            title: "Success",                       
+                            text: "Offer added successfully",
+                        })
+                        // .then(() => window.location.href='/admin/category')            
+                    }
+                    else if(result.status==400){
+                        swal.fire({
+                            icon: "error",
+                            title: "Error",                       
+                            text: "Enter a numer between 1 to 100",
+                        })
+                    }
+                    else{
+                        swal.fire({
+                            title: "Failed to add Offer",
+                            // text: "category already exist",
+                            icon: "error"
+                        })
+                    }
+                   
+                }
+                catch(err){
+                    console.log(err)
+                    
+                }
+
+            })
+
+
+            const statuses = document.querySelectorAll('.status');
+
+            statuses.forEach(status => {
+                status.addEventListener('click', () => {
+                    statuses.forEach(s => s.classList.remove('active'));
+                    status.classList.add('active');
+                });
+            });
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+
+</body>
+
+</html>

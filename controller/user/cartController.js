@@ -35,16 +35,35 @@ const cartPage = async (req, res) => {
                 as: "product"
             }},
             {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},            
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$project: {
                 image: {$arrayElemAt: ["$variant.image", 0]},
                 items: 1,
                 variant: 1,
                 "product.name": 1 ,
-                "product.discount": 1
+                discount: 1       
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
             
         ])
+
+        console.log(cart)
 
 
         res.status(200).render('user/cart', {cart})
@@ -61,6 +80,7 @@ const cartPost = async(req, res) => {
         const { variantId } = req.body
         const id = req.session.user || req.session?.passport?.user
 
+        // ObjectId('690a022f476fdb5aa0150823')
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(variantId)}},
             {$lookup: {
@@ -83,7 +103,10 @@ const cartPost = async(req, res) => {
                 foreignField: "_id",
                 as: "brand"
             }},
-            {$unwind: "$brand"}
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }}
         ])
 
         if(variant.length<=0){

@@ -277,19 +277,9 @@ const search = async (req, res) => {
     try{
         const { search } = req.body
 
-        // console.log(search)
-
         let filter = search.split("").map(ele => `(?=.*${ele})`).join("")
 
-        // console.log(filter)
-
-        // let regex = new RegExp(`^${filter}.*$`)
-
-        // const product = await productSchema.find({name: {$regex: regex, $options: 'i'}}, {name: 1})
-
         const product = await productSchema.aggregate([
-            // {$addFields: {productName: {$regexMatch: {input: "$name", regex: new RegExp(`^${filter}.*$`), options: "i"}}}},
-            // {$regexMatch: {input: "$name", regex: new RegExp(`^${filter}.*$`), options: "i"}},
             {$match: {name: {$regex: new RegExp(`^${filter}.*$`), $options: 'i'}}},
             {$lookup: {
                 from: "variants",
@@ -305,20 +295,6 @@ const search = async (req, res) => {
             {$project: {name: 1, _id: 1, variant: 1}},
           
         ])
-
-        // const variant = await variantSchema.aggregate([
-        //     {$lookup: {
-        //         from: "products",
-        //         localField: "productId",
-        //         foreignField: "_id",
-        //         as: "product"
-        //     }},
-        //     {$unwind: "$product"},
-        //     {$match: {"product.name": {$regex: regex, $options: 'i'}}},
-        //     {$project: {"product.name": 1, _id: 1}}
-        // ])
-
-        // console.log(product)
 
         res.status(200).json({product, success: true, message: "search success"})
     }

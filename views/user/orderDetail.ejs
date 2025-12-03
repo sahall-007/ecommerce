@@ -215,15 +215,7 @@
     </nav>
 
     <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
-    <div class=" sidebar d-flex flex-wrap justify-content-around">
-        <a href="/profile" class="">Profile</a>
-        <a href="/orders" class="">Order history</a>
-        <a href="/address" class="">Billing Address</a>
-        <a href="#" class="">Wallet</a>
-        <a href="#" class="">Wishlist</a>
-        <a href="/cart" class="">Shopping Cart</a>
-        <a href="#" class="">Coupon</a>
-    </div>
+    <%- include("../partials/user/userQuickLinks.ejs") %>
 
     <!-- ==================== MAIN CONTENT ==================== -->
         <% if(order){ %>

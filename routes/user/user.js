@@ -18,6 +18,7 @@ const checkoutRouter = require('./checkoutRouter.js')
 const orderRouter = require('./orderRouter.js')
 const invoiceRoute = require('./invoice.js')
 const wishlistRouter = require('./wishlistRouter.js')
+const walletRouter = require('./walletRouter.js')
 
 const router = express.Router()
 

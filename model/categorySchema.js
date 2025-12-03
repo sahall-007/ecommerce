@@ -4,7 +4,10 @@ const categorySchema = new mongoose.Schema({
     name: String,
     sold: Number,
     stock: Number,
-    discount: Number,
+    discount: {
+        type: Number,
+        default: 0
+    },
     isListed: Boolean    
 }, { timestamps: true })
 

@@ -1,5 +1,6 @@
 
 const passport = require('passport')
+const rndm = require('rndm')
 const googleStrategy = require('passport-google-oauth20').Strategy
 const userSchema = require('../model/userSchema.js')
 const env = require('dotenv').config()
@@ -20,6 +21,7 @@ async (req, accessToken, refreshToken, profile, done) => {
         // if(googleUser.isListed==false){
             
         // }
+        var referral = rndm.base62(10)
         
         if(googleUser){
             // req.session.user = googleUser._id
@@ -31,7 +33,8 @@ async (req, accessToken, refreshToken, profile, done) => {
                 username: profile.displayName,
                 email: profile.emails[0].value,                
                 googleId: profile.id,
-                isListed: true
+                isListed: true,
+                referral
             });
             await googleUser.save()
 

@@ -22,8 +22,6 @@ const loginVerify = async (req, res) =>{
     try{
         const { email, password } = req.body
 
-        console.log(email, password)
-
         const admin = await adminSchema.findOne({ email })
 
         if(!admin){
@@ -33,7 +31,6 @@ const loginVerify = async (req, res) =>{
         const isMatch = await bcrypt.compare(password, admin.password)
 
         if (!isMatch || admin.email !== email) {
-            console.log("inside condition")
             return res.status(401).json({success: false, message: "invalid email or password !"})
         }
 

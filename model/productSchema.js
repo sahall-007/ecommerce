@@ -3,7 +3,10 @@ const { schema } = require('./categorySchema')
 
 const productSchema = new mongoose.Schema({
     name: String,
-    discount: Number,
+    discount: {
+        type: Number,
+        default: 0
+    },
     offer: String,
     isListed: {
         type: Boolean,

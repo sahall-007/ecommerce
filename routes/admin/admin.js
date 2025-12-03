@@ -18,7 +18,7 @@ const customerRoute = require("./customerRoute.js")
 const productRoute = require("./productRoute.js")
 const variantRoute = require("./variantRoute.js")
 const orderRoute = require('./orderRoute.js')
-// const offerRoute = require('./offerRoute.js')
+const offerRoute = require('./offerRoute.js')
 
 const router = express.Router()
 
@@ -52,6 +52,6 @@ router.use(variantRoute)
 router.use(orderRoute)
 
 // offer management
-// router.use(offerRoute)
+router.use(offerRoute)
 
 module.exports = router

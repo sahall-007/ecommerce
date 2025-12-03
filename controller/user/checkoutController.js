@@ -38,12 +38,29 @@ const checkoutPage = async (req, res) => {
                 as: "product"
             }},
             {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},            
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$project: {
                 image: {$arrayElemAt: ["$variant.image", 0]},
                 items: 1,
                 variant: 1,
-                "product.name": 1 ,
-                "product.discount": 1
+                "product.name": 1,
+                discount: 1
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
         ])
