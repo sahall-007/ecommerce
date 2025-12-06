@@ -13,6 +13,8 @@ const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
 const walletSchema = require('../../model/walletSchema.js')
+const couponSchema = require('../../model/couponSchema.js')
+const userCouponSchema = require('../../model/userCouponSchema.js')
 
 // logger.info("server has started")
 
@@ -152,7 +154,6 @@ const loginPost = async (req, res) => {
         const { username, email, password } = req.body
 
         const userExist = await userSchema.findOne({email})
-
         if(!userExist){
             return res.status(404).json({success: false, message: "create an account first"})
         }
@@ -164,6 +165,12 @@ const loginPost = async (req, res) => {
         
         if(userExist.isListed==false){
             return res.status(403).json({success: false, message: "You are blocked by the Admin"})
+        }
+
+        var referral = rndm.base62(10)
+        if(!userExist?.referral){
+            userExist.referral = referral
+            await userExist.save()
         }
 
         const wishlist = await wishlistSchema.findOne({userId: userExist._id})
@@ -180,6 +187,22 @@ const loginPost = async (req, res) => {
                 userId: userExist._id,
             })
         }
+
+        // giving the welcome coupon if the user did not got it while registring
+        const coupon = await couponSchema.findOne({code: "WELCOME10"})
+        if(coupon){
+            const userCoupon = await userCouponSchema.findOne({userId: userExist._id, couponId: coupon._id})
+            if(!userCoupon){
+                await userCouponSchema.create({
+                    userId: userExist._id,
+                    couponId: coupon._id,
+                    startDate: Date.now(),
+                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 10) 
+                })
+                logger.info("successfully created welcome coupon")
+            }
+        }
+        
         
 
         req.session.user = userExist._id
@@ -271,6 +294,16 @@ const verifyOtp = async (req, res) => {
             else{
                 await walletSchema.create({
                     userId: saveUser._id,
+                })
+            }
+
+            const coupon = await couponSchema.findOne({code: "WELCOME10"})
+            if(coupon){
+                await userCouponSchema.create({
+                    userId: saveUser._id,
+                    couponId: coupon._id,
+                    startDate: Date.now(),
+                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 3) 
                 })
             }
 

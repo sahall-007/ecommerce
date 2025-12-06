@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Coupons</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .coupon-card {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .coupon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-color: #0d6efd;
+        }
+        .coupon-code {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 5px;
+        }
+        .discount-badge {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .copied-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-2">
+                    <i class="fas fa-ticket-alt text-primary"></i> Available Coupons
+                </h1>
+                <p class="text-muted">Save more on your purchases with exclusive discount codes</p>
+            </div>
+        </div>
+
+        <!-- Copied Toast Notification -->
+        <div class="copied-toast">
+            <div class="toast show" role="alert">
+                <div class="toast-header bg-success text-white">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong class="me-auto">Success</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    Coupon code copied to clipboard!
+                </div>
+            </div>
+        </div>
+
+        <!-- Coupons Grid -->
+        <div class="row g-4">
+            <!-- Coupon 1 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-danger discount-badge">20% OFF</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <h5 class="card-title fw-bold">New User Discount</h5>
+                        <p class="card-text text-muted small">Valid for first-time customers only. Minimum purchase of $50 required.</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3">
+                            <span id="code1">WELCOME20</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> Expires: Dec 31, 2025
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="copyCoupon('WELCOME20', this)">
+                            <i class="far fa-copy me-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupon 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-warning text-dark discount-badge">$15 OFF</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Flat Discount</h5>
+                        <p class="card-text text-muted small">Get $15 off on orders above $100. Valid on all products.</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3">
+                            <span id="code2">SAVE15NOW</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> Expires: Jan 15, 2026
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="copyCoupon('SAVE15NOW', this)">
+                            <i class="far fa-copy me-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupon 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-info discount-badge">30% OFF</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Weekend Special</h5>
+                        <p class="card-text text-muted small">Weekend exclusive offer. Valid only on Saturday and Sunday.</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3">
+                            <span id="code3">WEEKEND30</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> Expires: Dec 30, 2025
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="copyCoupon('WEEKEND30', this)">
+                            <i class="far fa-copy me-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupon 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-primary discount-badge">25% OFF</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Electronics Sale</h5>
+                        <p class="card-text text-muted small">Special discount on all electronics. Limited time offer!</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3">
+                            <span id="code4">TECH25</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> Expires: Feb 28, 2026
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="copyCoupon('TECH25', this)">
+                            <i class="far fa-copy me-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupon 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-secondary discount-badge">FREE SHIP</span>
+                            <span class="badge bg-success">Active</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Free Shipping</h5>
+                        <p class="card-text text-muted small">Free shipping on all orders. No minimum purchase required.</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3">
+                            <span id="code5">FREESHIP</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">
+                                <i class="far fa-calendar"></i> Expires: Mar 31, 2026
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100" onclick="copyCoupon('FREESHIP', this)">
+                            <i class="far fa-copy me-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coupon 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card coupon-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge bg-dark discount-badge">10% OFF</span>
+                            <span class="badge bg-secondary">Expired</span>
+                        </div>
+                        <h5 class="card-title fw-bold">Summer Sale</h5>
+                        <p class="card-text text-muted small">This coupon has expired. Check back for new offers!</p>
+                        
+                        <div class="coupon-code p-3 text-center mb-3 opacity-50">
+                            <span id="code6">SUMMER10</span>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-danger">
+                                <i class="far fa-calendar"></i> Expired: Nov 30, 2025
+                            </small>
+                        </div>
+                        
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="fas fa-ban me-2"></i>Expired
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading"><i class="fas fa-info-circle"></i> How to use coupons</h5>
+                    <p class="mb-0">Click on "Copy Code" to copy the coupon code, then paste it at checkout to apply your discount. Terms and conditions apply to each coupon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function copyCoupon(code, button) {
+            // Copy to clipboard
+            navigator.clipboard.writeText(code).then(function() {
+                // Change button text temporarily
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check me-2"></i>Copied!';
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-success');
+                
+                // Show toast notification
+                const toast = document.querySelector('.copied-toast');
+                toast.style.display = 'block';
+                
+                // Reset button after 2 seconds
+                setTimeout(function() {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-primary');
+                }, 2000);
+                
+                // Hide toast after 3 seconds
+                setTimeout(function() {
+                    toast.style.display = 'none';
+                }, 3000);
+            }).catch(function(err) {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy coupon code. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

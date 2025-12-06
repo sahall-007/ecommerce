@@ -64,12 +64,14 @@
         <div class="row row-cols-1 justify-content-between">
             <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
                 
+                <!-- ========== SIDEBAR ========== -->
+
                 <%- include("../partials/admin/sidebarLinks.ejs") %>
     
             </div>
             <div class="card col col-md-8 col-lg-9  px-0 mx-3">
                 <div class="card-header">
-                    <h1 class="text-center">Category Management</h1>
+                    <h1 class="text-center">Coupon Management</h1>
     
                     <div class="container">
                         <div class="row justify-content-between my-5">
@@ -88,7 +90,7 @@
                         </form>
     
                         <div class="col-2 d-flex justify-content-end  align-self-start">
-                            <a role="button" href="/admin/addCategory"
+                            <a role="button" href="/admin/addCoupon"
                                 class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">Add new</a>
                         </div>
     
@@ -99,38 +101,61 @@
                 <div class="card-body">
                     <div class="">
     
-                        <% if (categories) { %>
+                        <% if (coupons && coupons?.length > 0) { %>
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
-                                        <th> Name </th>
-                                        <th> Added </th>
-                                        <th> stock </th>
+                                        <th> Coupon code </th>
+                                        <th> Discount </th>
+                                        <th> Start </th>
+                                        <th> End </th>
+                                        <th> Min purchase </th>
+                                        <th> Max Discount </th>
                                         <th> Status </th>
                                         <th> Actions </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% categories.forEach((category, index) => { %>
+                                    <% coupons.forEach((coupon, index) => { %>
     
                                         <tr>
-                                            <td><%= index+1 %></td>
                                             <td class="py-1">
-                                                <%= category.name %>
+                                                <%= coupon.code %>
                                             </td>
                                             <td>
-                                                <%= new Date(category.createdAt).toLocaleDateString('en-GB', {
-                                                    day: 'numeric',
-                                                    month: 'short',
-                                                    year: 'numeric',
-                                                }) %>
+                                                <%= coupon.discount %> %
+                                            </td>
                                             <td>
-                                                50
+                                                <% if(coupon.startDate){ %>
+                                                    <%= new Date(coupon.startDate).toLocaleDateString('en-GB', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    }) %>
+                                                <% }else{ %>                                                
+                                                    ---
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if(coupon.endDate){ %>
+                                                    <%= new Date(coupon.endDate).toLocaleDateString('en-GB', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric',
+                                                    }) %>
+                                                <% }else{ %>                                                
+                                                    ---
+                                                <% } %>                                                
+                                            </td>
+                                            <td>
+                                                &#8377; <%= coupon.minimumPurchase %>
+                                            </td>
+                                            <td>
+                                                &#8377; <%= coupon.maximumDiscount %>
                                             </td>
     
-                                            <% if(category.isListed) { %>
-                                                <td class="text-success">Active</td>
+                                            <% if(coupon.isListed) { %>
+                                                <td class="text-success text-center">Active</td>
                                             <% } else{ %>
                                                 <td class="text-danger">blocked</td>
                                             <% } %>
@@ -138,12 +163,13 @@
                                             <td>
                                                 <div class="d-flex gap-4 ">
     
-                                                    <a class="actions" href="/admin/editCategory/<%= category.name %>" onclick='editCategory("<%= category._id%>")' ><i class="bi bi-pencil"></i></a>
-                                                    <% if(category.isListed) { %>
-                                                        <a class="actions block-btn"  onclick='block("<%= category._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
+                                                    <a class="actions" href="/admin/coupon/<%= coupon.code %>" onclick='coupon("<%= coupon._id%>")' ><i class="bi bi-pencil"></i></a>
+                                                    <% if(coupon.isListed) { %>
+                                                        <a class="actions block-btn"  onclick='block("<%= coupon._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
                                                     <% } else{ %>
-                                                        <a class="actions " onclick='unBlock("<%= category._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
+                                                        <a class="actions " onclick='unBlock("<%= coupon._id%>")' data-bs-toggle="modal" data-bs-target="#unBlockModal"><i class="bi bi-eye-slash"></i></a>
                                                     <% } %>
+                                                    
                                                 </div>
                                             </td>
                                         </tr>
@@ -157,8 +183,8 @@
                 </div>
     
                 <div class="mb-4 mx-auto">
-                    <a href="/admin/category/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
-                    <a href="/admin/category/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
+                    <a href="/admin/coupon/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1 <%= prevDisable %>"  >Prev</a>
+                    <a href="/admin/coupon/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1 <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
                 </div>
     
             </div>
@@ -187,7 +213,6 @@
     </div>
 
 <!----------------------  block modal  ----------------------->
-
     <div class="modal fade" id="blockModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -208,7 +233,6 @@
     </div>
 
 <!----------------------  unblock modal  ----------------------->
-
     <div class="modal fade" id="unBlockModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -250,10 +274,6 @@
 
         let editId, blockId, unBlockId, deleteId
 
-        // function editCategory(id){
-        //     window.location.href = `/admin/unBlock/${id}`
-        // }
-
         function block(id){
             blockId = id
         }
@@ -267,6 +287,7 @@
         }
 
         async function confirmBlock(){
+            return
             const res = await fetch('/admin/blockCategory', {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
@@ -281,6 +302,7 @@
         }
 
         async function confirmUnBlock(){
+            return
             console.log("un block confirm")
             const res = await fetch('/admin/unBlockCategory', {
                 method: "PATCH",
@@ -296,6 +318,7 @@
         }
 
         async function confirmDelete(){
+            return
             console.log("delte confirm")
             const res = await fetch('/admin/deleteCategory', {
                 method: "DELETE",

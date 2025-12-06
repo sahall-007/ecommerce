@@ -215,7 +215,7 @@
 
                           <button class="btn btn-outline-primary btn-sm">Add to Cart</button>
                         </div>
-                        <% if (wishlist?.items?.length> 0) { %>
+                        <% if (wishlist?.items) { %>
                     <% wishlist.items.forEach((item, index)=> { %>
                       <% if (String(item.variantId)==String(ele._id)) { %>
                         <% inWishlist=true %>

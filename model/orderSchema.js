@@ -15,8 +15,8 @@ const { EventEmitterAsyncResource } = require('nodemailer/lib/xoauth2')
 
 const orderSchema = new mongoose.Schema({
     orderId: String,
-    totalPrice: Number,
-    finalPrice: Number,
+    totalPriceBeforeDiscount: Number,
+    payablePrice: Number,
     items: [{
         name: String,
         price: String,
@@ -105,7 +105,7 @@ const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
-    },
+    }    
 
 }, { timestamps: true })
 

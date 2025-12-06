@@ -26,7 +26,20 @@ async (req, accessToken, refreshToken, profile, done) => {
         var referral = rndm.base62(10)
         
         if(googleUser){
-            // req.session.user = googleUser._id
+            const wishlist = await wishlistSchema.findOne({userId: googleUser._id})
+            if(!wishlist){
+                await wishlistSchema.create({
+                    userId: googleUser._id,
+                    items: []
+                })
+            }
+            const wallet = await walletSchema.findOne({userId: googleUser._id})
+            if(!wallet){
+                await walletSchema.create({
+                    userId: googleUser._id,
+                })
+            }
+
             logger.info("this is google login")
             return done(null, googleUser)
         }
@@ -53,7 +66,7 @@ async (req, accessToken, refreshToken, profile, done) => {
                     balance: 10000,
                     userId: googleUser._id,
                 })
-                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {balance: 10000})
+                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
             }
             else{
                 await walletSchema.create({

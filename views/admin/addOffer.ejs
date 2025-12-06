@@ -254,7 +254,6 @@
                 console.log(productName)
 
                 try{
-                    // alert(category.value)
                     const result = await fetch('/admin/addOffer', {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -266,7 +265,6 @@
                             title: "Success",                       
                             text: "Offer added successfully",
                         })
-                        // .then(() => window.location.href='/admin/category')            
                     }
                     else if(result.status==400){
                         swal.fire({

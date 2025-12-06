@@ -5,6 +5,8 @@ const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
 const walletSchema = require('../../model/walletSchema.js')
+const couponSchema = require('../../model/couponSchema.js')
+const userCouponSchema = require('../../model/userCouponSchema.js')
 
 
 const checkoutPage = async (req, res) => {
@@ -59,6 +61,8 @@ const checkoutPage = async (req, res) => {
             {$addFields: {"variant.image": "$$REMOVE"}},
         ])
 
+
+
         const wallet = await walletSchema.findOne({userId: id})
         if(!wallet){
             return res.status(404).json({success: false, message: "wallet not found in the database"})
@@ -66,7 +70,29 @@ const checkoutPage = async (req, res) => {
 
         const address = await addressSchema.findOne({userId: id})
 
-        res.render('user/checkout', {cart, address, wallet})
+        const userCoupons = await userCouponSchema.aggregate([
+            {$match: {$and: [{userId: new Types.ObjectId(id), used: false}, {used: false}]}},
+            {$lookup: {
+                from: "coupons",
+                localField: "couponId",
+                foreignField: "_id",
+                as: "coupon"
+            }},
+            {$unwind: "$coupon"},
+            {$match: {"coupon.isListed": true}},
+            {$project: {couponId: 1, "coupon.code": 1, "coupon.discount": 1, "coupon.minimumPurchase": 1, "coupon.maximumDiscount": 1}}
+            
+        ])
+        const globalCoupons = await couponSchema.aggregate([
+            {$match: 
+                {$and: [{startDate: {$gte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
+            },            
+            {$project: {code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
+        ])
+
+        let coupons = userCoupons.concat(globalCoupons)
+
+        res.render('user/checkout', {cart, address, wallet, coupons})
     }
     catch(err){
         logger.fatal(err)

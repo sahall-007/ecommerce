@@ -1,15 +1,10 @@
 
-const userSchema = require('../../model/userSchema.js')
-const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
-const categorySchema = require('../../model/categorySchema.js')
-const brandSchema = require('../../model/brandSchema.js')
 const cartSchema = require('../../model/cartSchema.js')
 const addressSchema = require('../../model/addressSchema.js')
 const orderSchema = require('../../model/orderSchema.js')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
-const env = require('dotenv').config()
+const couponSchema = require('../../model/couponSchema.js')
+const userCouponSchema = require('../../model/userCouponSchema.js')
 const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
@@ -30,7 +25,7 @@ async function generateOrderId(){
 
 const orderPost = async (req, res) => {
     try{
-        const { addressId, cartId, totalPrice, finalPrice, couponDiscount, paymentMethod } = req.body
+        const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, couponDiscount, paymentMethod } = req.body
         const userId = req.session.user || req.session?.passport?.user
 
         const cart = await cartSchema.aggregate([
@@ -43,6 +38,8 @@ const orderPost = async (req, res) => {
                 as: "variant"
             }},
             {$unwind: "$variant"},
+            {$match: {"variant.quantity": {$gt: 0}}},
+            {$inc: {"variant.price": -coupondistributerdPrice}},
             {$lookup: {
                 from: "products",
                 localField: "variant.productId",
@@ -50,12 +47,29 @@ const orderPost = async (req, res) => {
                 as: "product"
             }},
             {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},        
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$project: {
                 image: {$arrayElemAt: ["$variant.image", 0]},
                 items: 1,
                 variant: 1,
                 "product.name": 1 ,
-                "product.discount": 1,
+                discount: 1,
                 "product._id": 1
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
@@ -70,7 +84,7 @@ const orderPost = async (req, res) => {
                 storage: ele.variant.ram,
                 color: ele.variant.color,
                 quantity: ele.items.quantity,
-                discount: ele.product.discount,
+                discount: ele.discount,
                 image: ele.image,
                 status: "Pending",            
                 productId: ele.variant.productId,
@@ -78,6 +92,7 @@ const orderPost = async (req, res) => {
             }
         })
 
+        // to decrease the quantity of the product after while ordering
        const bulkOp = cart.map(ele => {
             return{
                 updateOne: {
@@ -106,8 +121,8 @@ const orderPost = async (req, res) => {
 
         const newOrder = await orderSchema.create({
             orderId,
-            totalPrice,
-            finalPrice,
+            totalPriceBeforeDiscount,
+            payablePrice,
             items: cartItems,
             billingAddress: {
                 fullname: userAddress.fullname,
@@ -123,10 +138,26 @@ const orderPost = async (req, res) => {
             userId,
             placedAt: Date.now()
         })
+
         req.session.orderId = newOrder._id
 
         await cartSchema.findOneAndUpdate({_id: cartId}, {$set: {items: []}})
         await variantSchema.bulkWrite(bulkOp)
+
+        // to give a coupon if it is the first order
+        const orderCount = await orderSchema.find({userId}).countDocuments()
+        console.log("order count", orderCount)
+        if(orderCount==1){
+            const coupon = await couponSchema.findOne({code: "FIRSTORDER5"})
+            if(coupon){
+                await userCouponSchema.create({
+                    userId,
+                    couponId: coupon._id,
+                    startDate: Date.now(),
+                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 3) 
+                })
+            }
+        }
     
         logger.info("order success")
         res.status(200).json({success: true, message: "Order successfully placed"})
@@ -155,7 +186,7 @@ const orderSuccess = async (req, res) => {
 const orderPage = async (req, res) => {
     try{
         const userId = req.session.user || req.session?.passport?.user
-        const orders = await orderSchema.find({userId}, {"items.quantity": 1, "items.image": 1, finalPrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1}).sort({_id: -1})
+        const orders = await orderSchema.find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1}).sort({_id: -1})
 
         res.render('user/order', {orders})
     }   
@@ -228,7 +259,6 @@ const cancelOrder = async (req, res) => {
 }
 
 const returnOrder = async (req, res) => {
-    console.log("----------------------------------------------------------")
     try{
         const { itemId, userId } = req.body
 

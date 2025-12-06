@@ -53,24 +53,6 @@
             /* user-select: none; */
             cursor: pointer;
         }
-
-        /* .quantity-input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 0.375rem;
-        } */
-
-        /* .subtotal-price {
-            font-weight: 600;
-            color: #212529;
-        }
-
-        .total-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-        } */
-
         .btn-proceed {
             background-color: #ff6d00;
             border: none;
@@ -89,15 +71,6 @@
                 font-size: 0.9rem;
             }
 
-            /* .quantity-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            } */
-/* 
-            .quantity-input {
-                width: 40px;
-            } */
         }
 
         .navbar {
@@ -199,6 +172,9 @@
     <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
      <% let addressIndex %>
      <% let addressSelected = false %>
+     <% let totalQuantity = 0 %>
+     <% let subTotal = 0 %>
+
     <% if(cart?.length > 0){ %>
         
         <div class="main-content">
@@ -223,6 +199,7 @@
                                         <% let totalPrice = 0 %>
                                         <% if(cart?.length > 0){ %>
                                             <% cart.forEach((ele, index) => { %>
+                                                <% totalQuantity += ele.items.quantity %>
                                                 <tr class="cart-item" id="tableRow-<%= index %>">
                                                     <td>
                                                         <div class="d-flex align-items-center">
@@ -258,7 +235,7 @@
 
                                                     <% 
                                                         
-                                                        let subTotal = finalPrice * ele.items.quantity
+                                                        subTotal = finalPrice * ele.items.quantity
                                                         totalPrice+=subTotal
 
                                                     %>
@@ -267,6 +244,7 @@
                                                     <td><i class="bi bi-trash3 text-muted cursor-pointer" onclick='removeProduct("<%= index %>", "<%= ele._id %>")'></i></td>
                                                 </tr>                                        
                                             <% }) %>
+                                            <% console.log(totalQuantity) %>
                                         <% } %>   
 
                                     </tbody>
@@ -372,16 +350,22 @@
                             <% } %>
                         </div>
 
-                        <!-- order summay -->
+                        <!-- order summay coupons -->
 
-                        <div class="bg-white rounded-3 shadow-sm p-4  mt-2"" style="top: 1rem; z-index: 10;">
+                        <div class="bg-white rounded-3 shadow-sm p-4  mt-2" style="top: 1rem; z-index: 10;">
+
                             <h5 class="mb-3" id="itemCount">Coupon code</h5>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="coupon" id="coupon" placeholder="Coupon code" disabled>
-                                <button class="btn btn-dark input-text" >Apply</button>
-
-                            </div>
+                            <select class="form-select mb-4" id="coupon" name="coupon" onchange="couponSelect(this)">
+                                <option value="0">Select coupon</option>
+                                <% if(coupons?.length > 0){ %>
+                                    <% coupons?.forEach(ele => {  %>
+                                        <option value="<%= ele?.coupon?.discount || ele?.discount %>,<%= ele?.coupon?.maximumDiscount || ele?.maximumDiscount %>"><%= ele?.coupon?.code || ele?.code %></option>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        
                             <hr>
+
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
                                 <li>
@@ -405,24 +389,31 @@
                                     <label for="upi" class="fs-6">UPI</label>
                                 </li>
                             </ul>
+
                             <hr>
+
                             <h5 class="mb-3" id="itemCount">Price (<%= cart?.length %> items)</h5>
                             <div class="d-flex justify-content-between mb-2">
                                <span>Sub total:</span>
-                               <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %>.00</span>
+                               <span class="total-price">&#8377; <span id="totalPrice"><%= totalPrice %></span>.00</span>
                            </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <% let couponDiscount = 0 %>
                                 <span>Coupon discount:</span>
-                                <span id="couponDiscount" class="total-price">&#8377; <%= couponDiscount %>.00</span>
+                                <span class="total-price"><span id="couponDiscount">0</span></span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping charge:</span>
                                 <span id="shippingCharge" class="total-price">&#8377; 50.00</span>
                             </div>
                             <div class="d-flex justify-content-between mt-3">
-                                <span class="fw-bold">Total Amount:</span>
-                                <span id="finalPrice" class="total-price text-success fw-bold">&#8377; <%= totalPrice - couponDiscount + 50 %>.00</span>
+                                <span >Total Amount:</span>
+                                <span class="total-price fw-bold">&#8377; <span id="finalPrice"><%= totalPrice%></span>.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mt-3">
+                                <span class="fw-bold">Payable Amount:</span>
+                                <span class="total-price text-success fw-bold">&#8377; <span id="payablePrice"><%= totalPrice + 50 %></span>.00</span>
                             </div>
 
                             <button class="btn btn-proceed text-white w-100 mt-3" onclick='placeOrder()'>
@@ -466,6 +457,7 @@
 
         const addressId = "<%= address?._id%>"
         const cartId = "<%= cart[0]?._id %>"
+        let discountAmount
         
 
         async function updateQuantity(btn, change, index, cartId, price, quantity) {
@@ -511,13 +503,47 @@
 
                     document.getElementById(`subTotal-${index}`).innerHTML = `&#8377; ${value*price}`
 
+                    // const couponDiscount = document.getElementById("couponDiscount")
+                    // const [discountPercentage, maxDiscountPrice] = element.value.split(",")
+
                     const total = document.querySelectorAll('.subtotal-price')
-                    let res=0
+                    let totalPrice=0
                     total.forEach(ele => {
-                        res+=Number(ele.innerHTML.slice(1))
+                        totalPrice+=Number(ele.innerHTML.slice(1))
                     })
                     
-                    document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
+                    const couponvalue = document.getElementById("couponDiscount")
+                    const coupon = document.getElementById("coupon")
+                    const [discountPercentage, maxDiscountPrice] = coupon.value.split(",")
+
+                    const couponDiscount = Number(discountPercentage)
+                    const discountableAmount = totalPrice * (couponDiscount / 100)
+                   
+                    let payableAmount
+                    if(discountableAmount > maxDiscountPrice){
+                        // asigning the discount amount to as global so that other functions can access it
+                        discountAmount = maxDiscountPrice
+
+                        payableAmount = Math.floor(totalPrice - maxDiscountPrice)
+                        couponvalue.innerHTML = `&#8377; ${maxDiscountPrice}`  
+                    }
+                    else{ 
+                        // asigning the discount amount to as global so that other functions can access it
+                        discountAmount = discountableAmount
+
+                        payableAmount = Math.floor(totalPrice - discountableAmount)
+                        couponvalue.textContent = `${discountPercentage}%`  
+                    }
+
+                    console.log("couponDiscount", couponDiscount)
+                    console.log("totalPrice", totalPrice)
+                    console.log("discountableAmount", discountableAmount)
+                    console.log("payableAmount", payableAmount)
+                    
+                    
+                    document.getElementById("totalPrice").innerHTML = `${totalPrice}`
+                    document.getElementById("finalPrice").textContent = payableAmount
+                    document.getElementById("payablePrice").textContent = payableAmount + 50
                     
                 }
             }
@@ -705,10 +731,18 @@
         }
         
         async function placeOrder(){
-            const totalPrice = Number(document.getElementById("totalPrice").textContent.slice(2))
-            const finalPrice = Number(document.getElementById("finalPrice").textContent.slice(2))
-            const couponDiscount = Number(document.getElementById("couponDiscount").textContent.slice(2))
+            const totalPrice = Number(document.getElementById("totalPrice").textContent)
+            const payablePrice = Number(document.getElementById("payablePrice").textContent)
+            const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
             const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')
+
+            const quantityInput = document.querySelectorAll('.quantity-input')
+            
+            let totalQuantity=0
+            quantityInput.forEach(ele => {
+                totalQuantity+=Number(ele.value)
+            })
+                    
 
             let isSelected = <%= addressSelected %>;
 
@@ -732,12 +766,11 @@
                 return
             }
 
-            // alert("working")
             try{
                 const request = await fetch('/placeOrder', {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ addressId, cartId, totalPrice, finalPrice, couponDiscount, paymentMethod })
+                    body: JSON.stringify({ addressId, cartId, totalPrice, payablePrice, couponDiscount, paymentMethod })
                 })
                 if(request.status==200){
                     window.location.href = "/orderSuccess"
@@ -748,6 +781,46 @@
                 console.log(err)
             }
         }
+    
+        function couponSelect(element){
+            const couponvalue = document.getElementById("couponDiscount")
+            const [discountPercentage, maxDiscountPrice] = element.value.split(",")
+                       
+            const total = document.querySelectorAll('.subtotal-price')
+            let totalPrice=0
+            total.forEach(ele => {
+                totalPrice+=Number(ele.innerHTML.slice(1))
+            })
+            
+            const couponDiscountvalue = Number(discountPercentage)
+            const discountableAmount = totalPrice * (couponDiscountvalue / 100)
+            
+            let payableAmount
+            if(discountableAmount > maxDiscountPrice){
+                // asigning the discount amount to as global so that other functions can access it
+                discountAmount = maxDiscountPrice
+                
+                payableAmount = Math.floor(totalPrice - maxDiscountPrice)
+                couponvalue.innerHTML = `&#8377; ${maxDiscountPrice}`  
+            }
+            else{ 
+                // asigning the discount amount to as global so that other functions can access it
+                discountAmount = discountableAmount
+                
+                payableAmount = Math.floor(totalPrice - discountableAmount)
+                couponvalue.textContent = `${discountPercentage}%`  
+            }
+
+
+            console.log("couponDiscount", couponDiscountvalue)
+            console.log("totalPrice", totalPrice)
+            console.log("discountableAmount", discountableAmount)
+            console.log("payableAmount", payableAmount)           
+            
+            document.getElementById("finalPrice").textContent = payableAmount
+            document.getElementById("payablePrice").textContent = payableAmount + 50
+        }
+    
     </script>
 </body>
 
