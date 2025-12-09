@@ -71,7 +71,7 @@ const checkoutPage = async (req, res) => {
         const address = await addressSchema.findOne({userId: id})
 
         const userCoupons = await userCouponSchema.aggregate([
-            {$match: {$and: [{userId: new Types.ObjectId(id), used: false}, {used: false}]}},
+            {$match: {userId: new Types.ObjectId(id)}},
             {$lookup: {
                 from: "coupons",
                 localField: "couponId",
@@ -80,17 +80,30 @@ const checkoutPage = async (req, res) => {
             }},
             {$unwind: "$coupon"},
             {$match: {"coupon.isListed": true}},
-            {$project: {couponId: 1, "coupon.code": 1, "coupon.discount": 1, "coupon.minimumPurchase": 1, "coupon.maximumDiscount": 1}}
+            // {$project: {couponId: 1, "coupon.code": 1, "coupon.discount": 1, "coupon.minimumPurchase": 1, "coupon.maximumDiscount": 1}}
             
         ])
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
                 {$and: [{startDate: {$gte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
             },            
-            {$project: {code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
+            // {$project: {_id: 1, code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
         ])
 
+        for(let ele1 in globalCoupons){
+            for(let ele2 in userCoupons){
+                if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
+                    globalCoupons.splice(ele1, 1)
+                }
+            }
+        }
+
+
         let coupons = userCoupons.concat(globalCoupons)
+
+        // console.log("this is usercoupons", userCoupons)
+        // console.log("this are global coupons", globalCoupons)
+        // console.log("these are checkout coupons", coupons)
 
         res.render('user/checkout', {cart, address, wallet, coupons})
     }

@@ -1,7 +1,6 @@
 
 
 const mongoose = require('mongoose')
-const { EventEmitterAsyncResource } = require('nodemailer/lib/xoauth2')
 // console.log("ORDER SCHEMA FILE LOADED:", __filename);
 
 // Force delete cached model
@@ -17,6 +16,7 @@ const orderSchema = new mongoose.Schema({
     orderId: String,
     totalPriceBeforeDiscount: Number,
     payablePrice: Number,
+    discountAmount: Number,
     items: [{
         name: String,
         price: String,
@@ -26,9 +26,16 @@ const orderSchema = new mongoose.Schema({
         color: String,
         image: String,
         discount: Number,
+        priceAfterDiscount: Number,
+        subTotal: Number,
+        priceAfterCouponDiscount: Number,
+        refundTransactionId: { 
+            type: mongoose.Schema.Types.ObjectId,
+            default: null
+        },
         status: { 
             type: String, 
-            enum: ['Pending', 'Out for delivery', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Returned'],
+            enum: ['Pending', 'Out for delivery', 'Confirmed', 'Shipped', 'Delivered', 'Cancelled', 'Return requested', 'Returned', 'Return approved', 'Return rejected', 'Returning'],
             default: 'Pending'
         }, 
         deliveredAt: { 
@@ -54,7 +61,15 @@ const orderSchema = new mongoose.Schema({
         return: { 
             requested: Boolean, 
             reason: String, 
+            customReason: String,
+            image: String,
             requestedAt: Date 
+        },
+        returnReject: {
+            rejected: Boolean,
+            reason: String, 
+            customReason: String,
+            rejectedAt: Date
         },
         productId: { 
             type: mongoose.Schema.Types.ObjectId, 
@@ -105,7 +120,11 @@ const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
-    }    
+    },
+    couponCode: {
+        type: String,
+        default: null
+    }
 
 }, { timestamps: true })
 

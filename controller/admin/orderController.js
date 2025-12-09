@@ -1,5 +1,8 @@
 const variantSchema = require('../../model/variantSchema.js')
 const orderSchema = require('../../model/orderSchema.js')
+const walletSchema = require('../../model/walletSchema.js')
+const { Types, default: mongoose } = require('mongoose')
+
 
 const logger = require('../../config/pinoLogger.js')
 const { on } = require('nodemailer/lib/ses-transport/index.js')
@@ -46,7 +49,6 @@ const adminOrderDetailPage = async (req, res) => {
 const editStatus = async (req, res) => {
     try{
         const { orderItemId, orderId, index, newStatus } = req.body
-        console.log(req.body)
 
         const order = await orderSchema.findOne({_id: orderId, "items._id": orderItemId})
 
@@ -55,7 +57,56 @@ const editStatus = async (req, res) => {
         }
 
         order.items.id(orderItemId).status = newStatus
+        
+        if(newStatus == "Return approved"){
+            const newTransactions = {
+                amount: order.items.id(orderItemId).priceAfterCouponDiscount,
+                date: Date.now(),
+                transactionType: "credit" ,
+                description: `Refund of order #${order.orderId}`,
+                status: "Pending"
+            }
+
+            const wallet = await walletSchema.findOneAndUpdate(
+                {userId: order.userId}, 
+                {$push: {transactions: newTransactions}}, 
+                { new: true }
+            )
+
+            if (!wallet) {
+                return res.status(404).json({ success: false, message: "Wallet not found" });
+            }
+
+            // putting the latest transaction id into refundTransactionId so that it can be access later to update the transaction status
+            order.items.id(orderItemId).refundTransactionId = wallet.transactions[wallet.transactions.length - 1]._id
+
+            console.log("this is wallet after update of return approved", wallet)
+        }
+
+        // refund money after order is returned
+        else if(newStatus == "Returned"){
+            const transId = order.items.id(orderItemId).refundTransactionId
+
+            if (!transId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "No refundTransactionId found for this item"
+                });
+            }
+
+            const wallet = await walletSchema.findOneAndUpdate(
+                {userId: order.userId, "transactions._id": transId}, 
+                {$inc: {balance: order.items.id(orderItemId).priceAfterCouponDiscount}, $set: {"transactions.$.status": "Completed"}},
+                { new: true }
+            )
+
+            console.log("this is wallet after update of returned", wallet)
+        }
+
         await order.save()
+        
+        logger.info("successfully edited the status")
+        // console.log("this is the order item", order.items.id(orderItemId))
 
         res.status(200).json({success: true, message: "successfully changed the product status"})
     }
@@ -177,6 +228,42 @@ const pagination = async (req, res) => {
     }
 }
 
+const rejectRequest = async (req, res) => {
+    try{
+        const { itemId, userId, rejectReason, custonReturnRejectReason } = req.body
+    
+        const order = await orderSchema.findOne({userId, "items._id":  new Types.ObjectId(itemId)})
+        if(!order){
+            return res.status(404).json({success: false, message: "order not found"})            
+        }
+
+        const item = order.items.id(itemId)
+
+        item.returnReject = {
+            rejected: true,
+            reason: rejectReason,
+            customReason: custonReturnRejectReason,
+            rejectedAt: Date.now()
+        }
+        item.status = "Return rejected"
+
+        await order.save()
+
+        console.log("this is items after successffull request", item)
+        console.log("updated order", order)
+
+        logger.info("successfully rejected")
+        res.status(200).json({success: true, message: "successfully rejected the request"})
+        
+    
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to reject the return request")
+        res.status(500).json({success: false, message: "something went wrong (reject return request)"})
+
+    }
+}
 
 module.exports = {
     orderManagement,
@@ -185,4 +272,5 @@ module.exports = {
     cancelOrder,
     returnOrder,
     pagination,
+    rejectRequest
 }

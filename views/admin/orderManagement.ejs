@@ -234,12 +234,17 @@
 
                                 <div class="col-6 col-md-4 mb-3">
                                     <strong class="text-dark">Total: </strong>
-                                    <span class="fs-5 fw-bold text-success ms-2">&#8377; <%= ele.finalPrice %></span>
+                                    <span class="fs-5 fw-bold text-success ms-2">&#8377; <%= ele.payablePrice %></span>
                                 </div>
+
+                                <%
+                                    let couponCode = 
+                                        (ele?.couponCode) ? ele.couponCode : "Null"
+                                %>
 
                                 <div class="col-6 col-md-4 mb-3 text-md-end text-lg-start">
                                     <strong>Coupon code: </strong>
-                                    <span class="text-primary px-2 py-1 ms-2">Null</span>
+                                    <span class="text-primary px-2 py-1 ms-2"><%= couponCode %></span>
                                 </div>
 
                                 <div class="col-6 col-md-4 mb-3">

@@ -26,6 +26,11 @@ const walletSchema = new mongoose.Schema({
             type: String,
             default: ''
         },
+        status: {
+            type: String,
+            enum: ['Completed', 'Pending'],
+            default: "Pending"
+        },
         createdAt: {
             type: Date,
             default: Date.now

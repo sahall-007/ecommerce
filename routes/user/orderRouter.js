@@ -1,6 +1,7 @@
 const express = require('express')
 const middleware = require('../../middlewares/userAuth.js')
 const orderController = require('../../controller/user/orderController.js')
+const uploads = require('../../middlewares/multer.js')
 
 
 const router = express.Router()
@@ -21,6 +22,6 @@ router.route('/cancel')
     .post(orderController.cancelOrder)
 
 router.route('/return')
-    .post(orderController.returnOrder)
+    .post(uploads.upload.single('returnImage'), orderController.returnOrder)      
 
 module.exports = router

@@ -174,6 +174,7 @@
      <% let addressSelected = false %>
      <% let totalQuantity = 0 %>
      <% let subTotal = 0 %>
+     <% let payablePrice %>
 
     <% if(cart?.length > 0){ %>
         
@@ -356,36 +357,40 @@
 
                             <h5 class="mb-3" id="itemCount">Coupon code</h5>
                             <select class="form-select mb-4" id="coupon" name="coupon" onchange="couponSelect(this)">
-                                <option value="0">Select coupon</option>
+                                <option value="0,0,0">Select coupon</option>
                                 <% if(coupons?.length > 0){ %>
                                     <% coupons?.forEach(ele => {  %>
-                                        <option value="<%= ele?.coupon?.discount || ele?.discount %>,<%= ele?.coupon?.maximumDiscount || ele?.maximumDiscount %>"><%= ele?.coupon?.code || ele?.code %></option>
+                                        <% if(!ele?.used){ %>
+                                            <option value="<%= ele?.coupon?.discount || ele?.discount %>,<%= ele?.coupon?.maximumDiscount || ele?.maximumDiscount %>,<%= ele?.coupon?._id || ele?._id %>,<%= ele?.coupon?.minimumPurchase || ele?.minimumPurchase %>"><%= ele?.coupon?.code || ele?.code %></option>
+                                        <% } %>
                                     <% }) %>
                                 <% } %>
                             </select>
                         
                             <hr>
 
+                            <% payablePrice =  totalPrice + 50 %>
+
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked> 
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
                                     <label for="cod" class="fs-6">Cash on delivery</label>
                                 </li>
-                                <% if(wallet?.balance >= totalPrice){ %>
+                                <% if(wallet?.balance >= payablePrice){ %>
                                     <li>
-                                        <input type="radio" class="paymentMethod" name="paymentMethod" id="wallet" >
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="Wallet" id="wallet" >
                                         <label for="wallet" class="fs-6">Wallet</label>
                                     </li>
                                 <% }else{ %>
                                     <li>
-                                        <input type="radio" class="paymentMethod" name="paymentMethod" id="wallet" disabled>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="Wallet" id="wallet" disabled>
                                         <label for="wallet" class="fs-6">Wallet</label>
                                     </li>
                                 <% } %>
                                 
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="upi" disabled>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="Razor pay" id="upi" disabled>
                                     <label for="upi" class="fs-6">UPI</label>
                                 </li>
                             </ul>
@@ -412,6 +417,7 @@
                             </div>
                             <hr>
                             <div class="d-flex justify-content-between mt-3">
+                                
                                 <span class="fw-bold">Payable Amount:</span>
                                 <span class="total-price text-success fw-bold">&#8377; <span id="payablePrice"><%= totalPrice + 50 %></span>.00</span>
                             </div>
@@ -457,7 +463,11 @@
 
         const addressId = "<%= address?._id%>"
         const cartId = "<%= cart[0]?._id %>"
-        let discountAmount
+        const walletBalance = "<%= wallet?.balance %>"
+
+        
+        let discountAmount = 0
+        let couponId
         
 
         async function updateQuantity(btn, change, index, cartId, price, quantity) {
@@ -514,7 +524,9 @@
                     
                     const couponvalue = document.getElementById("couponDiscount")
                     const coupon = document.getElementById("coupon")
-                    const [discountPercentage, maxDiscountPrice] = coupon.value.split(",")
+                    const [discountPercentage, maxDiscountPrice, selectedCouponId] = coupon.value.split(",")
+
+                    couponId = selectedCouponId
 
                     const couponDiscount = Number(discountPercentage)
                     const discountableAmount = totalPrice * (couponDiscount / 100)
@@ -529,17 +541,29 @@
                     }
                     else{ 
                         // asigning the discount amount to as global so that other functions can access it
-                        discountAmount = discountableAmount
+                        discountAmount = Math.round(discountableAmount)
 
                         payableAmount = Math.floor(totalPrice - discountableAmount)
-                        couponvalue.textContent = `${discountPercentage}%`  
+                        couponvalue.innerHTML = `&#8377; ${discountAmount}`  
                     }
 
                     console.log("couponDiscount", couponDiscount)
                     console.log("totalPrice", totalPrice)
                     console.log("discountableAmount", discountableAmount)
                     console.log("payableAmount", payableAmount)
-                    
+
+                    if(payableAmount > walletBalance){
+                        const wallet = document.getElementById("wallet")
+                        const cod = document.getElementById("cod")
+
+                        wallet.checked = false;    
+                        cod.checked = true;      
+                        wallet.disabled = true; 
+                    }
+                    else{ 
+                        document.getElementById("wallet").removeAttribute("disabled")                
+                    }
+
                     
                     document.getElementById("totalPrice").innerHTML = `${totalPrice}`
                     document.getElementById("finalPrice").textContent = payableAmount
@@ -731,18 +755,25 @@
         }
         
         async function placeOrder(){
-            const totalPrice = Number(document.getElementById("totalPrice").textContent)
+            const totalPriceBeforeDiscount = Number(document.getElementById("totalPrice").textContent)
             const payablePrice = Number(document.getElementById("payablePrice").textContent)
-            const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')
+            // const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
 
-            const quantityInput = document.querySelectorAll('.quantity-input')
-            
-            let totalQuantity=0
-            quantityInput.forEach(ele => {
-                totalQuantity+=Number(ele.value)
-            })
+            const coupon = document.getElementById("coupon")
+            const [discountPercentage, maxDiscountPrice, selectedCouponId, minPurchasePrice] = coupon.value.split(",")
+
+            if(totalPriceBeforeDiscount < minPurchasePrice){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: `You need to purchase for atleast ${minPurchasePrice} Rs to apply this coupon`
                     
+                })
+                return
+            }
+            
+            
 
             let isSelected = <%= addressSelected %>;
 
@@ -766,26 +797,35 @@
                 return
             }
 
-            try{
-                const request = await fetch('/placeOrder', {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ addressId, cartId, totalPrice, payablePrice, couponDiscount, paymentMethod })
-                })
-                if(request.status==200){
-                    window.location.href = "/orderSuccess"
+            console.log("this is payment mehtod", paymentMethod)
+            console.log("this is disoucnt amount",  discountAmount)
+            console.log("thsi is coupon id", couponId)
+
+            // setTimeout( async () => {
+                try{
+                    const request = await fetch('/placeOrder', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                    })
+                    if(request.status==200){
+                        window.location.href = "/orderSuccess"
+                    }
                 }
-            }
-            catch(err){
-                alert('place order error')
-                console.log(err)
-            }
+                catch(err){
+                    alert('place order error')
+                    console.log(err)
+                }
+
+            // }, 20000)
         }
     
         function couponSelect(element){
             const couponvalue = document.getElementById("couponDiscount")
-            const [discountPercentage, maxDiscountPrice] = element.value.split(",")
+            const [discountPercentage, maxDiscountPrice, selectedCouponId] = element.value.split(",")
                        
+            couponId = selectedCouponId
+
             const total = document.querySelectorAll('.subtotal-price')
             let totalPrice=0
             total.forEach(ele => {
@@ -805,10 +845,10 @@
             }
             else{ 
                 // asigning the discount amount to as global so that other functions can access it
-                discountAmount = discountableAmount
+                discountAmount = Math.round(discountableAmount)
                 
                 payableAmount = Math.floor(totalPrice - discountableAmount)
-                couponvalue.textContent = `${discountPercentage}%`  
+                couponvalue.innerHTML = `&#8377; ${discountAmount}`  
             }
 
 
@@ -816,6 +856,14 @@
             console.log("totalPrice", totalPrice)
             console.log("discountableAmount", discountableAmount)
             console.log("payableAmount", payableAmount)           
+
+            if(payableAmount > walletBalance){
+                document.getElementById("wallet").setAttribute("disabled", true)
+            }
+            else{ 
+                document.getElementById("wallet").removeAttribute("disabled")                
+            }
+
             
             document.getElementById("finalPrice").textContent = payableAmount
             document.getElementById("payablePrice").textContent = payableAmount + 50

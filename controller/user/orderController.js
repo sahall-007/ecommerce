@@ -4,6 +4,7 @@ const cartSchema = require('../../model/cartSchema.js')
 const addressSchema = require('../../model/addressSchema.js')
 const orderSchema = require('../../model/orderSchema.js')
 const couponSchema = require('../../model/couponSchema.js')
+const walletSchema = require('../../model/walletSchema.js')
 const userCouponSchema = require('../../model/userCouponSchema.js')
 const { Types, default: mongoose } = require('mongoose')
 
@@ -25,7 +26,7 @@ async function generateOrderId(){
 
 const orderPost = async (req, res) => {
     try{
-        const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, couponDiscount, paymentMethod } = req.body
+        const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
         const userId = req.session.user || req.session?.passport?.user
 
         const cart = await cartSchema.aggregate([
@@ -39,7 +40,6 @@ const orderPost = async (req, res) => {
             }},
             {$unwind: "$variant"},
             {$match: {"variant.quantity": {$gt: 0}}},
-            {$inc: {"variant.price": -coupondistributerdPrice}},
             {$lookup: {
                 from: "products",
                 localField: "variant.productId",
@@ -74,9 +74,18 @@ const orderPost = async (req, res) => {
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
             
-        ])
+        ])     
 
         const cartItems = cart.map(ele => {
+                
+            let price = Number(ele.variant.price)
+            let discount = Number(ele.discount)
+            let offAmount = price * (discount / 100)
+            let finalPrice = Math.floor(price - offAmount)
+            let subTotal  = finalPrice * ele.items.quantity
+            let discountThisProductGets = (finalPrice / Number(totalPriceBeforeDiscount)) * Number(discountAmount)
+            let priceAfterCouponDiscount = finalPrice - discountThisProductGets
+
             return {
                 name: ele.product.name,
                 price: ele.variant.price,
@@ -85,12 +94,20 @@ const orderPost = async (req, res) => {
                 color: ele.variant.color,
                 quantity: ele.items.quantity,
                 discount: ele.discount,
+                priceAfterDiscount: finalPrice,
+                subTotal,
+                priceAfterCouponDiscount,
                 image: ele.image,
                 status: "Pending",            
                 productId: ele.variant.productId,
                 variantId: ele.variant._id
             }
         })
+
+        // console.log(cartItems)
+        console.log("payment method", paymentMethod)
+        console.log("discount ammount", discountAmount)
+        console.log("this is coupon id", couponId)
 
         // to decrease the quantity of the product after while ordering
        const bulkOp = cart.map(ele => {
@@ -111,18 +128,39 @@ const orderPost = async (req, res) => {
             }
         })
 
-//         console.log("USING ORDER MODEL FROM:", require.resolve("../../model/orderSchema"));
-// console.log("SCHEMA PATHS:", orderSchema.schema.paths);
+            //         console.log("USING ORDER MODEL FROM:", require.resolve("../../model/orderSchema"));
+            // console.log("SCHEMA PATHS:", orderSchema.schema.paths);
 
-//         console.log("USING ORDER MODEL FROM:", orderSchema.modelName);
-// console.log("SCHEMA PATHS:", orderSchema.schema.paths);
+            //         console.log("USING ORDER MODEL FROM:", orderSchema.modelName);
+            // console.log("SCHEMA PATHS:", orderSchema.schema.paths);
 
+            // to reduce the money from the wallet if the payment method is wallet
+            
         const orderId = await generateOrderId()
+        
+        if(paymentMethod=="Wallet"){
+            const newTransactions = {
+                amount: payablePrice,
+                date: Date.now(),
+                transactionType: "debit" ,
+                description: `Order placed #${orderId}`,
+                status: "Completed"
+            }
+
+            const updatedWallet = await walletSchema.findOneAndUpdate({userId}, {$inc: {balance: -payablePrice}, $push: {transactions: newTransactions}})
+            if(!updatedWallet){
+                return res.status(404).json({success: false, message: "cannot find the wallet"})
+            }
+        }
+
+        const coupon = await couponSchema.findOne({_id: couponId})
+            
 
         const newOrder = await orderSchema.create({
             orderId,
             totalPriceBeforeDiscount,
             payablePrice,
+            discountAmount,
             items: cartItems,
             billingAddress: {
                 fullname: userAddress.fullname,
@@ -134,13 +172,37 @@ const orderPost = async (req, res) => {
                 isSelected: userAddress.isSelected,
             } ,
             status: "Pending",
-            paymentMethod: "COD",
+            paymentMethod,
             userId,
+            couponCode: coupon?.code,
             placedAt: Date.now()
         })
 
+        console.log("this is new order", newOrder)
+
         req.session.orderId = newOrder._id
 
+        if(coupon){
+            const userCoupon = await userCouponSchema.findOne({userId, couponId})
+            if(userCoupon){
+                await userCouponSchema.findOneAndUpdate({userId, couponId}, {$set: {used: true}})
+                // console.log("this is updated usercoupon", userCoupon)
+            }
+            else{
+                
+                await userCouponSchema.create({
+                    userId,
+                    couponId,
+                    startDate: coupon.startDate,
+                    endDate: coupon.endDate,
+                    used: true
+                })
+
+                // console.log("this is new user coupon", newUserCoupon)
+            }
+
+        }
+       
         await cartSchema.findOneAndUpdate({_id: cartId}, {$set: {items: []}})
         await variantSchema.bulkWrite(bulkOp)
 
@@ -186,7 +248,7 @@ const orderSuccess = async (req, res) => {
 const orderPage = async (req, res) => {
     try{
         const userId = req.session.user || req.session?.passport?.user
-        const orders = await orderSchema.find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1}).sort({_id: -1})
+        const orders = await orderSchema.find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1, couponCode: 1}).sort({_id: -1})
 
         res.render('user/order', {orders})
     }   
@@ -222,24 +284,43 @@ const cancelOrder = async (req, res) => {
 
         const order = await orderSchema.findOne({userId, "items._id": itemId})
 
+        // if order not found
         if(!order){
             return res.status(404).json({success: false, message: "order not found"})            
         }
         const item = order.items.id(itemId)
 
+        // checking if the current status of the order is cancellable or not
         const nonCancellable = ["Delivered", "Cancelled", "Returned"];
         if(nonCancellable.includes(item.status)){
             return res.status(400).json({success: false, message: `This item is ${item.status.toLowerCase()} and cannot be cancelled.`})
         }
 
+
         const variant = await variantSchema.findOne({_id: item.variantId})
-        if (!variant) {
-            return res.status(500).json({ success: false, message: "Variant not found" });
-        }
+
+        console.log("this is variant", variant)
+        
+        // if (!variant) {
+        //     return res.status(500).json({ success: false, message: "Variant not found" });
+        // }
+
+
         await variantSchema.findByIdAndUpdate(
             item.variantId,
             { $inc: { quantity: item.quantity } }
         );
+
+        const newTransactions = {
+            amount: item.priceAfterCouponDiscount,
+            date: Date.now(),
+            transactionType: "credit" ,
+            description: `Cancellation of order #${order.orderId}`,
+            status: "Completed"
+        }
+
+        const updatedWallet = await walletSchema.findOneAndUpdate({userId}, {$inc: {balance: item.priceAfterCouponDiscount}, $push: {transactions: newTransactions}})
+        console.log("updated wallet", updatedWallet)
 
         item.cancellation = {
             requested: true,
@@ -259,38 +340,61 @@ const cancelOrder = async (req, res) => {
 }
 
 const returnOrder = async (req, res) => {
+    logger.warn("return controller hit")
     try{
-        const { itemId, userId } = req.body
+        const { itemId, userId, returnReason, custonReturnReason } = req.body
 
-        const order = await orderSchema.findOne({userId, "items._id": itemId})
+        logger.info({userId}, "this is user id")
+
+        // console.log("thi sis reqeuest body", req.body)
+        // console.log("this is requsest file", req.file)
+
+        let imagePath = req?.file?.path.replace(/\\/g, '/')
+
+        const order = await orderSchema.findOne({userId, "items._id":  new Types.ObjectId(itemId)})
+
+        logger.info({itemId}, "this is item id")
 
         if(!order){
             return res.status(404).json({success: false, message: "order not found"})            
         }
         const item = order.items.id(itemId)
 
+        // logger.fatal({item})
+
         const nonReturnable = ["Pending", "Cancelled", "Returned", "Shipped", "Out for delivery"];
         if(nonReturnable.includes(item.status)){
-            return res.status(400).json({success: false, message: `This item is ${item.status.toLowerCase()} and cannot be cancelled.`})
+            console.log("inside non returnable", item.status)
+            return res.status(400).json({success: false, message: `This item is ${item.status.toLowerCase()} and cannot be requeset to return.`})
         }
 
         const variant = await variantSchema.findOne({_id: item.variantId})
         if (!variant) {
             return res.status(500).json({ success: false, message: "Variant not found" });
         }
-        await variantSchema.findByIdAndUpdate(
-            item.variantId,
-            { $inc: { quantity: item.quantity } }
-        );
+
+
+
+        // await variantSchema.findByIdAndUpdate(
+        //     item.variantId,
+        //     { $inc: { quantity: item.quantity } }
+        // );
 
         item.return = {
             requested: true,
+            reason: returnReason,
+            customReason: custonReturnReason,
+            image: imagePath,
             requestedAt: Date.now()            
         }
-        item.status = "Returned"
+        item.status = "Return requested"
 
-        
         await order.save()
+
+        console.log("this is items after successffull request", item)
+        console.log("updated order", order)
+
+        logger.info("success fully req")
         res.status(200).json({success: true, message: "successfully Returned the order"})
     }
     catch(err){

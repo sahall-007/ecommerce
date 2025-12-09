@@ -26,7 +26,7 @@ const getCouponPage = async (req, res) => {
         }
 
         const userCoupons = await userCouponSchema.aggregate([
-            {$match: {userId: new Types.ObjectId(userId), used: false}},
+            {$match: {userId: new Types.ObjectId(userId)}},
             {$lookup: {
                 from: "coupons",
                 localField: "couponId",
@@ -34,14 +34,24 @@ const getCouponPage = async (req, res) => {
                 as: "coupon"
             }},
             {$unwind: "$coupon"},
+            {$match: {"coupon.isListed": true}},
             
         ])
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
                 {$and: [{startDate: {$gte: new Date()}}, {endDate: {$gte: new Date()}}]}
-            },
-            {$addFields: {"used": true}}
+            }          
         ])
+
+        for(let ele1 in globalCoupons){
+            for(let ele2 in userCoupons){
+                if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
+                    globalCoupons.splice(ele1, 1)
+                }
+            }
+        }
+
+        
 
         let coupons = userCoupons.concat(globalCoupons)
 

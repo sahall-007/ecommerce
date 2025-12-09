@@ -495,7 +495,7 @@
         newCroppedBlobs = croppedBlob
 
         const formdata = new FormData()
-        formdata.append('profileImage', newCroppedBlobs)
+        formdata.append('profileImage', newCroppedBlobs, '.jpeg')
 
         try{
             const res = await fetch(`/profileImage/${userId}`, {

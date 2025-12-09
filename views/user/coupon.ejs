@@ -204,9 +204,9 @@
                                                 </button> -->
                                                 <%
                                                     let status = 
-                                                        (ele?.coupon?.used == true || ele?.used == true) ? "Used" : 
-                                                        (new Date(1764958634554).getTime() < Date.now()) ? "Expired" :
-                                                        (ele?.coupon?.used == false || ele?.used == false) ? "Active" : "Used"
+                                                        (ele?.used == true) ? "Used" : 
+                                                        (ele?.coupon?.endDate || ele?.endDate < Date.now()) ? "Expired" :
+                                                        (ele?.coupon?.used == false || ele?.used == false) ? "Active" : "Active"
                                                 %>
                                                 <button class="btn btn-outline-primary btn-sm copy-btn" data-code="WELCOME20">
                                                     <%= status %>

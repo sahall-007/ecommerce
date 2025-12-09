@@ -23,4 +23,10 @@ router.route('/cancel')
 router.route('/return')
     .post(middleware.checkSession, orderController.returnOrder)
 
+router.route('/rejectRequest')
+    .post(middleware.checkSession, orderController.rejectRequest)
+// router.route('/returnStatusUpdate')
+//     .post(middleware.checkSession, orderController.editStatus)
+
+
 module.exports = router
