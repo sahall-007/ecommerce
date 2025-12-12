@@ -8,6 +8,9 @@ const router = express.Router()
 router.route('/orders')
     .get(middleware.checkSession, orderController.orderManagement)
 
+router.route('/orders/search')
+    .get(middleware.checkSession, orderController.orderManagement)
+
 router.route('/orders/:page')
     .get(middleware.checkSession, orderController.pagination)
 
@@ -28,5 +31,7 @@ router.route('/rejectRequest')
 // router.route('/returnStatusUpdate')
 //     .post(middleware.checkSession, orderController.editStatus)
 
+router.route('/searchOrder')
+    .post(middleware.checkSession, orderController.searchOrder)
 
 module.exports = router

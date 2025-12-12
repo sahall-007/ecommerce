@@ -100,9 +100,12 @@
                 <div class="offcanvas-body pt-4">
 
                     <!-- Search -->
-                    <div class="mb-4">
-                        <input type="text" class="form-control form-control-lg" placeholder="Search orders...">
-                    </div>
+                     <form action="/admin/searchOrder" method="post">
+                         <div class="input-group mb-4">
+                             <input type="text" class="form-control form-control-lg" name="search" id="searchOrder" placeholder="Search orders...">
+                             <button class="btn btn-outline-secondary" type="submit" id="searchOrderBtn">Button</button>
+                         </div>
+                     </form>
                     <hr class="my-4">
 
                     <!-- Status Filter -->
@@ -426,6 +429,28 @@
         async function productInfo(id){
             window.location.href = `/admin/variant/${id}`
         }
+
+        // document.getElementById("searchOrderBtn").addEventListener('click', async (event) => {
+        //     event.preventDefault()
+
+        //     const search = document.getElementById("searchOrder").value
+
+        //     try{
+        //         const request = await fetch('/admin/searchOrder', {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify({ search })
+        //         })
+        //         if(request.status == 200){
+        //             window.location.reload()
+        //         }
+        //     }
+        //     catch(err){
+        //         alert("search product err")
+        //         console.log(err)
+        //     }
+
+        // })
 
 
     </script>

@@ -210,14 +210,17 @@
 
                           <% 
                             let price1 = Number(ele.price); 
-                            let discount1 = Number(ele.product.discount); 
+                            let discount1 = Number(ele.discount); 
                             let offAmount1 = price1 * (discount1 / 100); 
                             let finalPrice1 = Math.floor(price1 - offAmount1);
                           %>
 
                           <div class="d-flex gap-3 justify-content-center">
                             <p class="text-success" style="font-size: small;">&#8377; <%= finalPrice1 %></p>
-                            <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %></p>
+                            <div class="d-flex gap-1">
+                              <p class="text-decoration-line-through text-danger" style="font-size: small;">&#8377; <%= ele.price %> </p>
+                              <p class="text-dark" style="font-size: small;"> <%= ele.discount %>% off</p>
+                            </div>
                           </div>
 
                           <button class="btn btn-outline-primary btn-sm" onclick='addToCart("<%= ele._id %>")'>Add to Cart</button>

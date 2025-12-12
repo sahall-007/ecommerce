@@ -93,9 +93,12 @@ const allProducts = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
-            {$match: filter},
+            {$match: filter},            
             {$sample: {size: limit}},
             toSort,
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$limit: limit},
         ])
 
@@ -255,6 +258,9 @@ const filterPage = async (req, res) => {
             {$unwind: "$brand"},
             {$match: filter},
             toSort,
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$limit: limit}
         ])
 
@@ -341,7 +347,10 @@ const pagination = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
-            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},,
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$sample: {size: limit}}
         ])
 

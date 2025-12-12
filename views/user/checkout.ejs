@@ -12,6 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
         rel="stylesheet">
+    <script src="https://js.stripe.com/clover/stripe.js" defer></script>
     <style>
         html,
         body {
@@ -390,8 +391,8 @@
                                 <% } %>
                                 
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="Razor pay" id="upi" disabled>
-                                    <label for="upi" class="fs-6">UPI</label>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="Stripe" id="upi">
+                                    <label for="upi" class="fs-6">Stripe</label>
                                 </li>
                             </ul>
 
@@ -449,6 +450,10 @@
             </div>
         </div>
     <% } %>
+
+    <div class="position-relative start-50 top-50 translate-middle" id="checkout" >
+        <!-- Checkout will insert the payment form here -->
+    </div>
 
     <!-- ==================== FOOTER (always at the bottom) ==================== -->
     <footer class="bg-dark text-white text-center py-3 mt-auto">
@@ -755,6 +760,10 @@
         }
         
         async function placeOrder(){
+
+
+            const stripe = Stripe("pk_test_51ScQjnK3GRmT480dys7krr31ysDBzhxyFzV5hcr03hcG0xrfA0xiDBjUfh0OIS4dZf8tuN1YxEJ1Q6Wfdd2lDXci00Txh6IaxE");
+
             const totalPriceBeforeDiscount = Number(document.getElementById("totalPrice").textContent)
             const payablePrice = Number(document.getElementById("payablePrice").textContent)
             // const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
@@ -801,17 +810,47 @@
             console.log("this is disoucnt amount",  discountAmount)
             console.log("thsi is coupon id", couponId)
 
-            // setTimeout( async () => {
+           
                 try{
-                    const request = await fetch('/placeOrder', {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
-                    })
-                    if(request.status==200){
-                        window.location.href = "/orderSuccess"
+                    if(paymentMethod=="Stripe"){
+                        // return initialize();
+    
+                        // Create a Checkout Session
+                        // async function initialize() {
+                            // const fetchClientSecret = async () => {
+                                const response = await fetch("/create-checkout-session", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                                });
+                                const res = await response.json()
+
+                                if(res.success){
+                                    window.location.href = res.redirect
+                                }
+                                // const { clientSecret } = await response.json();
+                                // return clientSecret;
+                            // };
+    
+                            // const checkout = await stripe.initEmbeddedCheckout({
+                            //     fetchClientSecret,
+                            // });
+    
+                            // Mount Checkout
+                            // checkout.mount('#checkout');
+                            // window.location.href = "#checkout"
+                        }
                     }
-                }
+
+                    // const request = await fetch('/placeOrder', {
+                    //     method: "POST",
+                    //     headers: { "Content-Type": "application/json" },
+                    //     body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                    // })
+                    // if(request.status==200){
+                    //     window.location.href = "/orderSuccess"
+                    // }
+                // }
                 catch(err){
                     alert('place order error')
                     console.log(err)

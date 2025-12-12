@@ -385,6 +385,9 @@ const getHomePage = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             { $sample: { size: 5 }}
         ])
         
@@ -412,6 +415,9 @@ const getHomePage = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
             {$sample: {size: 10}}
         ])
 
@@ -469,7 +475,10 @@ const productDetail = async (req, res) => {
                 foreignField: "_id",
                 as: "brand"
             }},
-            {$unwind: "$brand"}
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
         ])
 
         if(variant.length<=0){
@@ -492,6 +501,16 @@ const productDetail = async (req, res) => {
                 as: "categoryDoc"
             }},
             {$unwind: "$categoryDoc"},
+            {$lookup: {
+                from: "brands",
+                localField: "productDoc.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
             {$sample: {size: 10}}
         ])
@@ -574,6 +593,9 @@ const newArrivals = async (req, res) => {
             {$match: filter},
             {$sample: {size: limit}},
             toSort,
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$limit: limit},
         ])
 

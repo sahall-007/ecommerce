@@ -6,9 +6,15 @@ const { Types, default: mongoose } = require('mongoose')
 
 const logger = require('../../config/pinoLogger.js')
 const { on } = require('nodemailer/lib/ses-transport/index.js')
+const { search } = require('../../routes/admin/orderRoute.js')
 
 const orderManagement = async (req, res) => {
     try{
+        if(req.query.search){
+            const orderSearch = await orderSchema.find({orderId: req.query.search}).populate("userId")
+            return res.status(200).render('admin/orderManagement', {orders: orderSearch, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+
         const limit = 5
         const orderCount = await orderSchema.countDocuments()
         const orders = await orderSchema.find().sort({_id: -1}).limit(limit).populate("userId")
@@ -265,6 +271,30 @@ const rejectRequest = async (req, res) => {
     }
 }
 
+const searchOrder = async (req, res) => {
+    try{
+        const { search } = req.body
+        // console.log(search)
+        // const orders = await orderSchema.find({orderId: search})
+
+        // if(orders.length > 0){
+        //     return res.status(200).render('admin/orderManagement', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        // }
+        // else{
+        //     res.status(404).json({success: false, message: "cannot find the order in the database"})
+        // }
+
+        return res.redirect(`/admin/orders?search=${search}`)
+
+
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get order management page")
+        res.status(500).json({success: false, message: "something went wrong (order management page)"})
+    }
+}
+
 module.exports = {
     orderManagement,
     adminOrderDetailPage,
@@ -272,5 +302,6 @@ module.exports = {
     cancelOrder,
     returnOrder,
     pagination,
-    rejectRequest
+    rejectRequest,
+    searchOrder
 }
