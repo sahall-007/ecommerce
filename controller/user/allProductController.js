@@ -347,7 +347,7 @@ const pagination = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
-            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},,
+            {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
             {$addFields: {
                 discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
             }},

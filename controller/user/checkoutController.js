@@ -85,7 +85,7 @@ const checkoutPage = async (req, res) => {
         ])
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
-                {$and: [{startDate: {$gte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
+                {$and: [{startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
             },            
             // {$project: {_id: 1, code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
         ])

@@ -839,18 +839,18 @@
                             // Mount Checkout
                             // checkout.mount('#checkout');
                             // window.location.href = "#checkout"
+                    }
+                    else{
+                        const request = await fetch('/placeOrder', {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                        })
+                        if(request.status==200){
+                            window.location.href = "/orderSuccess"
                         }
                     }
-
-                    // const request = await fetch('/placeOrder', {
-                    //     method: "POST",
-                    //     headers: { "Content-Type": "application/json" },
-                    //     body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
-                    // })
-                    // if(request.status==200){
-                    //     window.location.href = "/orderSuccess"
-                    // }
-                // }
+                }
                 catch(err){
                     alert('place order error')
                     console.log(err)

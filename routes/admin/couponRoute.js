@@ -15,4 +15,10 @@ router.route('/addCoupon')
 router.route('/coupon')
     .get(couponController.couponManagement)
 
+router.route('/blockCoupon')
+    .patch(couponController.blockCoupon)
+
+router.route('/unBlockCoupon')
+    .patch(couponController.unBlockCoupon)
+
 module.exports = router

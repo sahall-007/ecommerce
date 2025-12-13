@@ -19,7 +19,7 @@ const orderSchema = new mongoose.Schema({
     discountAmount: Number,
     items: [{
         name: String,
-        price: String,
+        price: Number,
         quantity: Number,
         ram: String,
         storage: String,

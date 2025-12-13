@@ -39,8 +39,8 @@ const getCouponPage = async (req, res) => {
         ])
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
-                {$and: [{startDate: {$gte: new Date()}}, {endDate: {$gte: new Date()}}]}
-            }          
+                {$and: [{startDate: {$gte: new Date()}}, {endDate: {$lte: "endDate"}}, {"coupon.isListed": true}]}
+            },
         ])
 
         for(let ele1 in globalCoupons){

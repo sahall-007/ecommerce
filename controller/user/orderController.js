@@ -242,6 +242,17 @@ const orderSuccess = async (req, res) => {
     }
 }
 
+const orderFail = async (req, res) => {
+    try{
+        res.render('user/orderFailed')
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to order failed page")
+        res.status(500).json({success: false, message: "something went wrong (order failed page)"})
+    }
+}
+
 const orderPage = async (req, res) => {
     try{
         const userId = req.session.user || req.session?.passport?.user
@@ -256,7 +267,9 @@ const orderPage = async (req, res) => {
             return res.status(200).render('user/order', {orders: orderSearch, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         const limit = 5
-        const orderCount = await orderSchema.countDocuments()
+        const orderCount = await orderSchema.find({userId}).countDocuments()
+        console.log(orderCount)
+        
         const orders = await orderSchema
             .find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1, couponCode: 1})
             .sort({_id: -1})
@@ -264,6 +277,8 @@ const orderPage = async (req, res) => {
 
         if (limit >= orderCount) {
             // return res.status(200).render('user/order', {orders})
+            console.log("condition true")
+
             return res.status(200).render('user/order', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
@@ -495,6 +510,16 @@ const checkSession = async (req, res) => {
                 quantity: ele.items.quantity
             }
         })
+        lineItems.push({
+            price_data: {
+                currency: "inr",
+                unit_amount: 50 * 100,   // e.g. 5000 for ₹50
+                product_data: {
+                    name: "Delivery Charge",
+                }
+            },
+            quantity: 1
+        });
 
         const session = await stripe.checkout.sessions.create({
             // ui_mode: 'embedded',
@@ -509,7 +534,8 @@ const checkSession = async (req, res) => {
                 paymentMethod, 
                 couponId
             },
-            success_url: `http://localhost:3000/orderSuccess`
+            success_url: `http://localhost:3000/orderSuccess`,
+            cancel_url: "http://localhost:3000/orderFail",
             // return_url: `http://localhost:4242/orderSuccess?session_id={CHECKOUT_SESSION_ID}`,
             // payment_method_types: ['bancontact', 'card', 'eps', 'ideal', 'p24', 'sepa_debit'],
         });
@@ -794,9 +820,12 @@ const searchOrder = async (req, res) => {
         res.status(500).json({success: false, message: "something went wrong (order  page)"})
     }
 }
+
+
 module.exports = {
     orderPost,
     orderSuccess,
+    orderFail,
     orderPage,
     orderDetailPage,
     cancelOrder,

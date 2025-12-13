@@ -14,6 +14,9 @@ router.route('/placeOrder')
 router.route('/orderSuccess')
     .get(middleware.checkSession, orderController.orderSuccess)
 
+router.route('/orderFail')
+    .get(middleware.checkSession, orderController.orderFail)
+
 router.route('/orders')
     .get(middleware.checkSession, orderController.orderPage)
 
