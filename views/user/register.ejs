@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register page</title>
+    <link rel="stylesheet" href="/register.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <div class="container-lg ">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-7 d-none d-sm-block">
+                <img src="/images/login1.jpg" alt="login image" style="width: 90%;">
+            </div>
+            <div class="col-10 col-sm-5 d-flex justify-content-center">
+                <div class="register-form">
+                    
+                    <h1 class="fs-1">Create an account</h1>
+                    <p class="fs-6">Enter your details below</p>
+
+                    <form action="/register" method="post" class="">
+
+                        <div class="form-field mt-5 mb-4 position-relative">
+                            <i class="bi bi-person-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" id="name" type="text" placeholder="Username" name="username">
+                            <p class="text-danger" id="usernameMsg" style="font-size: small;  max-width: 320px;"><%= username %></p>
+                        </div>
+
+                        <div class="form-field mb-4 position-relative">
+                            <i class="bi bi-envelope-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" id="email" type="text" placeholder="Email" name="email">
+                            <p class="text-danger" id="emailMsg" style="font-size: small;  max-width: 320px;"><%= email %></p>
+                        </div>
+
+                        <div class="form-field mb-4 position-relative">
+                            <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" id="password" type="password" placeholder="Password" name="password">
+                            <p class="text-danger" id="passMsg" style="font-size: small;  max-width: 320px;"><%= password %></p>
+                        </div>
+
+                        <div class="form-field mb-5 position-relative">
+                            <i class="bi bi-lock-fill position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" id="confirmPassword" type="password" placeholder="confirm" name="confirm">
+                            <p class="text-danger" id="confirmPassMsg" style="font-size: small;  max-width: 320px;"><%= confirm %></p>
+                        </div>
+
+                        <div class="form-field mb-5 position-relative">
+                            <i class="bi bi-ticket-perforated position-absolute pe-3 end-0"></i>
+                            <input class="w-100 pe-5" id="referral" type="text" placeholder="Referral code" name="referral">
+                            <p class="text-danger" id="referralMsg" style="font-size: small;  max-width: 320px;"></p>
+                        </div>
+
+                        <div>
+                            <button class="submit-btn w-100 rounded" id="submitBtn" type="submit">Generate OTP</button>
+                        </div>
+
+                        <!-- <div class="g-signin2" data-onsuccess="onSignIn"></div> -->
+
+                    </form>
+
+                    <a href="/auth/google" class="btn border border-dark bg-transparent mt-4 w-100 py-1 rounded"><img class="pe-4" src="images/google-logo.png" alt="google logo" style="width: 15%;"> Sign up with google</a>
+
+                    <p class="have-account my-3">Already have an account? <a href="/login">Login</a></p>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const submitBtn = document.getElementById("submitBtn")
+
+        const usernameRegex = /^[A-Za-z][A-Za-z]{3,15}$/
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Za-z])[A-za-z0-9!@#$%^&*]{8,15}$/
+        const confirmPasswordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Za-z])[A-za-z0-9!@#$%^&*]{8,15}$/
+
+        const usernameMsg = document.getElementById("usernameMsg")
+        const emailMsg = document.getElementById("emailMsg")
+        const passMsg = document.getElementById("passMsg")
+        const confirmPassMsg = document.getElementById("confirmPassMsg")
+
+        submitBtn.addEventListener('click', (event) => {
+
+            const username = document.getElementById("name")
+            const email = document.getElementById("email")
+            const password = document.getElementById("password")
+            const confirmPassword = document.getElementById("confirmPassword")
+
+            if(!usernameRegex.test(username.value) && !emailRegex.test(email.value) && !passwordRegex.test(password.value) && !confirmPasswordRegex.test(confirmPassword.value)){
+                event.preventDefault()
+
+                usernameMsg.textContent = "Must be 3 to 15 chars long. should only contain letters"
+                emailMsg.textContent = "Use a email address like john.doe@example.com characters like these are allowed: . _ % + -"
+                passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            }
+            else if(!usernameRegex.test(username.value)){
+                event.preventDefault()
+
+                usernameMsg.textContent = "Must be 3 to 15 chars long. should only contain letters"
+                emailMsg.textContent = ""
+                passMsg.textContent = ""
+                confirmPassMsg.textContent = ""
+            }
+            else if(!emailRegex.test(email.value)){
+                event.preventDefault()
+
+                usernameMsg.textContent = ""
+                emailMsg.textContent = "Use a email address like john.doe@example.com characters like these are allowed: . _ % + -"
+                passMsg.textContent = ""      
+                confirmPassMsg.textContent = ""          
+            }
+            else if(!passwordRegex.test(password.value)){
+                event.preventDefault()
+
+                usernameMsg.textContent = ""
+                emailMsg.textContent = ""
+                passMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"                  
+                confirmPassMsg.textContent = ""
+            }
+            else if(!confirmPasswordRegex.test(confirmPassword.value)){
+                event.preventDefault()
+
+                usernameMsg.textContent = ""
+                emailMsg.textContent = ""
+                passMsg.textContent = ""                  
+                confirmPassMsg.textContent = "Must be 8–15 chars long containing atleast 1 letter, 1 number and 1 symbol: !@#$%^&*"
+            }
+            else{
+                usernameMsg.textContent = ""
+                emailMsg.textContent = ""
+                passMsg.textContent = ""       
+                confirmPassMsg.textContent = ""
+                
+                if(password.value != confirmPassword.value){
+                    event.preventDefault()
+                    passMsg.textContent = "password and confirm password does not match"       
+                    confirmPassMsg.textContent = "password and confirm password does not match"
+                }
+                
+            }
+
+        })
+    
+
+
+    </script>
+
+</body>
+
+</html>

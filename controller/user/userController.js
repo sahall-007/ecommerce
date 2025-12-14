@@ -4,67 +4,26 @@ const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
+const wishlistSchema = require('../../model/wishlistSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const rndm = require('rndm')
 const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
+const walletSchema = require('../../model/walletSchema.js')
+const couponSchema = require('../../model/couponSchema.js')
+const userCouponSchema = require('../../model/userCouponSchema.js')
 
 // logger.info("server has started")
 
 const salt = 10
 
-// to load the register page
-const loadRegister = async (req, res) => {
-    try {
-
-        if(req.session.matchPass==false){
-            req.session.matchPass = true
-            return res.status(409).render('register', {confirm: "Password doesn't match, Try again", 
-                                                       username: null,
-                                                       email: null,
-                                                       password: null
-            })
-        }
-
-        if(req.session.userExist==true){
-            req.session.userExist = false
-            return res.status(409).render('register', {email: "Email already in use, Try again",
-                                                       username: null,                                                
-                                                       password: null,
-                                                       confirm: null
-            })
-        }
-
-        res.render('register', {confirm: null,
-                                username: null,
-                                email: null,
-                                password: null
-        })
-    }
-    catch (err) {
-        logger.info(err)
-        logger.info("failed to load the register page!")
-        res.status(500).json({success: false, message: "something went wrong (register page)"})
-    }
-}
-
 // to generate OTP
 function generateOtp(){
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-
-// const pageNotFound = async (req, res) => {
-//     try{
-//         res.render('pageNotFound')
-//     }
-//     catch(err){
-//         logger.fatal(err)
-//         logger.fatal("failed to 404 page")
-//         res.status(500).json({success: false, message: "something went wrong (404 page not found)"})
-//     }
-// }
 
 // to send the OTP to the provided email by the user during sign up
 async function sendVerificationEmail(email, otp){
@@ -97,11 +56,48 @@ async function sendVerificationEmail(email, otp){
     }
 }
 
+// to load the register page
+const loadRegister = async (req, res) => {
+    try {
+
+        if(req.session.matchPass==false){
+            req.session.matchPass = true
+            return res.status(409).render('user/register', {confirm: "Password doesn't match, Try again", 
+                                                       username: null,
+                                                       email: null,
+                                                       password: null
+            })
+        }
+
+        if(req.session.userExist==true){
+            req.session.userExist = false
+            return res.status(409).render('user/register', {email: "Email already in use, Try again",
+                                                       username: null,                                                
+                                                       password: null,
+                                                       confirm: null
+            })
+        }
+
+        res.render('user/register', {confirm: null,
+                                username: null,
+                                email: null,
+                                password: null
+        })
+    }
+    catch (err) {
+        logger.info(err)
+        logger.info("failed to load the register page!")
+        res.status(500).json({success: false, message: "something went wrong (register page)"})
+    }
+}
+
 // to validate the register details from the user
 const registerUser = async (req, res) => {
     try {
 
-        const { username, email, password, confirm } = req.body
+        const { username, email, password, confirm, referral } = req.body
+
+        // console.log(req.body)
 
         if(password!=confirm){
             req.session.matchPass = false
@@ -127,7 +123,9 @@ const registerUser = async (req, res) => {
             expiryAt: Date.now() + 60*1000
         }
     
-        req.session.userData = { username, email, password }
+        req.session.userData = { username, email, password, referral }
+
+        console.log("this is userdata", req.session.userData)
 
         res.redirect('/otp')
 
@@ -142,7 +140,7 @@ const registerUser = async (req, res) => {
 // to load the login pages
 const loadLogin = async (req, res) => {
     try {
-        res.render('userLogin')
+        res.render('user/userLogin')
     }
     catch (err) {
         logger.error(err)
@@ -156,7 +154,6 @@ const loginPost = async (req, res) => {
         const { username, email, password } = req.body
 
         const userExist = await userSchema.findOne({email})
-
         if(!userExist){
             return res.status(404).json({success: false, message: "create an account first"})
         }
@@ -169,6 +166,45 @@ const loginPost = async (req, res) => {
         if(userExist.isListed==false){
             return res.status(403).json({success: false, message: "You are blocked by the Admin"})
         }
+
+        var referral = rndm.base62(10)
+        if(!userExist?.referral){
+            userExist.referral = referral
+            await userExist.save()
+        }
+
+        const wishlist = await wishlistSchema.findOne({userId: userExist._id})
+        if(!wishlist){
+            await wishlistSchema.create({
+                userId: userExist._id,
+                items: []
+            })
+        }
+
+        const wallet = await walletSchema.findOne({userId: userExist._id})
+        if(!wallet){
+            await walletSchema.create({
+                userId: userExist._id,
+            })
+        }
+
+        // giving the welcome coupon if the user did not got it while registring
+        const coupon = await couponSchema.findOne({code: "WELCOME10"})
+        if(coupon){
+            const userCoupon = await userCouponSchema.findOne({userId: userExist._id, couponId: coupon._id})
+            if(!userCoupon){
+                await userCouponSchema.create({
+                    userId: userExist._id,
+                    couponId: coupon._id,
+                    startDate: Date.now(),
+                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 10) 
+                })
+                logger.info("successfully created welcome coupon")
+            }
+        }
+        
+        
+
         req.session.user = userExist._id
         
         logger.info( {userId: req.session.user}, "login post")
@@ -198,14 +234,8 @@ const guestLogin = async (req, res) => {
 // to load the otp page
 const loadOtpPage = async (req, res) =>{
     try{
-        // if(req.session.resend==true){
-        //     req.session.userOTP = 654321
-        //     req.session.resend = false
-        //     return res.render('otp', { otp: req.session.userOTP })    
-        // }
-        // req.session.userOTP = 123456
         console.log(req.session.userOTP)
-        res.render('otp', { otp: req.session.userOTP })
+        res.render('user/otp', { otp: req.session.userOTP })
 
         
     }
@@ -221,7 +251,6 @@ const verifyOtp = async (req, res) => {
     try{
         const { otp } = req.body
         
-        
         console.log("this is working - otp: ", otp)
         console.log("this is session: ", req.session.userOTP)
 
@@ -234,16 +263,49 @@ const verifyOtp = async (req, res) => {
             
             const user = req.session.userData
             const hashedPassword = await bcrypt.hash(user.password, salt)
+            var referral = rndm.base62(10)
 
             const saveUser = await new userSchema({
                 username: user.username,
                 email: user.email,
                 password: hashedPassword,
-                isListed: true
+                isListed: true,
+                referral
             })
 
             await saveUser.save()
-            req.session.user = saveUser._id
+            req.session.user = saveUser._id        
+            
+            // creating a wishlist for the user
+            await wishlistSchema.create({
+                userId: saveUser._id,
+                items: []
+            })
+            
+            // creating a wallet for the user based on the referral code the user enter
+            const userWithReferralCode = await userSchema.findOne({referral: user.referral})
+            if(userWithReferralCode){
+                await walletSchema.create({
+                    balance: 10000,
+                    userId: saveUser._id,
+                })
+                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
+            }
+            else{
+                await walletSchema.create({
+                    userId: saveUser._id,
+                })
+            }
+
+            const coupon = await couponSchema.findOne({code: "WELCOME10"})
+            if(coupon){
+                await userCouponSchema.create({
+                    userId: saveUser._id,
+                    couponId: coupon._id,
+                    startDate: Date.now(),
+                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 3) 
+                })
+            }
 
             return res.redirect('/')
         }
@@ -298,6 +360,7 @@ const resendOtp = async (req, res) => {
 // to get the home page
 const getHomePage = async (req, res) => {
     try{
+        const userId = req.session.user || req.session?.passport?.user
         const inOffer = await variantSchema.aggregate([
             {$lookup: {
                 from: "products",
@@ -322,6 +385,9 @@ const getHomePage = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             { $sample: { size: 5 }}
         ])
         
@@ -349,10 +415,15 @@ const getHomePage = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
             {$sample: {size: 10}}
         ])
+
+        const wishlist = await wishlistSchema.findOne({userId})
         
-        res.render('home', { newArrivals, inOffer })
+        res.render('user/home', { newArrivals, inOffer, wishlist })
     }
     catch(err){
         console.log(err)
@@ -379,10 +450,11 @@ const logout = async (req, res) => {
 // to get the product detail page
 const productDetail = async (req, res) => {
     try{
-        const { id } = req.params
+        const userId = req.session.user || req. session?.passport?.user
+        const { productId } = req.params
 
         const variant = await variantSchema.aggregate([
-            {$match: {_id: new Types.ObjectId(id) }},
+            {$match: {_id: new Types.ObjectId(productId) }},
             {$lookup: {
                 from: "products",
                 localField: "productId",
@@ -403,10 +475,11 @@ const productDetail = async (req, res) => {
                 foreignField: "_id",
                 as: "brand"
             }},
-            {$unwind: "$brand"}
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
         ])
-
-        console.log(variant)
 
         if(variant.length<=0){
             logger.fatal("condition")
@@ -428,13 +501,25 @@ const productDetail = async (req, res) => {
                 as: "categoryDoc"
             }},
             {$unwind: "$categoryDoc"},
+            {$lookup: {
+                from: "brands",
+                localField: "productDoc.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
             {$sample: {size: 10}}
         ])
 
+        const wishlist = await wishlistSchema.findOne({userId})
+
         const variantOptions = await variantSchema.find({productId: variant[0].productDoc._id })
 
-        res.render('productDetail', { variant, exploreMore, variantOptions })
+        res.render('user/productDetail', { variant, exploreMore, variantOptions, wishlist })
 
     }
     catch(err){
@@ -446,6 +531,7 @@ const productDetail = async (req, res) => {
 
 const newArrivals = async (req, res) => {
     try{
+        const userId = req.session.user || req.session?.passport?.user
         const filter = {}
         const toSort = {}
 
@@ -507,26 +593,27 @@ const newArrivals = async (req, res) => {
             {$match: filter},
             {$sample: {size: limit}},
             toSort,
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$limit: limit},
         ])
 
-        // console.log(filter)
-        // console.log(toSort)
-
+        const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})
 
         if(allProducts.length < limit){
             req.session.filter = null
-            return res.status(200).render('newArrivals', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         if(limit>=variantCount){
             req.session.filter = null
             console.log("inside condition")
-            return res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         req.session.filter = null
-        res.status(200).render('newArrivals', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/newArrivals', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     }
     catch(err){

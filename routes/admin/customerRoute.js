@@ -22,11 +22,11 @@ router.route('/unBlockUser')
 router.route('/deleteUser')
     .delete(middleware.checkSession, costumerController.deleteUser)
 
-router.route('/userManagement/next')
-    .get(middleware.checkSession, costumerController.nextPage)
+router.route('/userManagement/:page')
+    .get(middleware.checkSession, costumerController.pagination)
 
-router.route('/userManagement/prev')
-    .get(middleware.checkSession, costumerController.prevPage)
+// router.route('/userManagement/prev')
+//     .get(middleware.checkSession, costumerController.prevPage)
 
 router.route('/searchUser')
     .post(middleware.checkSession, costumerController.searchUser)

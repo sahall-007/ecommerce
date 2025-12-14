@@ -5,6 +5,7 @@ const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
 const cartSchema = require('../../model/cartSchema.js')
+const wishlistSchema = require('../../model/wishlistSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const env = require('dotenv').config()
@@ -34,18 +35,33 @@ const cartPage = async (req, res) => {
                 as: "product"
             }},
             {$unwind: "$product"},
+            {$lookup: {
+                from: "categories",
+                localField: "product.categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "product.brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"},            
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+            }},
             {$project: {
                 image: {$arrayElemAt: ["$variant.image", 0]},
                 items: 1,
                 variant: 1,
                 "product.name": 1 ,
-                "product.discount": 1
+                discount: 1       
             }},
             {$addFields: {"variant.image": "$$REMOVE"}},
             
         ])
-
-        // console.log(cart)
 
         res.status(200).render('user/cart', {cart})
     } 
@@ -61,6 +77,7 @@ const cartPost = async(req, res) => {
         const { variantId } = req.body
         const id = req.session.user || req.session?.passport?.user
 
+        // ObjectId('690a022f476fdb5aa0150823')
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(variantId)}},
             {$lookup: {
@@ -83,7 +100,10 @@ const cartPost = async(req, res) => {
                 foreignField: "_id",
                 as: "brand"
             }},
-            {$unwind: "$brand"}
+            {$unwind: "$brand"},
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+            }}
         ])
 
         if(variant.length<=0){
@@ -106,31 +126,15 @@ const cartPost = async(req, res) => {
                 if(cart.items[i].variantId==variantId ){
                     
                     if(cart.items[i].quantity < 5){
-                        logger.fatal("here is second problem")
                         variantExist = true
                         cart.items[i].quantity += 1             
                     }
                     else{
-                        logger.fatal(cart.items[i].quantity)
                         logger.fatal("here is first problem")
                         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
                     }
                 }
             }
-            // cart.items.forEach(ele => {
-            //     if(ele.variantId==variantId && ele.quantity < 5){
-            //         logger.fatal("here is first problem")
-
-            //         variantExist = true
-            //         ele.quantity += 1                    
-            //     }
-            //     else{
-            //         logger.fatal(ele.quantity)
-            //         logger.fatal("here is second problem")
-            //         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})
-                    
-            //     }
-            // })
             if(!variantExist){
                 cart.items.push({variantId, quantity: 1})
             }
@@ -143,6 +147,13 @@ const cartPost = async(req, res) => {
             })
             await newCart.save()
         }
+
+        const wishlist = await wishlistSchema.findOne({userId: id})
+        wishlist.items = wishlist.items.filter(ele => 
+            !ele.variantId.equals(variantId)
+        )
+
+        await wishlist.save()
 
         
         return res.status(200).json({success: true, message: "successfully added the product to cart"})
@@ -161,8 +172,6 @@ const updateQuantity = async (req, res) => {
         const id = req.session.user || req.session?.passport?.user
     
         const cart = await cartSchema.findOne({_id: cartId})
-
-        // console.log(cart)
 
         cart.items[index].quantity+=Number(change)
     

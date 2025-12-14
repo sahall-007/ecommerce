@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add variant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link href="/cropper/cropper.css" rel="stylesheet">
+    <script src="/cropper/cropper.js"></script>
+    <style>
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+
+        .actions {
+            color: #151414;
+        }
+        .image-label {
+            border: black dashed 2px;
+            border-radius: 5px;
+        }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }
+    </style>
+</head>
+
+<body>
+
+   <!-- //  ========== NAVBAR ========== -->
+
+    <%- include("../partials/admin/navbar.ejs") %>
+
+
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0"
+                style="padding-bottom: -100px;">
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+
+            </div>
+            <div class="card col col-md-9  px-0 mx-3">
+
+                <div class="card-body" style="background-color: #edededb8;">
+                    <div class="">
+                        <h1 class="text-center m-b5">Add variant</h1>
+                    </div>
+                    <form id="productForm" >
+                        <div class="container">
+                            <div class="row justify-content-center my-4" id="variant-session-1">
+
+                            <div class="col col-md-10 col-lg-8 ">
+
+                                <div class="border border-dark rounded-0 pt-2 pb-3">
+                                    <h1 class="fs-6 fw-normal text-secondary  ps-2">Add variant</h1>
+
+                                    <div class="row row-cols-1 row-cols-lg-3 mx-2">
+
+                                        <div class="col col-md-4 mt-3">
+                                            <label class="d-block mb-1 fs-5" for="ram">RAM</label>
+                                            <input class="form-control border-dark rounded-0 p-2" name="ram" type="text"
+                                                id="ram-1" placeholder="Type here">
+                                            <p class="text-danger" id="ramMsg-1" style="font-size: small;"></p>
+                                        </div>
+
+                                        <div class="col col-md-4 mt-3">
+                                            <label class="d-block mb-1 fs-5" for="storage">Storage</label>
+                                            <input class="form-control border-dark rounded-0 p-2" name="storage"
+                                                type="text" id="storage-1" placeholder="Type here">
+                                            <p class="text-danger" id="storageMsg-1" style="font-size: small;"></p>
+                                        </div>
+
+                                        <div class="col col-md-4 mt-3">
+                                            <label class="d-block mb-1 fs-5" for="color">Color</label>
+                                            <input class="form-control border-dark rounded-0 p-2" name="color"
+                                                type="text" id="color-1" placeholder="Type here">
+                                            <p class="text-danger" id="colorMsg-1" style="font-size: small;"></p>
+                                        </div>
+                                        <div class="col col-md-4 mt-3 ">
+                                            <label class="d-block mb-1 fs-5" for="quantity">Quantity</label>
+                                            <input class="form-control border-dark rounded-0 p-2" name="quantity" type="number"
+                                                id="quantity-1" placeholder="Type here">
+                                            <p class="text-danger" id="quantityMsg-1" style="font-size: small;"></p>
+                                        </div>
+
+                                        <div class="col col-md-4 mt-3 ">
+                                            <label class="d-block mb-1 fs-5" for="price">Price</label>
+                                            <input class="form-control border-dark rounded-0 p-2" name="price"
+                                                type="text" id="price-1" placeholder="Type here">
+                                            <p class="text-danger" id="priceMsg-1" style="font-size: small;"></p>
+                                        </div>
+
+                                        <!-- <div class="col col-md-4 mt-3 ">
+                                                <label class="d-block mb-1 fs-5" for="discount">Discount</label>
+                                                <input class="form-control border-dark rounded-0 p-2" name="discount" type="text" id="discount"
+                                                    placeholder="Type here">
+                                            </div> -->
+
+
+                                            <!--------------------- images container----------------- -->
+
+
+
+
+                                    </div>
+
+                                    <div class="container mt-5">
+                                        <div class="row row-cols-1  g-4" id="imageRow-1">
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class=" mt-4 d-flex justify-content-center " id="image-input">
+                                        <label for="image-1" class="image-label rounded border-danger bg-light p-5">Add
+                                            image</label>
+                                        <input id="image-1" type="file" name="image-1" accept="image/*" multiple onchange="newFile(1)"
+                                            class="border border-black d-none">
+                                        
+                                    </div>
+
+                                    <div class="d-flex justify-content-center mt-3" id="image-msg-1">
+                                        <p class="text-danger" id="imageMsg-1" style="font-size: small;"></p>
+                                    </div>
+
+                                    <div class="row justify-content-center">
+                                        <div class="col-2">
+                                            <button id="submit" class="btn btn-primary mt-4" >submit</button>                                        
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+    </div>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+        <script>
+            const editId = "<%= editId %>"
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
+
+            const statuses = document.querySelectorAll('.status');
+
+            statuses.forEach(status => {
+                status.addEventListener('click', () => {
+                    statuses.forEach(s => s.classList.remove('active'));
+                    status.classList.add('active');
+                });
+            });
+
+            let croppers = []
+            let count = 0
+            let cropCount = 0
+            let imageCount = 0
+
+            function newFile(id){
+               const imageInput = document.getElementById("image-" + id)                           
+                const imageRow = document.getElementById("imageRow-" + id)
+
+                const file = imageInput.files
+
+                let length = (file.length > 5) ? 5 : file.length
+
+                if(file){
+                    for(let i=0; i<length; i++){
+
+                        if (!file[i].type.startsWith("image/")) {
+
+                            // Clear wrong file
+                            imageInput.value = "";
+                            
+                            // Show SweetAlert error
+                            Swal.fire({
+                                icon: "error",
+                                title: "Invalid File",
+                                text: `Only image files are accepted`,
+                            });
+
+
+                            return; // Stop further execution
+                        }
+
+                        imageCount++
+
+                        if(imageCount>=5){
+                            document.getElementById(`image-input`).classList.add("d-none")
+                        }
+
+                        count+=1
+
+                        imageRow.insertAdjacentHTML('beforeend', `
+                            <div class="position-relative pb-5" id="imgContainer${count}">
+                                <div class="d-flex gap-3 position-absolute bottom-0 start-50 translate-middle-x">
+                                    <button class="btn btn-dark text-light py-1 px-3  " id="cropperBtn${count}" onclick="cropImg(this, ${count}, ${id})">Crop</button>
+                                    
+                                </div>
+                            </div>
+                        `)
+
+                        // <button class="btn btn-danger text-light py-1 px-3 " id="deleteBtn${count}" onclick="deleteImg(this, ${count})">Delete</button>
+
+                        const imgContainer = document.getElementById(`imgContainer${count}`)
+
+                        const reader = new FileReader()
+
+                        reader.onload = (e) => {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.className = 'w-100 imageContainer';
+
+                            img.onload = function () {
+                                imgContainer.prepend(img);
+                                // btn.classList.remove("d-none")
+
+                                const cropper = new Cropper(img, {
+                                    aspectRatio: 1,
+                                    viewMode: 1,
+                                    preview: '.preview'
+                                })
+                                croppers.push(cropper)
+
+                            };
+                        }
+                        reader.readAsDataURL(file[i])
+                    }         
+                    console.log("cropper array after the loop", croppers)           
+                }
+                event.target.value = ''
+            }
+
+            let deleteCount = 0
+            let croppedBlobs = [];
+
+            // to crop the image
+            async function cropImg(element, id, variantNumber) {
+                event.preventDefault()
+                console.log("cropper array during btn click", croppers)
+                const closeImg = element.parentElement.parentElement.querySelector("img")
+
+                let croppedCanvas;
+
+                if(id<=deleteCount){
+                croppedCanvas = croppers[id-1].getCroppedCanvas()
+                }
+                else{
+                    croppedCanvas = croppers[(id-1)-(deleteCount)].getCroppedCanvas()
+                }
+
+                closeImg.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
+                
+                const siblingElement = closeImg.nextElementSibling
+
+                closeImg.classList.remove("cropper-hidden")
+                siblingElement.classList.add("d-none")
+
+                // blob -------------------------
+
+                const blobPromise = new Promise((resolve) => {
+                    croppedCanvas.toBlob((blob) => {
+                        resolve(blob);
+                    }, "image/jpeg");
+                });
+
+                const croppedBlob = await blobPromise;
+
+                croppedBlob.variant = variantNumber
+                croppedBlobs.push(croppedBlob)
+
+                console.log("this is blob during btn click",  croppedBlob)
+
+                cropCount++
+
+                setTimeout(() => {
+                    croppers.pop()
+                }, 100);
+            }
+
+            // to delete the image
+            function deleteImg(element, id){
+                event.preventDefault()
+
+                console.log("this is delete croppers", croppers)            
+                
+                if(id<=deleteCount){
+                    croppers.splice(id-1, 1)         
+                }
+                else{
+                    croppers.splice((id-1)-(deleteCount), 1)
+                }
+
+                deleteCount+=1
+                imageCount--
+
+                const grandParent = element.parentElement.parentElement
+
+                grandParent.classList.add("d-none")
+            }
+
+            // to submmit the variant form
+            document.getElementById("submit").addEventListener('click', async () => {
+                event.preventDefault()
+
+                const ramRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
+                const storageRegex = /^\s*\d+\s*(GB|gb|MB|mb|TB|tb)$/
+                const colorRegex = /^\s*[A-Za-z]+([ -]?[A-Za-z]+)*\s*$/
+                const quantityRegex = /^\s*\d+\s*$/
+                const priceRegex = /^\s*\d+(\.\d{1,2})?\s*$/;
+
+                const ram = document.getElementById("ram-1")
+                const storage = document.getElementById("storage-1")
+                const color = document.getElementById("color-1")
+                const quantity = document.getElementById("quantity-1")
+                const price = document.getElementById("price-1")
+
+                const ramMsg = document.getElementById("ramMsg-1");
+                const storageMsg = document.getElementById("storageMsg-1");
+                const colorMsg = document.getElementById("colorMsg-1");
+                const quantityMsg = document.getElementById("quantityMsg-1");
+                const priceMsg = document.getElementById("priceMsg-1");
+                const imageMsg = document.getElementById("imageMsg-1")
+
+                if( !ramRegex.test(ram.value) && !storageRegex.test(storage.value) && !colorRegex.test(color.value) && !storageRegex.test(quantity.value) && !priceRegex.test(price.value)){
+                    ramMsg.textContent = "invalid ram format"
+                    storageMsg.textContent = "invalid storage format"
+                    colorMsg.textContent = "invalid color format"
+                    quantityMsg.textContent = "invalid quantity format"
+                    priceMsg.textContent = "invalid price format"
+
+                    return 1
+                }
+                else if(!ramRegex.test(ram.value)){
+                    ramMsg.textContent = "invalid ram format"
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!storageRegex.test(storage.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = "invalid storage format"
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!colorRegex.test(color.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = "invalid color format"
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!quantityRegex.test(quantity.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = "invalid quantity format"
+                    priceMsg.textContent = ""
+
+                    return 1
+                }
+                else if(!priceRegex.test(price.value)){
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = "invalid price format"
+
+                    return 1
+                }
+                else{
+                    ramMsg.textContent = ""
+                    storageMsg.textContent = ""
+                    colorMsg.textContent = ""
+                    quantityMsg.textContent = ""
+                    priceMsg.textContent = ""
+                }
+
+                if(cropCount<3){
+                 imageMsg.textContent = "minimum 3 cropped images required, maaximum 5"   
+
+                 return
+                }
+
+
+
+                const form = document.getElementById("productForm")
+                console.log(form)
+                const formdata = new FormData(form)
+
+                console.log("blob duirng publish", croppedBlobs)
+
+                croppedBlobs.forEach((blob, index) => {
+                    formdata.append(`image-${blob.variant}`, blob, `cropped-${index}.jpeg`);
+                });
+
+                try{
+                    const res = await fetch(`/admin/addVariant/${editId}`, {
+                        method: "POST",
+                        body: formdata
+                    })
+                    .then((res) => {
+                        if(res.ok){
+                            swal.fire({
+                                title: "Success",
+                                text: "Successfully added the product",
+                                icon: "success",
+                                timer: 30000
+                            })
+                            .then(() => window.location.href = `/admin/variant/${editId}` )
+                        }
+                        else{
+                            swal.fire({
+                                title: "Error",
+                                text: "Failed to added the product",
+                                icon: "error",
+                                timer: 30000
+                            })
+                            .then(() => window.location.href = `/admin/variant/${editId}`)
+                        }
+                    })
+                }
+                catch(err){
+                    console.log(err)
+                }
+
+            })
+
+
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+
+</body>
+
+</html>

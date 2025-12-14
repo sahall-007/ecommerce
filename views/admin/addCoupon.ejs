@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offer adding page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        body{
+            overflow-x: hidden;
+        }
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+
+        .actions {
+            color: #151414;
+        }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }        
+    </style>
+</head>
+
+<body onclick="bodyClick()">
+
+    <!-- //  ========== NAVBAR ========== -->
+
+    <%- include("../partials/admin/navbar.ejs") %>
+
+
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 justify-content-between">
+            <div class="col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0"
+                style="padding-bottom: -100px;">
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+
+            </div>
+            <div class="card col-10 col-md-8 col-lg-9  px-0 mx-3 main-content" >
+
+                <div class="card-body" style="background-color: #edededb8;">
+                    <div class="">
+                        <h1 class="text-center m-b5">Add new Offer</h1>
+                    </div>
+                    <form action="/admin/addOffer" method="post" id="form">
+                        <div class="container">
+                            <div class="row justify-content-around ">
+
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="code" class="form-label mb-2 fs-5">Coupon code</label>                                        
+                                        <input autocomplete="off" id="code" class="form-control rounded w-100" name="code" type="text" placeholder="Type here" />
+                                        <p class="text-danger" id="codeMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="discount" class="form-label mb-2 fs-5">Discount</label>                                        
+                                        <input autocomplete="off" id="discount" class="form-control rounded w-100" name="discount" type="number" placeholder="Type here" />
+                                        <p class="text-danger" id="discountMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                                
+
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="start" class="form-label mb-2 fs-5">Start date</label>                                        
+                                        <input autocomplete="off" id="startDate" class="form-control rounded w-100" name="start" type="date" placeholder="Type here" />
+                                        <p class="text-danger" id="startMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="end" class="form-label mb-2 fs-5">End date</label>                                        
+                                        <input autocomplete="off" id="endDate" class="form-control rounded w-100" name="end" type="date" placeholder="Type here" />
+                                        <p class="text-danger" id="endMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+                               
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="minimumPurchase" class="form-label mb-2 fs-5">Minimum purchase</label>                                        
+                                        <input autocomplete="off" id="minimumPurchase" class="form-control rounded w-100" name="minimumPurchase" type="number" placeholder="Type here" />
+                                        <p class="text-danger" id="minimumPurchaseMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                                <div class="col-6 col-lg-5 mt-3">
+                                    <div class="row align-items-center position-relative">
+                                        <label for="maximumDiscount" class="form-label mb-2 fs-5">Maximum discount amount</label>                                        
+                                        <input autocomplete="off" id="maximumDiscount" class="form-control rounded w-100" name="maximumDiscount" type="number" placeholder="Type here" />
+                                        <p class="text-danger" id="maximumDiscountMsg" style="font-size: small;"></p>                                    
+                                    </div>
+                                </div>
+
+                         
+
+                                <div class="col-lg-12 d-flex justify-content-end my-4 gap-3">
+                                    <a href="/admin/coupon"button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
+                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" id="submitBtn" style="background-color: #EF6627;">Add</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+    </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+            const searchResult = document.getElementById("searchResult")
+
+            document.getElementById("submitBtn").addEventListener('click', async (event) => {
+                event.preventDefault()
+
+                const codeRegex = /^(?!\s*$).{3,15}$/
+                const discountRegex = /^(100|[1-9]?[0-9])$/
+                const amountRegex = /^[0-9]\d*$/
+
+                const codeMsg = document.getElementById("codeMsg")
+                const discountMsg = document.getElementById("discountMsg")
+                const startMsg = document.getElementById("startMsg")
+                const endMsg = document.getElementById("endMsg")
+                const minimumPurchaseMsg = document.getElementById("minimumPurchaseMsg")
+                const maximumDiscountMsg = document.getElementById("maximumDiscountMsg")
+                
+                const code = document.getElementById('code').value
+                const discount = document.getElementById("discount").value
+                const startDate = document.getElementById("startDate").value
+                const endDate = document.getElementById("endDate").value
+                const minimumPurchase = document.getElementById("minimumPurchase").value
+                const maximumDiscount = document.getElementById("maximumDiscount").value
+
+                
+                if(!codeRegex.test(code)){
+                    codeMsg.textContent = "Field required. Should not be empty and characters should be between 3 to 15"
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }
+                else if(!discountRegex.test(discount)){
+                    discountMsg.textContent = "Enter a valid number between 1 to 100"
+                    codeMsg.textContent = ""
+                    startMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }                
+                else if(new Date(startDate) <= Date.now()){
+                    startMsg.textContent = "Start date cant be less than currnt date"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }
+                else if(new Date(endDate) <=  Date.now()){
+                    endMsg.textContent = "End date cant be less than current date"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }
+                else if(!amountRegex.test(minimumPurchase)){
+                    minimumPurchaseMsg.textContent = "Field required, Must be a positive integer"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    endMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }
+                else if(!amountRegex.test(maximumDiscount)){
+                    maximumDiscountMsg.textContent = "Field required, Must be a positive integer"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+
+                    return
+                }
+                else{
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+                }
+
+                try{
+                    const result = await fetch('/admin/addCoupon', {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            code, 
+                            discount,
+                            startDate, 
+                            endDate, 
+                            minimumPurchase, 
+                            maximumDiscount
+                        })
+                    })
+                    if(result.status==200){
+                        swal.fire({
+                            icon: "success",
+                            title: "Success",                       
+                            text: "Coupon added successfully",
+                        })
+                        .then(() => window.location.href = "/admin/coupon")
+                    }
+                    else if(result.status==400){
+                        swal.fire({
+                            icon: "error",
+                            title: "Error",                       
+                            text: "Enter a numer between 1 to 100",
+                        })
+                    }
+                    else{
+                        swal.fire({
+                            title: "Failed to add coupon",
+                            // text: "category already exist",
+                            icon: "error"
+                        })
+                    }
+                   
+                }
+                catch(err){
+                    console.log(err)
+                    
+                }
+            })
+
+            toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('show');
+            });
+
+            const statuses = document.querySelectorAll('.status');
+
+            statuses.forEach(status => {
+                status.addEventListener('click', () => {
+                    statuses.forEach(s => s.classList.remove('active'));
+                    status.classList.add('active');
+                });
+            });
+
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+
+</body>
+
+</html>

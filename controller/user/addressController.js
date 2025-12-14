@@ -57,14 +57,18 @@ const addressPost = async (req, res) => {
         }
         const userAddress = await addressSchema.findOne({userId: user._id})
 
-        if(userAddress){
+        if(userAddress?.billingAddress?.length <= 0){
+            userAddress.billingAddress.push({fullname, phone, email, pincode, address, addressType, city, state, isSelected: true})
+            await userAddress.save();
+        }
+        else if(userAddress){
             userAddress.billingAddress.push({fullname, phone, email, pincode, address, addressType, city, state, isSelected: false})
             await userAddress.save();
         }
         else{
             const newAddress = new addressSchema({
                 userId: id,
-                billingAddress: [{fullname, phone, email, address, pincode, addressType, city, state, isSelected: false}]
+                billingAddress: [{fullname, phone, email, address, pincode, addressType, city, state, isSelected: true}]
             })
             await newAddress.save()
         }

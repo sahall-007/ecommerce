@@ -4,7 +4,11 @@ const categorySchema = new mongoose.Schema({
     name: String,
     sold: Number,
     stock: Number,
-    isListed: Boolean
+    discount: {
+        type: Number,
+        default: 0
+    },
+    isListed: Boolean    
 }, { timestamps: true })
 
 module.exports = mongoose.model("category", categorySchema)

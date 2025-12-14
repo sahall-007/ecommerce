@@ -8,6 +8,12 @@ const router = express.Router()
 router.route('/orders')
     .get(middleware.checkSession, orderController.orderManagement)
 
+router.route('/orders/search')
+    .get(middleware.checkSession, orderController.orderManagement)
+
+router.route('/orders/:page')
+    .get(middleware.checkSession, orderController.pagination)
+
 router.route('/orderDetail/:orderId')
     .get(middleware.checkSession,  orderController.adminOrderDetailPage)
 
@@ -19,5 +25,13 @@ router.route('/cancel')
 
 router.route('/return')
     .post(middleware.checkSession, orderController.returnOrder)
+
+router.route('/rejectRequest')
+    .post(middleware.checkSession, orderController.rejectRequest)
+// router.route('/returnStatusUpdate')
+//     .post(middleware.checkSession, orderController.editStatus)
+
+router.route('/searchOrder')
+    .post(middleware.checkSession, orderController.searchOrder)
 
 module.exports = router

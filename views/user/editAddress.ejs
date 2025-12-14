@@ -129,7 +129,7 @@
 
                     <!-- Icons -->
                     <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
-                        <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+                        <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
                         <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
                         <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
                     </div>
@@ -144,15 +144,7 @@
         </div>
     </nav>
 
-    <div class=" sidebar d-flex flex-wrap justify-content-around">
-        <a href="/profile" class="p-2">Profile</a>
-        <a href="/orders" class="p-2">Order history</a>
-        <a href="/address" class="p-2">Billing Address</a>
-        <a href="#" class="p-2">Wallet</a>
-        <a href="#" class="p-2">Wishlist</a>
-        <a href="#" class="p-2">Shopping Cart</a>
-        <a href="#" class="p-2">Coupon</a>
-    </div>
+    <%- include("../partials/user/userQuickLinks.ejs") %>
 
     <div class="container-fluid container-xl">
         <h3 class="my-4">Edit Address</h3>

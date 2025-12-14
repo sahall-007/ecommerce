@@ -183,7 +183,7 @@
 
                 <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
                     <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
-                        <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+                        <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
                         <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
                         <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
                     </div>
@@ -196,15 +196,7 @@
     </nav>
 
     <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
-    <div class=" sidebar d-flex flex-wrap justify-content-around">
-        <a href="/profile" class="">Profile</a>
-        <a href="/orders" class="">Order history</a>
-        <a href="/address" class="">Billing Address</a>
-        <a href="#" class="">Wallet</a>
-        <a href="#" class="">Wishlist</a>
-        <a href="/cart" class="">Shopping Cart</a>
-        <a href="#" class="">Coupon</a>                
-    </div>
+    <%- include("../partials/user/userQuickLinks.ejs") %>
 
     <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
     
@@ -248,7 +240,7 @@
                                                     
                                                     <% 
                                                         let price = Number(ele.variant.price); 
-                                                        let discount = Number(ele.product.discount); 
+                                                        let discount = ele.discount; 
                                                         let offAmount = price * (discount / 100); 
                                                         let finalPrice = Math.floor(price - offAmount);
                                                     %>

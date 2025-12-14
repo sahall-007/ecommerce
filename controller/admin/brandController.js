@@ -4,7 +4,7 @@ const brandSchema = require('../../model/brandSchema.js')
 
 const addBrandPage = async (req, res) => {
     try{
-        res.status(200).render('addBrand')
+        res.status(200).render('admin/addBrand')
     }
     catch(err){
         console.log(err)
@@ -51,10 +51,10 @@ const brandManagement = async (req, res) => {
         const brands = await brandSchema.find().sort({_id: -1}).limit(limit)
 
         if (limit >= brandCount) {
-            return res.status(200).render('brandManagement', { brands, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('admin/brandManagement', { brands, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
-        res.status(200).render('brandManagement', { brands, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('admin/brandManagement', { brands, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
     }
     catch(err){
         console.log(err)
@@ -71,7 +71,7 @@ const brandEditPage = async (req, res) => {
 
         console.log(brand)
 
-        res.status(200).render('editBrand', { brand })
+        res.status(200).render('admin/editBrand', { brand })
     }
     catch(err){
         console.log(err)
@@ -162,9 +162,9 @@ const deleteBrand = async (req, res) => {
     }
 }
 
-const nextPage = async (req, res) => {
+const pagination = async (req, res) => {
     try{
-        const { page } = req.query
+        const { page } = req.params
                 
         const pageNo = Number(page)
         const limit = 5
@@ -178,40 +178,40 @@ const nextPage = async (req, res) => {
         console.log(brandCount)
 
         if(pageNo * limit + limit >= brandCount){
-            res.render('brandManagement', { brands, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('admin/brandManagement', { brands, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('brandManagement', { brands, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('admin/brandManagement', { brands, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
     }
     catch(err){
         console.log(err)
-        console.log("failed to get the next page")
-        res.status(500).json({success: false, message: "something went wrong (brand next page)"})
+        console.log("failed to get the pagination page")
+        res.status(500).json({success: false, message: "something went wrong (brand pagination page)"})
     }
 }
 
-const prevPage = async (req, res) => {
-    try{
-        const { page } = req.query
+// const prevPage = async (req, res) => {
+//     try{
+//         const { page } = req.query
         
-        const pageNo = Number(page)
-        const limit = 5
+//         const pageNo = Number(page)
+//         const limit = 5
 
-        if(pageNo==0){
-            return res.redirect('/admin/brand')
-        }
+//         if(pageNo==0){
+//             return res.redirect('/admin/brand')
+//         }
 
-        const brands = await brandSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+//         const brands = await brandSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        res.render( 'brandManagement', { brands, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-    }
-    catch(err){
-        console.log(err)
-        console.log('failed to get brand prev page')
-        res.status(500).json({success: false, messaage: "something went wrong (brand prev page)"})
-    }
-}
+//         res.render( 'admin/brandManagement', { brands, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+//     }
+//     catch(err){
+//         console.log(err)
+//         console.log('failed to get brand prev page')
+//         res.status(500).json({success: false, messaage: "something went wrong (brand prev page)"})
+//     }
+// }
 
 const searchBrand = async (req, res) => {
     try{
@@ -243,14 +243,14 @@ const searchResult = async (req, res) => {
         const { name } = req.params
 
         if(name=="null"){
-            return res.render('brandManagement', { brands: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+            return res.render('admin/brandManagement', { brands: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
         const brand = await brandSchema.findOne({name})
 
         let arr = [brand]
 
-        res.render('brandManagement', { brands: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+        res.render('admin/brandManagement', { brands: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }
     catch(err){
         console.log(err)
@@ -269,8 +269,8 @@ module.exports = {
     brandBlock,
     brandUnblock,
     deleteBrand,
-    nextPage,
-    prevPage,
+    pagination,
+    // prevPage,
     searchBrand,
     searchResult
 }

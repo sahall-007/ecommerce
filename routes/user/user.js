@@ -17,6 +17,9 @@ const cartRouter = require('./cartRouter.js')
 const checkoutRouter = require('./checkoutRouter.js')
 const orderRouter = require('./orderRouter.js')
 const invoiceRoute = require('./invoice.js')
+const wishlistRouter = require('./wishlistRouter.js')
+const walletRouter = require('./walletRouter.js')
+const couponRouter = require('./couponRouter.js')
 
 const router = express.Router()
 
@@ -74,9 +77,13 @@ router.use(orderRouter)
 // invoice ------------------------------
 router.use(invoiceRoute)
 
-// router.use((req, res) => {
-//     res.render('pageNotFound')
-// })
+// wishlist -----------------------------------
+router.use(wishlistRouter)
 
+// wallet ----------------------------------
+router.use(walletRouter)
+
+// coupon --------------------------------
+router.use(couponRouter)
 
 module.exports = router

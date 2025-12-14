@@ -2,7 +2,10 @@ const mongoose = require('mongoose')
 
 const brandSchema = new mongoose.Schema({
     name: String,
-    sold: Number,
+    discount: {
+        type: Number,
+        default: 0
+    },
     isListed: Boolean
 }, { timestamps: true })
 

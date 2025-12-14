@@ -12,7 +12,10 @@ const cartSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "variant"
         },
-        quantity: Number,
+        quantity: {
+            type: Number,
+            default: 1
+        },
         price: Number
     }]
 }, { timestamps: true })

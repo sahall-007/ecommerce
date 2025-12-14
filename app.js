@@ -5,11 +5,12 @@ const adminRoute = require('./routes/admin/admin.js')
 const env = require('dotenv').config()
 const PDFDocument = require('pdfkit');
 
+const orderController = require('./controller/user/orderController.js')
+
 const session = require('express-session')
 const nocache = require('nocache')
 const passport = require('./config/passport.js')
-
-const logger = require("./config/logger.js")
+const stripe = require('./config/stripe.js')
 
 // logger.info("server has started")
 
@@ -20,8 +21,11 @@ const app = express()
 app.use(express.static('public'))
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
+
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.webhook);
+
 app.use(express.json())
-app.use(express.urlencoded({extends: true}))
+app.use(express.urlencoded({ extends: true }))
 app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,
@@ -29,7 +33,7 @@ app.use(session({
     cookie: {
         secure: false,
         httpOnly: true,
-        maxAge: 72*60*60*1000
+        maxAge: 72 * 60 * 60 * 1000
     }
 }))
 app.use(passport.initialize())

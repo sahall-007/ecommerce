@@ -18,6 +18,9 @@ const customerRoute = require("./customerRoute.js")
 const productRoute = require("./productRoute.js")
 const variantRoute = require("./variantRoute.js")
 const orderRoute = require('./orderRoute.js')
+const offerRoute = require('./offerRoute.js')
+const couponRoute = require('./couponRoute.js')
+const invoiceRoute = require('./invoice.js')
 
 const router = express.Router()
 
@@ -27,6 +30,9 @@ router.route('/login')
     .post(adminController.loginVerify)
 
 router.route('/dashboard')
+    .get(middleware.checkSession, adminController.loadDashboard)
+
+router.route('/dashboard/time')
     .get(middleware.checkSession, adminController.loadDashboard)
 
 router.route('/logout')
@@ -49,5 +55,14 @@ router.use(variantRoute)
 
 // order management --------------------
 router.use(orderRoute)
+
+// offer management ----------------------
+router.use(offerRoute)
+
+// coupon management ---------------------
+router.use(couponRoute)
+
+// invoice ------------------------------
+router.use(invoiceRoute)
 
 module.exports = router

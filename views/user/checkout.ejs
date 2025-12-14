@@ -12,6 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
         rel="stylesheet">
+    <script src="https://js.stripe.com/clover/stripe.js" defer></script>
     <style>
         html,
         body {
@@ -53,24 +54,6 @@
             /* user-select: none; */
             cursor: pointer;
         }
-
-        /* .quantity-input {
-            width: 50px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-radius: 0.375rem;
-        } */
-
-        /* .subtotal-price {
-            font-weight: 600;
-            color: #212529;
-        }
-
-        .total-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-        } */
-
         .btn-proceed {
             background-color: #ff6d00;
             border: none;
@@ -89,15 +72,6 @@
                 font-size: 0.9rem;
             }
 
-            /* .quantity-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 1rem;
-            } */
-/* 
-            .quantity-input {
-                width: 40px;
-            } */
         }
 
         .navbar {
@@ -181,7 +155,7 @@
 
                 <div class="d-lg-flex flex-column flex-lg-row align-items-center gap-5">
                     <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
-                        <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
+                        <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
                         <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
                         <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
                     </div>
@@ -194,19 +168,15 @@
     </nav>
 
     <!-- ==================== USER QUICK LINKS (horizontal on large screens) ==================== -->
-    <div class=" sidebar d-flex flex-wrap justify-content-around">
-        <a href="/profile" class="">Profile</a>
-        <a href="/orders" class="">Order history</a>
-        <a href="/address" class="">Billing Address</a>
-        <a href="#" class="">Wallet</a>
-        <a href="#" class="">Wishlist</a>
-        <a href="/cart" class="">Shopping Cart</a>
-        <a href="#" class="">Coupon</a>                
-    </div>
+    <%- include("../partials/user/userQuickLinks.ejs") %>
 
     <!-- ==================== MAIN CONTENT (this grows and pushes footer down) ==================== -->
      <% let addressIndex %>
      <% let addressSelected = false %>
+     <% let totalQuantity = 0 %>
+     <% let subTotal = 0 %>
+     <% let payablePrice %>
+
     <% if(cart?.length > 0){ %>
         
         <div class="main-content">
@@ -231,6 +201,7 @@
                                         <% let totalPrice = 0 %>
                                         <% if(cart?.length > 0){ %>
                                             <% cart.forEach((ele, index) => { %>
+                                                <% totalQuantity += ele.items.quantity %>
                                                 <tr class="cart-item" id="tableRow-<%= index %>">
                                                     <td>
                                                         <div class="d-flex align-items-center">
@@ -245,7 +216,7 @@
                                                     
                                                     <% 
                                                         let price = Number(ele.variant.price); 
-                                                        let discount = Number(ele.product.discount); 
+                                                        let discount = Number(ele.discount); 
                                                         let offAmount = price * (discount / 100); 
                                                         let finalPrice = Math.floor(price - offAmount);
                                                     %>
@@ -266,7 +237,7 @@
 
                                                     <% 
                                                         
-                                                        let subTotal = finalPrice * ele.items.quantity
+                                                        subTotal = finalPrice * ele.items.quantity
                                                         totalPrice+=subTotal
 
                                                     %>
@@ -275,6 +246,7 @@
                                                     <td><i class="bi bi-trash3 text-muted cursor-pointer" onclick='removeProduct("<%= index %>", "<%= ele._id %>")'></i></td>
                                                 </tr>                                        
                                             <% }) %>
+                                            <% console.log(totalQuantity) %>
                                         <% } %>   
 
                                     </tbody>
@@ -380,49 +352,75 @@
                             <% } %>
                         </div>
 
-                        <!-- order summay -->
+                        <!-- order summay coupons -->
 
-                        <div class="bg-white rounded-3 shadow-sm p-4  mt-2"" style="top: 1rem; z-index: 10;">
+                        <div class="bg-white rounded-3 shadow-sm p-4  mt-2" style="top: 1rem; z-index: 10;">
+
                             <h5 class="mb-3" id="itemCount">Coupon code</h5>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="coupon" id="coupon" placeholder="Coupon code" disabled>
-                                <button class="btn btn-dark input-text" >Apply</button>
-
-                            </div>
+                            <select class="form-select mb-4" id="coupon" name="coupon" onchange="couponSelect(this)">
+                                <option value="0,0,0">Select coupon</option>
+                                <% if(coupons?.length > 0){ %>
+                                    <% coupons?.forEach(ele => {  %>
+                                        <% if(!ele?.used){ %>
+                                            <option value="<%= ele?.coupon?.discount || ele?.discount %>,<%= ele?.coupon?.maximumDiscount || ele?.maximumDiscount %>,<%= ele?.coupon?._id || ele?._id %>,<%= ele?.coupon?.minimumPurchase || ele?.minimumPurchase %>"><%= ele?.coupon?.code || ele?.code %></option>
+                                        <% } %>
+                                    <% }) %>
+                                <% } %>
+                            </select>
+                        
                             <hr>
+
+                            <% payablePrice =  totalPrice + 50 %>
+
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" id="cod" checked>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
                                     <label for="cod" class="fs-6">Cash on delivery</label>
                                 </li>
+                                <% if(wallet?.balance >= payablePrice){ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="Wallet" id="wallet" >
+                                        <label for="wallet" class="fs-6">Wallet</label>
+                                    </li>
+                                <% }else{ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="Wallet" id="wallet" disabled>
+                                        <label for="wallet" class="fs-6">Wallet</label>
+                                    </li>
+                                <% } %>
+                                
                                 <li>
-                                    <input type="radio" class="paymentMethod" name="payment" id="wallet" disabled>
-                                    <label for="wallet" class="fs-6">Wallet</label>
-                                </li>
-                                <li>
-                                    <input type="radio" class="paymentMethod" name="payment" id="upi" disabled>
-                                    <label for="upi" class="fs-6">UPI</label>
+                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="Stripe" id="upi">
+                                    <label for="upi" class="fs-6">Stripe</label>
                                 </li>
                             </ul>
+
                             <hr>
+
                             <h5 class="mb-3" id="itemCount">Price (<%= cart?.length %> items)</h5>
                             <div class="d-flex justify-content-between mb-2">
                                <span>Sub total:</span>
-                               <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %>.00</span>
+                               <span class="total-price">&#8377; <span id="totalPrice"><%= totalPrice %></span>.00</span>
                            </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <% let couponDiscount = 0 %>
                                 <span>Coupon discount:</span>
-                                <span id="couponDiscount" class="total-price">&#8377; <%= couponDiscount %>.00</span>
+                                <span class="total-price"><span id="couponDiscount">0</span></span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Shipping charge:</span>
                                 <span id="shippingCharge" class="total-price">&#8377; 50.00</span>
                             </div>
                             <div class="d-flex justify-content-between mt-3">
-                                <span class="fw-bold">Total Amount:</span>
-                                <span id="finalPrice" class="total-price text-success fw-bold">&#8377; <%= totalPrice - couponDiscount + 50 %>.00</span>
+                                <span >Total Amount:</span>
+                                <span class="total-price fw-bold">&#8377; <span id="finalPrice"><%= totalPrice%></span>.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mt-3">
+                                
+                                <span class="fw-bold">Payable Amount:</span>
+                                <span class="total-price text-success fw-bold">&#8377; <span id="payablePrice"><%= totalPrice + 50 %></span>.00</span>
                             </div>
 
                             <button class="btn btn-proceed text-white w-100 mt-3" onclick='placeOrder()'>
@@ -453,6 +451,10 @@
         </div>
     <% } %>
 
+    <div class="position-relative start-50 top-50 translate-middle" id="checkout" >
+        <!-- Checkout will insert the payment form here -->
+    </div>
+
     <!-- ==================== FOOTER (always at the bottom) ==================== -->
     <footer class="bg-dark text-white text-center py-3 mt-auto">
         <p class="mb-0">© 2025 ShopEase. All rights reserved.</p>
@@ -466,6 +468,11 @@
 
         const addressId = "<%= address?._id%>"
         const cartId = "<%= cart[0]?._id %>"
+        const walletBalance = "<%= wallet?.balance %>"
+
+        
+        let discountAmount = 0
+        let couponId
         
 
         async function updateQuantity(btn, change, index, cartId, price, quantity) {
@@ -511,13 +518,61 @@
 
                     document.getElementById(`subTotal-${index}`).innerHTML = `&#8377; ${value*price}`
 
+                    // const couponDiscount = document.getElementById("couponDiscount")
+                    // const [discountPercentage, maxDiscountPrice] = element.value.split(",")
+
                     const total = document.querySelectorAll('.subtotal-price')
-                    let res=0
+                    let totalPrice=0
                     total.forEach(ele => {
-                        res+=Number(ele.innerHTML.slice(1))
+                        totalPrice+=Number(ele.innerHTML.slice(1))
                     })
                     
-                    document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
+                    const couponvalue = document.getElementById("couponDiscount")
+                    const coupon = document.getElementById("coupon")
+                    const [discountPercentage, maxDiscountPrice, selectedCouponId] = coupon.value.split(",")
+
+                    couponId = selectedCouponId
+
+                    const couponDiscount = Number(discountPercentage)
+                    const discountableAmount = totalPrice * (couponDiscount / 100)
+                   
+                    let payableAmount
+                    if(discountableAmount > maxDiscountPrice){
+                        // asigning the discount amount to as global so that other functions can access it
+                        discountAmount = maxDiscountPrice
+
+                        payableAmount = Math.floor(totalPrice - maxDiscountPrice)
+                        couponvalue.innerHTML = `&#8377; ${maxDiscountPrice}`  
+                    }
+                    else{ 
+                        // asigning the discount amount to as global so that other functions can access it
+                        discountAmount = Math.round(discountableAmount)
+
+                        payableAmount = Math.floor(totalPrice - discountableAmount)
+                        couponvalue.innerHTML = `&#8377; ${discountAmount}`  
+                    }
+
+                    console.log("couponDiscount", couponDiscount)
+                    console.log("totalPrice", totalPrice)
+                    console.log("discountableAmount", discountableAmount)
+                    console.log("payableAmount", payableAmount)
+
+                    if(payableAmount > walletBalance){
+                        const wallet = document.getElementById("wallet")
+                        const cod = document.getElementById("cod")
+
+                        wallet.checked = false;    
+                        cod.checked = true;      
+                        wallet.disabled = true; 
+                    }
+                    else{ 
+                        document.getElementById("wallet").removeAttribute("disabled")                
+                    }
+
+                    
+                    document.getElementById("totalPrice").innerHTML = `${totalPrice}`
+                    document.getElementById("finalPrice").textContent = payableAmount
+                    document.getElementById("payablePrice").textContent = payableAmount + 50
                     
                 }
             }
@@ -547,24 +602,8 @@
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({index, cartId})
                         })
-                        if(request.status==200){
-                            
-                            // const row = document.getElementById(`tableRow-${index}`)
-                            // if(row) row.remove()
-
-                            // const total = document.querySelectorAll('.subtotal-price')
-                            // let res=0
-                            // let itemCount = 0
-                            // total.forEach(ele => {
-                            //     itemCount+=1
-                            //     res+=Number(ele.innerHTML.slice(1))
-                            // })
-                            
-                            // document.getElementById("totalPrice").innerHTML = `&#8377; ${res}`
-                            // document.getElementById("itemCount").innerText  = `Price (${itemCount} items)`
-
-                            window.location.reload()
-                            
+                        if(request.status==200){                            
+                            window.location.reload()                            
                         }
                     }   
                     catch(err){
@@ -721,10 +760,29 @@
         }
         
         async function placeOrder(){
-            const totalPrice = Number(document.getElementById("totalPrice").textContent.slice(2))
-            const finalPrice = Number(document.getElementById("finalPrice").textContent.slice(2))
-            const couponDiscount = Number(document.getElementById("couponDiscount").textContent.slice(2))
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')
+
+
+            const stripe = Stripe("pk_test_51ScQjnK3GRmT480dys7krr31ysDBzhxyFzV5hcr03hcG0xrfA0xiDBjUfh0OIS4dZf8tuN1YxEJ1Q6Wfdd2lDXci00Txh6IaxE");
+
+            const totalPriceBeforeDiscount = Number(document.getElementById("totalPrice").textContent)
+            const payablePrice = Number(document.getElementById("payablePrice").textContent)
+            // const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+
+            const coupon = document.getElementById("coupon")
+            const [discountPercentage, maxDiscountPrice, selectedCouponId, minPurchasePrice] = coupon.value.split(",")
+
+            if(totalPriceBeforeDiscount < minPurchasePrice){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: `You need to purchase for atleast ${minPurchasePrice} Rs to apply this coupon`
+                    
+                })
+                return
+            }
+            
+            
 
             let isSelected = <%= addressSelected %>;
 
@@ -738,23 +796,118 @@
                 })
                 return
             }
-
-            // alert("working")
-            try{
-                const request = await fetch('/placeOrder', {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ addressId, cartId, totalPrice, finalPrice, couponDiscount, paymentMethod })
+            if(!paymentMethod){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Select an payment method before placing order"
+                    
                 })
-                if(request.status==200){
-                    window.location.href = "/orderSuccess"
+                return
+            }
+
+            console.log("this is payment mehtod", paymentMethod)
+            console.log("this is disoucnt amount",  discountAmount)
+            console.log("thsi is coupon id", couponId)
+
+           
+                try{
+                    if(paymentMethod=="Stripe"){
+                        // return initialize();
+    
+                        // Create a Checkout Session
+                        // async function initialize() {
+                            // const fetchClientSecret = async () => {
+                                const response = await fetch("/create-checkout-session", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                                });
+                                const res = await response.json()
+
+                                if(res.success){
+                                    window.location.href = res.redirect
+                                }
+                                // const { clientSecret } = await response.json();
+                                // return clientSecret;
+                            // };
+    
+                            // const checkout = await stripe.initEmbeddedCheckout({
+                            //     fetchClientSecret,
+                            // });
+    
+                            // Mount Checkout
+                            // checkout.mount('#checkout');
+                            // window.location.href = "#checkout"
+                    }
+                    else{
+                        const request = await fetch('/placeOrder', {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId })
+                        })
+                        if(request.status==200){
+                            window.location.href = "/orderSuccess"
+                        }
+                    }
                 }
-            }
-            catch(err){
-                alert('place order error')
-                console.log(err)
-            }
+                catch(err){
+                    alert('place order error')
+                    console.log(err)
+                }
+
+            // }, 20000)
         }
+    
+        function couponSelect(element){
+            const couponvalue = document.getElementById("couponDiscount")
+            const [discountPercentage, maxDiscountPrice, selectedCouponId] = element.value.split(",")
+                       
+            couponId = selectedCouponId
+
+            const total = document.querySelectorAll('.subtotal-price')
+            let totalPrice=0
+            total.forEach(ele => {
+                totalPrice+=Number(ele.innerHTML.slice(1))
+            })
+            
+            const couponDiscountvalue = Number(discountPercentage)
+            const discountableAmount = totalPrice * (couponDiscountvalue / 100)
+            
+            let payableAmount
+            if(discountableAmount > maxDiscountPrice){
+                // asigning the discount amount to as global so that other functions can access it
+                discountAmount = maxDiscountPrice
+                
+                payableAmount = Math.floor(totalPrice - maxDiscountPrice)
+                couponvalue.innerHTML = `&#8377; ${maxDiscountPrice}`  
+            }
+            else{ 
+                // asigning the discount amount to as global so that other functions can access it
+                discountAmount = Math.round(discountableAmount)
+                
+                payableAmount = Math.floor(totalPrice - discountableAmount)
+                couponvalue.innerHTML = `&#8377; ${discountAmount}`  
+            }
+
+
+            console.log("couponDiscount", couponDiscountvalue)
+            console.log("totalPrice", totalPrice)
+            console.log("discountableAmount", discountableAmount)
+            console.log("payableAmount", payableAmount)           
+
+            if(payableAmount > walletBalance){
+                document.getElementById("wallet").setAttribute("disabled", true)
+            }
+            else{ 
+                document.getElementById("wallet").removeAttribute("disabled")                
+            }
+
+            
+            document.getElementById("finalPrice").textContent = payableAmount
+            document.getElementById("payablePrice").textContent = payableAmount + 50
+        }
+    
     </script>
 </body>
 

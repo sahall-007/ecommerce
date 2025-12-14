@@ -60,7 +60,7 @@
             transition: all 0.2s;
         }
 
-        .card:hover {
+        .order-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
         }
@@ -69,32 +69,24 @@
 
 <body class="bg-light">
 
-    <!-- <% var sample = 11111; %> -->
+    <!-- //  ========== NAVBAR ========== -->
 
-    <nav class="navbar bg-black">
-        <div class="container">
-            <a class="navbar-brand text-light" href="#">
-                <i class="bi bi-box me-2"></i> ShopEase
-            </a>
-            <button class="navbar-toggler d-md-none border-0" type="button" id="menuToggle">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <a href="/admin/logout" class="btn btn-outline-light d-md-block d-none">logout</a>
-        </div>
-    </nav>
+    <%- include("../partials/admin/navbar.ejs") %>
 
 
     <div class="container px-0 mt-5">
 
-        <div class="d-flex justify-content-between">
-            <h2 class="mb-5 fw-bold">Your Orders</h2>
-            <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
-            <div class="">
-                <button class="btn btn-dark rounded-circle shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#orderFilters">
-                    <i class="bi bi-funnel fs-4"></i>
-                </button>
-            </div>
-        </div>
+        <!-- <div class="d-flex justify-content-between">
+            <h2 class="mb-5 fw-bold " style="visibility: hidden;" >Your Orders</h2>
+            
+        </div> -->
+
+        <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
+        <!-- <div class="">
+            <button class="btn btn-dark rounded-circle shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#orderFilters">
+                <i class="bi bi-funnel fs-4"></i>
+            </button>
+        </div> -->
         
         <div class="row row-cols-1 gap-5">
             <!-- ============= FILTER SIDE BAR ============= -->
@@ -108,9 +100,12 @@
                 <div class="offcanvas-body pt-4">
 
                     <!-- Search -->
-                    <div class="mb-4">
-                        <input type="text" class="form-control form-control-lg" placeholder="Search orders...">
-                    </div>
+                     <form action="/admin/searchOrder" method="post">
+                         <div class="input-group mb-4">
+                             <input type="text" class="form-control form-control-lg" name="search" id="searchOrder" placeholder="Search orders...">
+                             <button class="btn btn-outline-secondary" type="submit" id="searchOrderBtn">Button</button>
+                         </div>
+                     </form>
                     <hr class="my-4">
 
                     <!-- Status Filter -->
@@ -150,76 +145,51 @@
 
                 </div>
             </div>
-            <!-- =========================================== -->
-            <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
-                <div class="">
+            <!-- ============== SIDE BAR ================= -->
+            <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0 sticky-top" style="top: 1rem;">
 
-                    <div onclick="location.href='/admin/dashboard'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/dashboard.png" alt="" style="width: 25px;">
-                        <a href="/admin/dashboard" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Dashboard</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/product'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/products.png" alt="" style="width: 25px;">
-                        <a href="/admin/product" class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Product</a>
-                    </div>
-
-                    <div onclick="location.href='/admin/category'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/category.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Category</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/order.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Order</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/coupon.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Coupon</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/transaction.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Transactions</a>
-                    </div>
-
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Offer</a>
-                    </div>
-                    
-                    <div onclick="location.href='/admin/brand'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/offer.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Brand</a>
-                    </div>
-                    
-                </div>
-
-                <div class="my-5">
-                    <div class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/admin.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">Admins</a>
-                    </div>
-                    <div onclick="location.href='/admin/userManagement'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/user.png" alt="" style="width: 25px;">
-                        <a class="fs-6 pb-3 px-3 py-1 ms-3 mb-0 text-secondary text-decoration-none">customers</a>
-                    </div>
-                </div>
-
-                <div>
-                    
-                    <div onclick="location.href='/admin/logout'" class="test ps-2 pb-3 px-3 py-1">
-                        <img class="position-absolute" src="images/admin-icons/logout.png" alt="" style="width: 25px;">
-                        <a href="/admin/logout" class="fs-6 px-3 pb-3 ms-3 mb-0 text-secondary text-decoration-none">Logout</a>
-                    </div>
-                </div>
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
 
             </div>
-            <div class="col-12 col-md-7 ">
+            <div class="card shadow mb-5 col col-md-8 col-lg-9 ">
+                <div class="card-header position-relative">
+                    <h1 class="text-center">Order Management</h1>
+
+                    <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
+                    <div class="position-absolute top-0 end-0 mt-2 me-2">
+                        <button class="btn btn-dark rounded-circle shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#orderFilters">
+                            <i class="bi bi-funnel fs-4"></i>
+                        </button>
+                    </div>
+    
+                    <div class="container">
+                        <div class="row justify-content-between my-5">
+    
+                        <!-- <div class="col-3 d-flex justify-content-around border-bottom border-3 align-self-start pb-1 user-status">
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">Pending
+                            </h1>
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Delivered
+                            </h1>
+                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Returned</h1>
+                        </div> -->
+    
+                        <!-- <form action="/admin/searchCategory" class="col-4 align-self-start d-flex gap-2" method="post">
+                            <input class="form-control me-2 " name="name" type="search" placeholder="Search" aria-label="Search" />
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form> -->
+    
+                        <!-- <div class="col-2 d-flex justify-content-end  align-self-start">
+                            <a role="button" href="/admin/addCategory"
+                                class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">Add new</a>
+                        </div> -->
+    
+                    </div>
+                    </div>
+                    
+                </div>
                 <% orders.forEach(ele => { %>
                 
-                    <div class="card mb-4 shadow border-0 rounded-4 overflow-hidden position-relative">
+                    <div class="card order-card mb-4 shadow border-0 rounded-4 overflow-hidden position-relative">
                         <div class="card-body p-4">                            
                             <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
                                 <div class="d-flex align-items-center gap-3 flex-wrap ">
@@ -267,12 +237,17 @@
 
                                 <div class="col-6 col-md-4 mb-3">
                                     <strong class="text-dark">Total: </strong>
-                                    <span class="fs-5 fw-bold text-success ms-2">&#8377; <%= ele.finalPrice %></span>
+                                    <span class="fs-5 fw-bold text-success ms-2">&#8377; <%= ele.payablePrice %></span>
                                 </div>
+
+                                <%
+                                    let couponCode = 
+                                        (ele?.couponCode) ? ele.couponCode : "Null"
+                                %>
 
                                 <div class="col-6 col-md-4 mb-3 text-md-end text-lg-start">
                                     <strong>Coupon code: </strong>
-                                    <span class="text-primary px-2 py-1 ms-2">Null</span>
+                                    <span class="text-primary px-2 py-1 ms-2"><%= couponCode %></span>
                                 </div>
 
                                 <div class="col-6 col-md-4 mb-3">
@@ -285,11 +260,10 @@
                                     <small class="text-dark ms-2">John Doe123 Art Avenue, Suite 456Creative City, Artland</small>
                                 </div> -->
 
-                                <div class="col-12 col-md-4 mb-3">
+                                <div class="col-6 col-md-4 mb-3">
                                     <strong class="text-dark">Order date:</strong>
                                     <span class="text-dark">
                                         <%= new Date(ele.placedAt).toLocaleDateString('en-GB', {
-                                            weekday: 'short',
                                             day: 'numeric',
                                             month: 'short',
                                             year: 'numeric',
@@ -308,12 +282,19 @@
                             </div>
                             
                         </div>
+                        
                     </div>
 
                 <% }) %>
+                
             </div>
             
+            
     </div>
+    </div>
+    <div class="mb-4 text-center">
+        <a href="/admin/orders/<%= prevPage %>" class="text-light btn bg-secondary rounded border-0 px-3 py-1  <%= prevDisable %>"  >Prev</a>
+        <a href="/admin/orders/<%= nextPage %>" class="text-light btn rounded border-0 px-3 py-1  <%= nextDisable %>" style="background-color: #EF6627;">Next</a>
     </div>
 
 
@@ -448,6 +429,28 @@
         async function productInfo(id){
             window.location.href = `/admin/variant/${id}`
         }
+
+        // document.getElementById("searchOrderBtn").addEventListener('click', async (event) => {
+        //     event.preventDefault()
+
+        //     const search = document.getElementById("searchOrder").value
+
+        //     try{
+        //         const request = await fetch('/admin/searchOrder', {
+        //             method: "POST",
+        //             headers: { "Content-Type": "application/json" },
+        //             body: JSON.stringify({ search })
+        //         })
+        //         if(request.status == 200){
+        //             window.location.reload()
+        //         }
+        //     }
+        //     catch(err){
+        //         alert("search product err")
+        //         console.log(err)
+        //     }
+
+        // })
 
 
     </script>

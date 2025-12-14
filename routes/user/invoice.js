@@ -4,6 +4,8 @@ const router = express.Router();
 const PDFDocument = require('pdfkit');
 const Order = require('../../model/orderSchema'); // your order model (lowercase 'o' if filename is order.js)
 const authMiddleware = require('../../middlewares/userAuth'); // your auth middleware
+const orderSchema = require('../../model/orderSchema.js')
+
 
 // GET /invoice/ORD-1001
 router.get('/invoice/:orderId', authMiddleware.checkSession, async (req, res) => {
@@ -62,7 +64,7 @@ let currentY = startY + 30;
 let grandTotal = 0;
 
 for (let item of order.items) {
-    const price = parseFloat(item.price) || 0;
+    const price = parseFloat(item.priceAfterCouponDiscount) || 0;
     const amount = price * item.quantity;
     grandTotal += amount;
 
@@ -97,8 +99,8 @@ doc.moveTo(50, currentY + 5).lineTo(550, currentY + 5).stroke();
 
 // Grand Total (BOLD & BIG)
 doc.font('Helvetica-Bold').fontSize(16)
-   .text('Total Amount:', 400, currentY + 25, { width: 100, align: 'right' })
-   .text(`₹ ${parseFloat(order.finalPrice).toLocaleString('en-IN')}`, 500, currentY + 25, { width: 80, align: 'right' });
+   .text('Total :', 400, currentY + 25, { width: 100, align: 'right' })
+   .text(`₹ ${parseFloat(order.payablePrice).toLocaleString('en-IN')}`, 500, currentY + 25, { width: 80, align: 'right' });
 
 doc.fontSize(12).font('Helvetica')
    .text('Thank you for shopping with us!', 50, currentY + 70, { align: 'center', width: 500 });

@@ -1,7 +1,10 @@
 
 const passport = require('passport')
+const rndm = require('rndm')
 const googleStrategy = require('passport-google-oauth20').Strategy
 const userSchema = require('../model/userSchema.js')
+const wishlistSchema = require('../model/wishlistSchema.js')
+const walletSchema = require('../model/walletSchema.js')
 const env = require('dotenv').config()
 
 const logger = require('./pinoLogger.js')
@@ -20,9 +23,23 @@ async (req, accessToken, refreshToken, profile, done) => {
         // if(googleUser.isListed==false){
             
         // }
+        var referral = rndm.base62(10)
         
         if(googleUser){
-            // req.session.user = googleUser._id
+            const wishlist = await wishlistSchema.findOne({userId: googleUser._id})
+            if(!wishlist){
+                await wishlistSchema.create({
+                    userId: googleUser._id,
+                    items: []
+                })
+            }
+            const wallet = await walletSchema.findOne({userId: googleUser._id})
+            if(!wallet){
+                await walletSchema.create({
+                    userId: googleUser._id,
+                })
+            }
+
             logger.info("this is google login")
             return done(null, googleUser)
         }
@@ -31,9 +48,31 @@ async (req, accessToken, refreshToken, profile, done) => {
                 username: profile.displayName,
                 email: profile.emails[0].value,                
                 googleId: profile.id,
-                isListed: true
+                isListed: true,
+                referral
             });
             await googleUser.save()
+
+            // creating a wishlist for the user
+            await wishlistSchema.create({
+                userId: googleUser._id,
+                items: []
+            })
+
+            // creating a wallet for the user based on the referral code the user enter
+            const userWithReferralCode = await userSchema.findOne({referral: user.referral})
+            if(userWithReferralCode){
+                await walletSchema.create({
+                    balance: 10000,
+                    userId: googleUser._id,
+                })
+                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
+            }
+            else{
+                await walletSchema.create({
+                    userId: googleUser._id,
+                })
+            }
 
             logger.info("this is google register")
             // req.session.user = googleUser._id

@@ -2,6 +2,7 @@ const userSchema = require('../../model/userSchema.js')
 const addressSchema = require('../../model/addressSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
+const orderSchema = require('../../model/orderSchema.js')
 const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
@@ -50,11 +51,13 @@ const profilePage = async (req, res) => {
     try{
 
         const id = req.session.user || req.session?.passport?.user
-        
-        logger.info(id)
-
+               
         const user = await userSchema.findOne({_id: id})
         const address = await addressSchema.findOne({userId: id})
+        const order = await orderSchema.aggregate([
+            {$match: {userId: new Types.ObjectId(id)}},
+            
+        ])
 
         // logger.info(user)
 

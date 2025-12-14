@@ -2,13 +2,15 @@ const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
+const wishlistSchema = require('../../model/wishlistSchema.js')
 
-const logger = require("../../config/logger.js")
+const logger = require("../../config/pinoLogger.js")
 
 
 const searchResult = async (req, res) => {
     try {
 
+        const userId = req.session.user || req.session?.passport?.user
         const { name } = req.query
         
         const filter = {}
@@ -75,24 +77,21 @@ const searchResult = async (req, res) => {
             // {$limit: limit},
         ])
 
-        // console.log(allProducts)
-        // console.log(filter)
-        // console.log(toSort)
-        // console.log(name)
-
+        const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})
+        
 
         if(allProducts.length < limit){
             req.session.searchFilter = null
-            return res.status(200).render('searchResult', { allProducts, category, brand, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/searchResult', { allProducts, category, brand, wishlist, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         if(limit>=productCount){
             req.session.searchFilter = null
-            return res.status(200).render('searchResult', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('user/searchResult', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
         req.session.searchFilter = null
-        res.status(200).render('searchResult', { allProducts, category, brand,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('user/searchResult', { allProducts, category, brand, wishlist,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
 
     } 
     catch (err) {

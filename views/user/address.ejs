@@ -94,8 +94,8 @@
 
           <!-- Icons -->
           <div class="d-flex align-items-center justify-content-center gap-5 mt-lg-0 mt-3 mb-3 mb-lg-1">
-            <a href="#" class="text-light"><i class="bi bi-heart"></i></a>
-            <a href="cart" class="text-light"><i class="bi bi-cart3"></i></a>
+            <a href="/wishlist" class="text-light"><i class="bi bi-heart"></i></a>
+            <a href="/cart" class="text-light"><i class="bi bi-cart3"></i></a>
             <a href="/profile" class="text-light"><i class="bi bi-person-circle"></i></a>
           </div>
           
@@ -224,29 +224,51 @@
 
                             <!-- other billing address -->
                              <% if(address?.billingAddress?.length > 0){ %>
-                                <h5 class="mt-5 fw-bold">Other Billing Addresses</h5>
+                                <h5 class="mt-5 fw-bold" id="OtherBillingAddresses">Other Billing Addresses</h5>
                                 <div class="row row-cols-1 row-cols-lg-2">
                                     <% address.billingAddress.forEach((ele, index) => { %>
-                                    
-                                        <div class="card p-4 mt-3">
-                                            <div class="d-flex justify-content-between">
-                                                <!-- <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                    -->
-                                            </div>
-                                            <div>
-                                                <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
-                                                <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
-                                                <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
-                                                <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
-                                                <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
-                                                <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
-                                            </div>
-                                            <div class="row row-cols-1 row-cols-md-2 justify-content-around">
-                                                <button class="btn btn-dark mt-3" onclick='selectAddress("<%= index %>")' style="width: 100px;">Select</button>
-                                                <button class="btn btn-danger mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
-                                                <button class="btn btn-primary mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
+                                        <% if(ele.isSelected){ %>
+                                            <div class="card p-4 mt-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <!-- <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                    -->
+                                                </div>
+                                                <div>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                                    <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                                </div>
+                                                <div class="row row-cols-1 row-cols-md-2 justify-content-around">
+                                                    <button class="btn btn-dark mt-3" onclick='selectAddress("<%= index %>")' style="width: 100px;" disabled>Select</button>
+                                                    <button class="btn btn-danger mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
+                                                    <button class="btn btn-primary mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
 
+                                                </div>
                                             </div>
-                                        </div>
+                                        <% }else{ %>
+                                            <div class="card p-4 mt-3">
+                                                <div class="d-flex justify-content-between">
+                                                    <!-- <i class="bi bi-patch-check" style="color: #0d6efd;"></i>                    -->
+                                                </div>
+                                                <div>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Name: </span><%= ele.fullname %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Email: </span><%= ele.email %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Phone: </span><%= ele.phone %></h1>
+                                                    <h1 class="fs-6 fw-light"><span class="fw-bold me-3">Address: </span><%= ele.address %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Pincode: </span><%= ele.pincode %></h1>
+                                                    <h1 class="fs-6"><span class="fw-bold me-3">Type: </span><%= ele.addressType %></h1>
+                                                </div>
+                                                <div class="row row-cols-1 row-cols-md-2 justify-content-around">
+                                                    <button class="btn btn-dark mt-3" onclick='selectAddress("<%= index %>")' style="width: 100px;">Select</button>
+                                                    <button class="btn btn-danger mt-3" onclick='deleteAddress("<%= index %>")' style="width: 100px;">Delete</button>
+                                                    <button class="btn btn-primary mt-3" onclick='editAddress("<%= index %>")' style="width: 100px;">Edit</button>
+    
+                                                </div>
+                                            </div>
+                                        <% } %>
+                                    
                                                                        
                                 <% }) %>
                                 </div>                                                        
@@ -341,7 +363,7 @@
             
             return
         }
-        else if(!addressRegex.test(address.value)){
+        else if(!addressRegex.test(address.value.trim())){
             fullnameMsg.textContent = ""
             phoneMsg.textContent = ""
             emailMsg.textContent = ""

@@ -9,10 +9,10 @@ const loadCategoryManagement = async (req, res) => {
         const categories = await categorySchema.find().sort({_id: -1}).limit(limit)
 
         if (limit >= categoryCount) {
-            return res.status(200).render('categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+            return res.status(200).render('admin/categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
-        res.status(200).render('categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
+        res.status(200).render('admin/categoryManagement', { categories, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
     }
     catch(err){
         console.log(err)
@@ -23,7 +23,7 @@ const loadCategoryManagement = async (req, res) => {
 
 const addCategoryPage = async (req, res) => {
     try{
-        res.status(200).render('addCategory')
+        res.status(200).render('admin/addCategory')
     }
     catch(err){
         console.log(err)
@@ -35,8 +35,6 @@ const addCategoryPage = async (req, res) => {
 const addCategoryPost = async(req, res) => {
     try{
         let { name, status } = req.body
-
-        
 
         const existCategory = await categorySchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
@@ -118,11 +116,9 @@ const deleteCategory = async (req, res) => {
     }
 }
 
-const nextPage = async (req, res) => {
-   
-    console.log("next handler hit")
+const pagination = async (req, res) => {
     try{
-        const { page } = req.query
+        const { page } = req.params
         
         const pageNo = Number(page)
         const limit = 5
@@ -136,10 +132,10 @@ const nextPage = async (req, res) => {
         console.log(categoryCount)
 
         if(pageNo * limit + limit >= categoryCount){
-            res.render('categoryManagement', { categories, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+            res.render('admin/categoryManagement', { categories, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
         else{
-            res.render('categoryManagement', { categories, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+            res.render('admin/categoryManagement', { categories, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
         }
 
     }
@@ -150,29 +146,29 @@ const nextPage = async (req, res) => {
     }
 }
 
-const prevPage = async (req, res) => {
-console.log("prev handler hit.........")
-    try{
-        const { page } = req.query
+// const prevPage = async (req, res) => {
+// console.log("prev handler hit.........")
+//     try{
+//         const { page } = req.params
 
-        const pageNo = Number(page)
-        const limit = 5
+//         const pageNo = Number(page)
+//         const limit = 5
 
-        if(pageNo==0){
-            return res.redirect('/admin/category')
-        }
+//         if(pageNo==0){
+//             return res.redirect('/admin/category')
+//         }
 
-        const categories = await categorySchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+//         const categories = await categorySchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        res.render('categoryManagement', { categories, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
+//         res.render('admin/categoryManagement', { categories, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
 
-    }
-    catch(err){
-        console.log(err)
-        console.log("failed to get previous page")
-        res.status(500).json({message: "something went wrong, (category prev page)"})
-    }
-}
+//     }
+//     catch(err){
+//         console.log(err)
+//         console.log("failed to get previous page")
+//         res.status(500).json({message: "something went wrong, (category prev page)"})
+//     }
+// }
 
 const searchCategory = async (req, res) => {
     try{
@@ -205,14 +201,14 @@ const searchResult = async (req, res) => {
         const { name } = req.params
 
         if(name=="null"){
-            return res.render('categoryManagement', { categories: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+            return res.render('admin/categoryManagement', { categories: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
         const category = await categorySchema.findOne({name})
 
         let arr = [category]
 
-        res.render('categoryManagement', { categories: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
+        res.render('admin/categoryManagement', { categories: arr, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }
     catch(err){
         console.log(err)
@@ -226,7 +222,7 @@ const editCategoryPage = async (req, res) => {
 
         const { name } = req.params
 
-        res.status(200).render('editCategory', { editName: name })
+        res.status(200).render('admin/editCategory', { editName: name })
     }
     catch(err){
         console.log(err)
@@ -270,8 +266,8 @@ module.exports = {
     blockCategory,
     unBlockCategory,
     deleteCategory,
-    nextPage,
-    prevPage,
+    pagination,
+    // prevPage,
     searchCategory,
     searchResult,
     editCategoryPage,
