@@ -1,19 +1,30 @@
-const categorySchema = require('../../model/categorySchema.js')
-const brandSchema = require('../../model/brandSchema.js')
-const productSchema = require('../../model/productSchema.js')
-const { castObject } = require('../../model/userSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const orderSchema = require('../../model/orderSchema.js')
+const walletSchema = require('../../model/walletSchema.js')
+const { Types, default: mongoose } = require('mongoose')
+
 
 const logger = require('../../config/pinoLogger.js')
 const { on } = require('nodemailer/lib/ses-transport/index.js')
+const { search } = require('../../routes/admin/orderRoute.js')
 
 const orderManagement = async (req, res) => {
     try{
-        const orders = await orderSchema.find().sort({_id: -1}).populate("userId")
+        if(req.query.search){
+            const orderSearch = await orderSchema.find({orderId: req.query.search}).populate("userId")
+            return res.status(200).render('admin/orderManagement', {orders: orderSearch, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
 
-        // console.log(orders)
-        res.status(200).render('admin/orderManagement', {orders})
+        const limit = 5
+        const orderCount = await orderSchema.countDocuments()
+        const orders = await orderSchema.find().sort({_id: -1}).limit(limit).populate("userId")
+
+        if (limit >= orderCount) {
+            return res.status(200).render('admin/orderManagement', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        }
+
+        res.status(200).render('admin/orderManagement', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "null" })
+
     }
     catch(err){
         logger.fatal(err)
@@ -44,7 +55,6 @@ const adminOrderDetailPage = async (req, res) => {
 const editStatus = async (req, res) => {
     try{
         const { orderItemId, orderId, index, newStatus } = req.body
-        console.log(req.body)
 
         const order = await orderSchema.findOne({_id: orderId, "items._id": orderItemId})
 
@@ -53,7 +63,56 @@ const editStatus = async (req, res) => {
         }
 
         order.items.id(orderItemId).status = newStatus
+        
+        if(newStatus == "Return approved"){
+            const newTransactions = {
+                amount: order.items.id(orderItemId).priceAfterCouponDiscount,
+                date: Date.now(),
+                transactionType: "credit" ,
+                description: `Refund of order #${order.orderId}`,
+                status: "Pending"
+            }
+
+            const wallet = await walletSchema.findOneAndUpdate(
+                {userId: order.userId}, 
+                {$push: {transactions: newTransactions}}, 
+                { new: true }
+            )
+
+            if (!wallet) {
+                return res.status(404).json({ success: false, message: "Wallet not found" });
+            }
+
+            // putting the latest transaction id into refundTransactionId so that it can be access later to update the transaction status
+            order.items.id(orderItemId).refundTransactionId = wallet.transactions[wallet.transactions.length - 1]._id
+
+            console.log("this is wallet after update of return approved", wallet)
+        }
+
+        // refund money after order is returned
+        else if(newStatus == "Returned"){
+            const transId = order.items.id(orderItemId).refundTransactionId
+
+            if (!transId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "No refundTransactionId found for this item"
+                });
+            }
+
+            const wallet = await walletSchema.findOneAndUpdate(
+                {userId: order.userId, "transactions._id": transId}, 
+                {$inc: {balance: order.items.id(orderItemId).priceAfterCouponDiscount}, $set: {"transactions.$.status": "Completed"}},
+                { new: true }
+            )
+
+            console.log("this is wallet after update of returned", wallet)
+        }
+
         await order.save()
+        
+        logger.info("successfully edited the status")
+        // console.log("this is the order item", order.items.id(orderItemId))
 
         res.status(200).json({success: true, message: "successfully changed the product status"})
     }
@@ -107,12 +166,10 @@ const cancelOrder = async (req, res) => {
 }
 
 const returnOrder = async (req, res) => {
-    console.log("----------------------------------------------------------")
     try{
         const { itemId, userId } = req.body
 
         const order = await orderSchema.findOne({userId, "items._id": itemId})
-
         if(!order){
             return res.status(404).json({success: false, message: "order not found"})            
         }
@@ -138,7 +195,6 @@ const returnOrder = async (req, res) => {
         }
         item.status = "Returned"
 
-        
         await order.save()
         res.status(200).json({success: true, message: "successfully Returned the order"})
     }
@@ -149,10 +205,103 @@ const returnOrder = async (req, res) => {
     }
 }
 
+const pagination = async (req, res) => {
+    try{
+        const { page } = req.params
+
+        const pageNo = Number(page)
+        const limit = 5
+
+        if(pageNo==0){
+            return res.redirect('/admin/orders')
+        }
+        const orderCount = await orderSchema.countDocuments()
+        const orders = await orderSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+
+        console.log(orderCount)
+
+        if(pageNo * limit + limit >= orderCount){
+            res.render('admin/orderManagement', { orders, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+        }
+        else{
+            res.render('admin/orderManagement', { orders, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+        }
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get pagination page")
+        res.status(500).json({success: false, message: "something went wrong (order pagination page)"})
+    }
+}
+
+const rejectRequest = async (req, res) => {
+    try{
+        const { itemId, userId, rejectReason, custonReturnRejectReason } = req.body
+    
+        const order = await orderSchema.findOne({userId, "items._id":  new Types.ObjectId(itemId)})
+        if(!order){
+            return res.status(404).json({success: false, message: "order not found"})            
+        }
+
+        const item = order.items.id(itemId)
+
+        item.returnReject = {
+            rejected: true,
+            reason: rejectReason,
+            customReason: custonReturnRejectReason,
+            rejectedAt: Date.now()
+        }
+        item.status = "Return rejected"
+
+        await order.save()
+
+        console.log("this is items after successffull request", item)
+        console.log("updated order", order)
+
+        logger.info("successfully rejected")
+        res.status(200).json({success: true, message: "successfully rejected the request"})
+        
+    
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to reject the return request")
+        res.status(500).json({success: false, message: "something went wrong (reject return request)"})
+
+    }
+}
+
+const searchOrder = async (req, res) => {
+    try{
+        const { search } = req.body
+        // console.log(search)
+        // const orders = await orderSchema.find({orderId: search})
+
+        // if(orders.length > 0){
+        //     return res.status(200).render('admin/orderManagement', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
+        // }
+        // else{
+        //     res.status(404).json({success: false, message: "cannot find the order in the database"})
+        // }
+
+        return res.redirect(`/admin/orders?search=${search}`)
+
+
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get order management page")
+        res.status(500).json({success: false, message: "something went wrong (order management page)"})
+    }
+}
+
 module.exports = {
     orderManagement,
     adminOrderDetailPage,
     editStatus,
     cancelOrder,
-    returnOrder
+    returnOrder,
+    pagination,
+    rejectRequest,
+    searchOrder
 }
