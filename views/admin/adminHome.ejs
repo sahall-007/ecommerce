@@ -51,16 +51,16 @@
                     <%- include("../partials/admin/sidebarLinks.ejs") %>
 
                 </div>
-                <% if(orders && orders?.length > 0){ %>
+                <% if(orders){ %>
 
                     <% 
                         let totalRevenue = 0, totalOrder = 0, totalDiscountPrice = 0, couponDiscountAmount = 0
 
-                        orders.forEach(ele => {
-                            totalRevenue += ele.payablePrice
+                        orders?.forEach(ele => {
+                            totalRevenue += ele?.payablePrice
                             totalOrder++
-                            totalDiscountPrice += ele.totalDiscountPrice
-                            couponDiscountAmount += ele.discountAmount
+                            totalDiscountPrice += ele?.totalDiscountPrice
+                            couponDiscountAmount += ele?.discountAmount
                             
                         })
                     %>
@@ -178,19 +178,19 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <% orders.forEach((ele, index) => { %>
+                                                <% orders?.forEach((ele, index) => { %>
                                                     <tr>
                                                         <td><%= index + 1 %></td>
                                                         <td>#<%= ele.orderId %></td>
                                                         <td class="text-center">
-                                                            <%= new Date(ele.createdAt).toLocaleDateString('en-GB', {
+                                                            <%= new Date(ele?.createdAt).toLocaleDateString('en-GB', {
                                                                 day: 'numeric',
                                                                 month: 'short',
                                                                 year: 'numeric',
                                                             }) %>
                                                         </td>
-                                                        <td class="text-center"><%= ele.user.username %></td>
-                                                        <td>&#8377; <%= ele.payablePrice %></td>
+                                                        <td class="text-center"><%= ele?.user?.username %></td>
+                                                        <td>&#8377; <%= ele?.payablePrice %></td>
                                                         <td><span class="badge bg-success">Completed</span></td>
                                                     </tr>
                                                 <% }) %>
