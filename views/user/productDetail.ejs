@@ -409,6 +409,17 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ variantId })
           })
+
+          const res = await request.json()
+          if(res.message == "out of stock"){
+            swal.fire({
+              icon: "warning",
+              title: "Warning",
+              text: "This product is out of stock"
+            })
+            return
+          }
+
           if (request.status == 200) {
             window.location.href = '/cart'
           }

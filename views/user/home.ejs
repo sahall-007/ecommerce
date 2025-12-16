@@ -85,17 +85,13 @@
     </div>
   </nav>
 
-
-
-
   <section class="my-2">
     <div class="container-sm hero">
       <img src="/images/category/msi.jpeg" class="w-100" alt="">
     </div>
   </section>
 
-
-  <% let inWishlist=false %>
+  
 
   <!--===================== NEW ARRIVALS ========================= -->
   <section id="featured" class="bg-light pb-5">
@@ -106,6 +102,7 @@
         </div>
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
         <% newArrivals.forEach(ele => { %>
+          <% let inWishlist=false %>
           <% if(ele.categoryDoc.isListed && ele.productDoc.isListed && ele.isListed  && ele.brand.isListed){ %>
             <div class="col" onclick='viewProduct("<%= ele._id %>")'>
               <div class="card product-card border border-0 shadow-sm position-relative" >
@@ -164,6 +161,7 @@
       <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4 row-cols-xxl-5 g-4">
         
         <% inOffer.forEach(ele => { %>
+          <% let inWishlist=false %>
           <% if(ele.categoryDoc.isListed && ele.productDoc.isListed ){ %>
             <div class="col "  onclick='viewProduct("<%= ele._id %>")'>
               <div class="card product-card border border-0 shadow-sm position-relative">
@@ -234,6 +232,16 @@
           headers: {"Content-Type": "application/json" },
           body: JSON.stringify({ variantId })
         })
+
+        const res = await request.json()
+        if(res.message == "out of stock"){
+          swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "This product is out of stock"
+          })
+          return
+        }
         if(request.status==200){
           window.location.href = '/cart'
         }

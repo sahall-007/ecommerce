@@ -110,8 +110,6 @@
     </ol>
   </div> -->
 
-  <% let inWishlist=false %>
-
   <div class="container-fluid px-0 mt-4">
     <div class="row ps-5">
       <div class="col col-md-2  d-xl-block d-none border border-secondary text-secondary sidebar align-self-start p-0">
@@ -200,6 +198,7 @@
               </div> -->
               <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
                 <% allProducts.forEach(ele => { %>
+                  <% let inWishlist=false %>
                   <% if(ele.category.isListed && ele.product.isListed ){ %>
                     <div class="col" onclick='viewProduct("<%= ele._id %>")'>
                       <div class="card product-card  border-1  border-dark  shadow-sm position-relative">
@@ -350,6 +349,7 @@
     </a>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
 
     const searchResult = document.getElementById("searchResult")
@@ -447,6 +447,15 @@
           headers: {"Content-Type": "application/json" },
           body: JSON.stringify({ variantId })
         })
+        const res = await request.json()
+        if(res.message == "out of stock"){
+          swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "This product is out of stock"
+          })
+          return
+        }
         if(request.status==200){
           window.location.href = '/cart'
         }

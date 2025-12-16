@@ -115,6 +115,10 @@ const cartPost = async(req, res) => {
             logger.fatal("blocked")
             return res.status(423).json({success: false, message: "this product is blocked"})
         }
+        if(variant[0].quantity<=0){
+            logger.fatal("out of stock")
+            return res.status(400).json({success: false, message: "out of stock"})
+        }
         
         const cart = await cartSchema.findOne({userId: id})
 
@@ -130,7 +134,6 @@ const cartPost = async(req, res) => {
                         cart.items[i].quantity += 1             
                     }
                     else{
-                        logger.fatal("here is first problem")
                         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
                     }
                 }
@@ -154,7 +157,6 @@ const cartPost = async(req, res) => {
         )
 
         await wishlist.save()
-
         
         return res.status(200).json({success: true, message: "successfully added the product to cart"})
     }

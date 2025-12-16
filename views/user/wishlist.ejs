@@ -190,7 +190,7 @@
             <div class="container py-5">
                 <div class="row">
                     <!-- Cart Items -->
-                    <div class="col-lg-8">
+                    <div class="col-lg-10">
                         <div class="bg-white rounded-3 shadow-sm">
                             <div class="table-responsive">
                                 <table class="table table-borderless align-middle mb-0">
@@ -199,6 +199,7 @@
                                             <th>Product</th>
                                             <th>Variant</th>
                                             <th>Price</th>
+                                            <th></th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -238,6 +239,7 @@
                                                     %>
 
                                                     <td><i class="bi bi-trash3 text-muted cursor-pointer" onclick='removeProduct("<%= index %>", "<%= ele.variant._id %>")'></i></td>
+                                                    <td><button class="btn btn-dark px-4" onclick='addToCart("<%= ele.variant._id %>")'>Add to Cart</button></td>
                                                 </tr>                                        
                                             <% }) %>                                    
                                     </tbody>
@@ -247,18 +249,10 @@
                     </div>
 
                     <!-- Summary -->
-                    <div class="col-lg-4 mt-4 mt-lg-0">
-                        <div class="bg-white rounded-3 shadow-sm p-4 sticky-top" style="top: 1rem; z-index: 10;">
-                            <h5 class="mb-3" id="itemCount">Price (<%= wishlist?.length %> items)</h5>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span>Total Amount:</span>
-                                <span id="totalPrice" class="total-price">&#8377; <%= totalPrice %></span>
-                            </div>
+                    <div class="col-lg-2 mt-4 mt-lg-0">
                             <button class="btn btn-proceed text-white w-100 mt-3"  onclick='moveAllToCart("<%= wishlist[0]._id %>")'>
                                 Move all to cart
                             </button>
-                        </div>
-                        
                     </div>
                     
 
@@ -372,7 +366,16 @@
                         })
                         if(request.status==200){
  
-                            window.location.reload()
+                            const row = document.getElementById(`tableRow-${index}`)
+                            if(row) row.remove()
+
+                            // const nextRow = document.getElementById(`tableRow-${index+1}`)
+                            // if(!nextRow){
+                            //     window.location.reload()
+                            // }
+
+                            // window.location.reload()
+
                             
                         }
                     }   
@@ -395,6 +398,13 @@
             if(request.status==200){
                 window.location.href = "/cart"
             }
+            else if(request.status==400){
+                swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "These products are out of stock"
+                })
+            }
             else if(request.status==404){
                 swal.fire({
                     icon: "error",
@@ -404,6 +414,47 @@
             }
         }
  
+        async function addToCart(variantId){
+            event.stopPropagation()
+            try{
+                const request = await fetch('/cart', {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json" },
+                    body: JSON.stringify({ variantId })
+                })
+
+                const res = await request.json()
+                if(res.message == "out of stock"){
+                    swal.fire({
+                    icon: "warning",
+                    title: "Warning",
+                    text: "This product is out of stock"
+                    })
+                    return
+                }
+                if(request.status==200){
+                    window.location.href = '/cart'
+                }
+                else if(request.status==423){
+                    swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "The product is blocked by the Admin"
+                    })
+                }
+                else if(request.status==400){
+                    swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: "You have reached max quantity limit for this product"
+                    })
+                }
+            }
+            catch(err){
+                alert("add to cart error"),
+                console.log(err)
+            }
+        }
     </script>
 </body>
 

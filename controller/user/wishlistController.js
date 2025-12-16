@@ -54,7 +54,6 @@ const wishlistPost = async(req, res) => {
         const id = req.session.user || req.session?.passport?.user
         
         const user = await userSchema.findOne({_id: id})
-        logger.fatal(id)
         if(!user){
             return res.status(404).json({success: false, message: "user not found"})
         }
@@ -98,12 +97,10 @@ const wishlistPost = async(req, res) => {
         const wishlist = await wishlistSchema.findOne({userId: id})
 
         if(wishlist){
-            logger.fatal("pushed to already existing wishlist")
             wishlist.items.push({variantId})
             await wishlist.save()
         }    
         else{
-            logger.fatal("new wishlist created")
             const newWishlist = new wishlistSchema({
                 userId: id,
                 items: [{variantId}]
@@ -176,33 +173,85 @@ const moveAllToCart = async (req, res) => {
         
         const id = req.session.user || req.session?.passport?.user
 
-        const wishlist = await wishlistSchema.findOne({_id: wishlistId})
-        if(!wishlist){
-            return res.status(404).json({success: false, message: "wishlist not found in the database"})
+        // const wishlist = await wishlistSchema.findOne({_id: wishlistId})
+        const wishlist = await wishlistSchema.aggregate([
+            {$match: {_id: new Types.ObjectId(wishlistId)}},
+            {$unwind: "$items"},
+            {$lookup: {
+                from: "variants",
+                localField: "items.variantId",
+                foreignField: "_id",
+                as: "variant"
+            }},
+            {$project: {"variant.quantity": 1, "variant._id": 1, "_id": 1, "items": 1}},
+            {$unwind: "$variant"},
+            {$match: {"variant.quantity": {$gt: 0}}}
+        ])
+        if(wishlist.length <= 0){
+            return res.status(400).json({success: false, message: "These products are out of stock"})
         }
 
-        const cart = await cartSchema.findOne({userId: wishlist.userId})
-        
-        for(let ele1 in cart.items){
-            for(let ele2 in wishlist.items){
-                if(String(cart.items[ele1].variantId) == String(wishlist.items[ele2].variantId)){
-                    if(cart.items[ele1].quantity >= 5){
-                        wishlist.items.splice(ele2, 1)
-                    }
-                    else{
-                        wishlist.items.splice(ele2, 1)
-                        cart.items[ele1].quantity+=1
-                    }
+        let cart = await cartSchema.findOne({userId: id})
+        if(!cart){
+            cart = new cartSchema({
+                userId: id,
+            })
+            await cart.save()
+        }
+
+        // creating a map so that we dont have to use nested loop to check 
+        // wether each variantId of cart.item match with variantId of wishlist.item
+        let cartMap = new Map()
+
+        // setting key value pairs for the cartMap
+        for(let item of cart.items){
+            cartMap.set(String(item.variantId), item)
+        }
+
+        // main operation of moving products from wishlist to cart
+        for(let wishlistItem of wishlist){            
+            const key = String(wishlistItem.items.variantId)
+
+            if(cartMap.has(key)){
+                const cartItem = cartMap.get(key)
+
+                if(cartItem.quantity < 5){
+                    cartItem.quantity+=1
                 }
+            }
+            else{
+                cart.items.push({
+                    variantId: wishlistItem.items.variantId,
+                    quantity: 1
+                })
             }
         }
 
-        let result = wishlist.items.concat(cart.items)
+        
+        // for(let ele1 in cart.items){
+        //     for(let ele2 in wishlist.items){
+        //         if(String(cart.items[ele1].variantId) == String(wishlist.items[ele2].variantId)){
+        //             if(cart.items[ele1].quantity >= 5){
+        //                 wishlist.items.splice(ele2, 1)
+        //             }
+        //             else{
+        //                 wishlist.items.splice(ele2, 1)
+        //                 cart.items[ele1].quantity+=1
+        //             }
+        //         }
+        //     }
+        // }
 
-        cart.items = result
+        // let result = wishlist.items.concat(cart.items)
+
+        // cart.items = result
         await cart.save()
 
-        await wishlistSchema.findOneAndUpdate({_id: wishlistId}, {$set: {items: []}})
+        const moveToCartIds = wishlist.map(ele => ele.items._id)
+
+        await wishlistSchema.updateOne({_id: wishlistId}, {$pull: {items: {_id: {$in: moveToCartIds}}}})
+
+        const result = await wishlistSchema.findOne({_id: wishlistId})
 
         res.status(200).json({success: true, message: "successfully moved all the products to the cart"})
 
