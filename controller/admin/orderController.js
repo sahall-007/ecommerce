@@ -216,7 +216,7 @@ const pagination = async (req, res) => {
             return res.redirect('/admin/orders')
         }
         const orderCount = await orderSchema.countDocuments()
-        const orders = await orderSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+        const orders = await orderSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit).populate("userId")
 
         console.log(orderCount)
 
@@ -295,6 +295,23 @@ const searchOrder = async (req, res) => {
     }
 }
 
+const returnRequestPage = async (req, res) => {
+    try{
+        const orders = await orderSchema.aggregate([
+            {$match: {"items.status": {$in: ["Return requested", "Return approved", "Returning"]}}}
+        ])
+
+        console.log("this is return requested", orders)
+
+        res.status(200).render('admin/returnRequest', {orders})
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get request return page")
+        res.status(500).json({success: false, message: "something went wrong (request return page)"})
+    }
+}
+
 module.exports = {
     orderManagement,
     adminOrderDetailPage,
@@ -303,5 +320,6 @@ module.exports = {
     returnOrder,
     pagination,
     rejectRequest,
-    searchOrder
+    searchOrder,
+    returnRequestPage
 }

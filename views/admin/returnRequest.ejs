@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Shopping Cart</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <style>
+        .test:hover {
+            background-color: rgb(238, 238, 238);
+        }
+
+        .add-user-btn {
+            background-color: #EF6627;
+            /* border: none; */
+        }
+
+        .active::after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: black;
+            bottom: -7px;
+        }
+
+        .actions {
+            color: #151414;
+        }
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        @media (max-width: 767.98px) {
+        .sidebar {
+            position: fixed;
+            top: 56px; /* height of navbar */
+            left: 0;
+            width: 200px;
+            height: 100vh;
+            background-color: #000;
+            color: white;
+            z-index: 1050;
+            transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+        }
+        .product-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+        }
+        .card {
+            transition: all 0.2s;
+        }
+
+        .order-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12) !important;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- //  ========== NAVBAR ========== -->
+
+    <%- include("../partials/admin/navbar.ejs") %>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+
+    <div class="container px-0 mt-5">
+        <div class="row row-cols-1 gap-5">
+            <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0 sticky-top" style="top: 1rem;">
+                
+                <%- include("../partials/admin/sidebarLinks.ejs") %>
+        
+            </div>
+
+            <div class="card col col-md-8 col-lg-9  px-0 mx-3">
+                <div class="card-header">
+                    <h1 class="text-center">Return requests</h1>
+        
+                    
+                    
+                </div>
+
+                <div class="card-body">
+                    <% if(orders?.length > 0){ %>
+                        <% orders?.forEach((order, orderIndex) => { %>
+                            <% order?.items.forEach((ele, index) => { %>
+                                
+                                
+                                <% 
+                                    let status = ele.status || order?.status;
+                                    
+                                    let btnColor = 
+                                        status === "Pending" ? "warning" :
+                                        status === "Delivered" || status === "partially delivered" ? "success" :
+                                        status === "Shipped" || status === "partially shipped" ? "primary" :
+                                        status === "Cancelled" || status === "Returned" || status === "Refunded" ? "danger" :
+                                        "secondary";
+                                    
+                                    let cardHeaderBg = 
+                                        (status == "Return requested") ? "bg-danger" : 
+                                        (status == "Return approved") ?" bg-success" : 
+                                        (status == "Returning") ?" bg-warning bg-opacity-75" : ""
+
+                                    let cardHeaderText = 
+                                        (status == "Return requested") ? "Return request" : 
+                                        (status == "Return approved") ?" Return Approved" : 
+                                        (status == "Returning") ? "Returning" : ""
+                                
+                                    let cardBg = 
+                                        (status == "Return requested") ? "bg-danger bg-opacity-10" : 
+                                        (status == "Return approved") ? "bg-success bg-opacity-10" : 
+                                        (status == "Returning") ? "bg-warning bg-opacity-10" : "bg-light"
+                                %>
+
+                                <% if(["Return requested", "Return approved", "Returning"].includes(status)){ %>
+                                    <div class="card mb-3">
+                                        <div class="card-header <%= cardHeaderBg %>">
+                                            <div class="d-flex justify-content-between">
+                                                <div class="text-light "><%= cardHeaderText %></div>
+                                                <div>
+                                                    <h5 class="mb-0"><%= order.orderId %></h5>
+                                                    <small>Placed on <%= new Date(order.placedAt).toLocaleDateString('en-GB', {
+                                                        weekday: 'short',
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: 'numeric'
+                                                    }) %></small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="card-body rounded-3 p-3 <%= cardBg %>">
+                                            
+                                            <div class="row align-items-center g-3">
+
+                                                <div class="col-auto">
+                                                    <img src="/<%= ele.image %>" class="rounded" width="80" height="80" alt="Product">
+                                                </div>
+                                                <div class="col">
+                                                    <h6 class="mb-1"><%= ele.name %></h6>
+                                                    <small class="text-muted"><%= ele.ram %> | <%= ele.storage %> | <%= ele.color %></small>
+
+                                                    
+
+                                                    <div class="fw-light text-success" style="font-size: small">&#8377; <%= ele.priceAfterCouponDiscount %></div>
+
+                                                </div>
+
+                                                <!-- STATUS OF THE ORDER -->
+                                                <div id="status-<%= index %>" class="col-auto text-end">
+                                                    <% 
+                                                        
+                                                        
+                                                        let bgColor = 
+                                                            status === "Pending" ? "bg-warning" :
+                                                            status === "Delivered" || status === "partially delivered" ? "bg-success" :
+                                                            status === "Shipped" || status === "partially shipped" ? "bg-primary" :
+                                                            status === "Cancelled" || status === "Returned" || status === "Refunded" ? "bg-danger" :
+                                                            "bg-secondary";
+                                                    %>
+
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <!-- Edit Button (only show if not final state) -->
+                                                        
+
+                                                        <!-- Current Status Badge -->
+                                                        <% if(ele?.status == "Return requested"){ %>
+                                                            <div>
+                                                                <button class="btn btn-dark btn-sm w-100 mb-1"  data-bs-toggle="modal" data-bs-target="#returnReasonModal-<%= index %>">Show Reason</button>
+                                                                <div class="d-flex gap-1">
+                                                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#returnRejectModal-<%= index %>">Reject</button>
+                                                                    <button class="btn btn-success btn-sm" onclick='returnApprove("<%= ele._id %>", "<%= order._id %>", "Return approved", event)'>Approve</button>
+                                                                </div>
+                                                            </div>
+                                                        <%  }else{ %>
+                                                            <div>
+                                                                <div>
+                                                                    <% if (!["Delivered", "Cancelled", "Returned", "Return approved", "Returning", "Return rejected"].includes(status)) { %>                                                                    
+                                                                        <button class="btn btn-sm btn-outline-primary" onclick='editStatus("<%= index %>", event)' >
+                                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                                        </button>
+                                                                    <% } %>
+                                                                    <% if(["Return approved", "Returning"].includes(status)){ %>
+                                                                        <button class="btn btn-sm btn-outline-primary" onclick='editReturnStatus("<%= index %>", event)' >
+                                                                            <i class="bi bi-pencil-square"></i> Edit
+                                                                        </button>
+                                                                    <% } %>
+                                                                    <span class="badge <%= bgColor %> text-white px-3 py-2">
+                                                                        <%= status %>
+                                                                    </span>
+                                                                </div>
+                                                                <% if (!["Delivered", "Cancelled", "Returned", "Return approved", "Returning", "Return rejected"].includes(status)) { %>
+                                                                    <button class="btn btn-danger btn-sm mt-2"  onclick='cancelOrder("<%= ele._id %>", "<%= order.userId._id %>", event)'>Cancel Order</button>
+                                                                <% } %>
+                                                            </div>
+                                                        <% } %>
+
+                                                        <!-- =================RETURN REASON MODAL================= -->                                                                        
+                                                        <div class="modal fade" id="returnReasonModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
+                                                                <div class="modal-content bg-dark text-light">
+                                                                    <div class="modal-header border-secondary">
+                                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Return reason</h1>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <form id="returnForm">
+                                                                        <div class="modal-body text-start">
+
+                                                                            <div class="mb-4 mt-3">
+                                                                                <label class="" for="returnReason">Return reason</label>
+                                                                                <input class="form-control bg-dark text-light border-secondary" type="text" value="<%= ele?.return?.reason %>" disabled>
+                                                                            </div>
+
+                                                                            <div class="my-4">
+                                                                                <label for="custonReturnReason">More specific reason</label>
+                                                                                <textarea class="form-control bg-dark  text-light border-secondary"  disabled><%= ele?.return?.customReason || "Null" %></textarea>
+                                                                            </div>
+
+                                                                            <% if(ele?.return?.image){ %>
+                                                                                <label for="imageInput">Uploaded image</label>
+                                                                                <img src="/<%= ele?.return?.image %>" alt="" style="width: 100px; height: 100px;">                                                                                           
+                                                                            <% } %>
+
+                                                                        </div>
+                                                                        <div class="modal-footer border-secondary">
+                                                                            <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- =================RETURN REJECT REASON MODAL================= -->
+                                                        <div class="modal fade" id="returnRejectModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
+                                                                <div class="modal-content bg-dark text-light">
+                                                                    <div class="modal-header border-secondary">
+                                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Reject reason ?</h1>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div>
+                                                                    <form id="rejectRequestForm-<%= index %>">
+                                                                        <div class="modal-body text-start">
+
+                                                                            <input type="hidden" name="itemId" value="<%= ele._id %>" id="itemId">
+                                                                            <input type="hidden" name="userId" id="userId" value="<%= order.userId %>">
+
+                                                                            <div class="mb-4 mt-3">
+                                                                                <label class="" for="returnReason">Select your reason</label>
+                                                                                <select class="form-select bg-dark text-light border-secondary" name="rejectReason" id="returnReason">
+                                                                                    <option value="" selected>Select a reason</option>
+                                                                                    <option value="Invalid reason">Invalid reason</option>
+                                                                                    <option value="Outside return window">Outside return window</option>
+                                                                                    <option value="Policy violation">Policy violation</option>                                                                                                
+                                                                                </select>
+                                                                            </div>
+
+                                                                            <div class="my-4">
+                                                                                <label for="custonReturnReason">Be more specific (optional)</label>
+                                                                                <textarea class="form-control bg-dark  text-light border-secondary" name="custonReturnRejectReason" id="custonReturnRejectReason"></textarea>
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="modal-footer border-secondary">
+                                                                            <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                            <button type="submit" class="btn btn-primary"  onclick='rejectRequest("<%= index %>", event)'  data-bs-dismiss="modal">Reject request</button>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <!--==================== Hidden Status Editor (will be shown on click) ======================-->
+                                                <% if (!["Delivered", "Cancelled", "Returned"].includes(status)) { %>
+                                                    <div id="editor-<%= index %>" class="col-auto text-end d-none" >
+                                                        <form id="statusUpdateForm-<%= index %>"  class="d-inline statusUpdateForm">
+
+                                                            <input id="orderItemId" type="hidden" name="orderItemId" value="<%= ele._id || ele.id %>">
+                                                            <input id="orderId" type="hidden" name="orderId" value="<%= order._id %>">
+                                                            <input id="index" type="hidden" name="index" value="<%= index %>">
+
+                                                            <div class="input-group input-group-sm" style="max-width: 300px;">
+                                                                <select name="newStatus" class="form-select" required>
+                                                                    <option value="" hidden>-- Select Status --</option>
+                                                                    <option value="Pending" <%= status==='Pending' ? 'selected' : '' %>>Pending</option>
+                                                                    <option value="Out for delivery" <%= status==='Out for delivery' ? 'selected' : '' %>>Out for delivery</option>
+                                                                    <option value="Shipped" <%= status==='Shipped' ? 'selected' : '' %>>Shipped</option>
+                                                                    <option value="Delivered" <%= status==='Delivered' ? 'selected' : '' %>>Delivered</option>
+                                                                    <option value="Cancelled" <%= status==='Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                                    <!-- <option value="Returned" <%= status==='Returned' ? 'selected' : '' %>>Returned</option> -->
+                                                                </select>
+                                                                <a href="" class="btn btn-secondary cancel-edit-btn" onclick='cancelEdit("<%= index %>", event)'>Cancel</a>
+                                                                <button type="submit" class="btn btn-success" onclick='submitNewStatus("<%= index %>", event)'>Save</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+
+                                                    <div id="returnEditor-<%= index %>" class="col-auto text-end d-none" >
+                                                        <form id="returnStatusUpdateForm-<%= index %>"  class="d-inline statusUpdateForm">
+
+                                                            <input id="orderItemId" type="hidden" name="orderItemId" value="<%= ele._id || ele.id %>">
+                                                            <input id="orderId" type="hidden" name="orderId" value="<%= order._id %>">
+                                                            <input id="index" type="hidden" name="index" value="<%= index %>">
+
+                                                            <div class="input-group input-group-sm" style="max-width: 300px;">
+                                                                <select name="newStatus" class="form-select" required>
+                                                                    <option value="" hidden>-- Select Status --</option>
+                                                                    <option value="Return approved" <%= status=='Return Approved' ? 'selected' : '' %>>Return Approved</option>
+                                                                    <option value="Returning" <%= status=='Returning' ? 'selected' : '' %>>Returning</option>
+                                                                    <option value="Returned" <%= status=='Returned' ? 'selected' : '' %>>Returned</option>                                                                                    
+                                                                </select>
+                                                                <a href="" class="btn btn-secondary cancel-edit-btn" onclick='returnCancelEdit("<%= index %>", event)'>Cancel</a>
+                                                                <button type="submit" class="btn btn-success" onclick='returnSubmitNewStatus("<%= ele._id %>", "<%= index %>", event)'>Save</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                <% } %>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+
+                            <% }) %>                                        
+                        <% }) %>                                        
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+       
+
+<footer class="bg-dark text-white text-center py-3 mt-auto">
+    <p class="mb-0">© 2025 ShopEase. All rights reserved.</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    window.addEventListener("unload", function () { });
+
+    function editStatus(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`editor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.add('d-none');
+        editor.classList.remove('d-none');
+    }
+
+    function editReturnStatus(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`returnEditor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.add('d-none');
+        editor.classList.remove('d-none');
+    }
+
+    function cancelEdit(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`editor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.remove('d-none');
+        editor.classList.add('d-none');
+    }
+
+    function returnCancelEdit(index, e){
+        e.preventDefault();
+        // alert(index)
+        const editor = document.getElementById(`returnEditor-${index}`);
+        const statusRow = document.getElementById(`status-${index}`)
+        statusRow.classList.remove('d-none');
+        editor.classList.add('d-none');
+    }
+   
+    async function submitNewStatus(index, e){
+        e.preventDefault()
+        const form = document.getElementById(`statusUpdateForm-${index}`)
+
+        const formData = new FormData(form);
+        const dataObj = Object.fromEntries(formData.entries());
+
+        try{
+            const res = await fetch("/admin/editStatus", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataObj),
+            })
+            
+            if(res.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Succcessfully updated the status"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(res.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to updated the status"
+                })
+            }
+        }
+        catch(err){
+            alert("update status error")
+            console.log(err)
+        }
+    }
+
+    async function returnSubmitNewStatus(itemId, index, e) {
+        e.preventDefault()
+        const form = document.getElementById(`returnStatusUpdateForm-${index}`)
+
+        const formData = new FormData(form);
+        const dataObj = Object.fromEntries(formData.entries());
+
+        try{
+            const request = await fetch('/admin/editStatus', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataObj),
+                
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Succcessfully updated the status"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(request.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Order not found in the database"
+                })
+            }
+            else if(request.status==500){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to updated the status"
+                })
+            }
+        }
+        catch(err){
+            alert("return approve error")
+            console.log(err)
+        }
+    }
+    
+    async function returnApprove(itemId, orderId, newStatus, e) {
+        e.preventDefault()
+        try{
+            const request = await fetch('/admin/editStatus', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderItemId: itemId,
+                    orderId: orderId,
+                    newStatus
+                })
+                
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Succcessfully updated the status"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(request.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Order not found in the database"
+                })
+            }
+            else if(request.status==500){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to updated the status"
+                })
+            }
+        }
+        catch(err){
+            alert("return approve error")
+            console.log(err)
+        }
+    }
+    
+    async function rejectRequest(index, event) {
+        event.preventDefault()
+
+        const form = document.getElementById(`rejectRequestForm-${index}`)
+        const formData = new FormData(form)
+        const dataObj = Object.fromEntries(formData.entries());
+
+        try{
+            const request = await fetch('/admin/rejectRequest', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataObj),
+            })
+            if(request.status==200){
+                swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "Succcessfully rejected the request"
+                })
+                .then(() => window.location.reload())
+            }
+            else if(request.status==404){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Order not found"
+                })
+            }
+            else if(request.status==500){
+                swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: "Failed to rejected the request"
+                })
+            }
+
+        }
+        catch(err){
+
+        }
+
+    }
+    
+
+    
+    async function cancelOrder(itemId, userId, event) {
+        // alert(itemId)
+        event.preventDefault()
+
+        swal.fire({
+            icon: "question",
+            title: "Are you sure",
+            showCancelButton: true,
+            confirmButtonText: "confirm",
+        })
+        .then(async (result) => {
+            if(result.isConfirmed){
+                try{    
+                    const request = await fetch('/admin/cancel', {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json" },
+                        body: JSON.stringify({itemId, userId})
+                    })
+                    if(request.status==200){
+                        swal.fire({
+                            icon: "success",
+                            title: "Success",
+                            text: "This product is cancelled"
+                        })
+                        .then(() => window.location.reload())
+                    }
+                    else if(request.status==404){
+                        swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "Order not found"
+                        })
+                    }
+                    else if(request.status==400){
+                        swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "This item is not cancellable"
+                        })
+                    }
+                    else if(request.status==500){
+                        swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: "variant not found"
+                        })
+                    }
+
+                }
+                catch(err){
+                    alert("cancel product error")
+                    console.log(err)
+                }
+            }
+        })
+        
+    }
+    
+</script>
+</body>
+
+</html>

@@ -37,25 +37,39 @@ const getCouponPage = async (req, res) => {
             {$match: {"coupon.isListed": true}},
             
         ])
+
+        const userCouponSet = new Set()
+
+        userCoupons.forEach(ele => {
+            userCouponSet.add(ele.couponId)
+        })
+
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
-                {$and: [{startDate: {$gte: new Date()}}, {endDate: {$lte: "endDate"}}, {"coupon.isListed": true}]}
+                {$and: [{startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
             },
         ])
 
-        for(let ele1 in globalCoupons){
-            for(let ele2 in userCoupons){
-                if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
-                    globalCoupons.splice(ele1, 1)
-                }
-            }
-        }
+        const filteredGlobalCoupons = globalCoupons.filter(ele => !userCouponSet.has(ele._id))
 
-        
+        // for(let i=0; i<globalCoupons.length; i++){
+        //     const key = globalCoupons[i]._id
+        //     if(userCouponSet.has(key)){
+        //         globalCoupons.splice(i, 1)
+        //         i--
+        //     }
+        // }
 
-        let coupons = userCoupons.concat(globalCoupons)
+        // for(let ele1 in globalCoupons){
+        //     for(let ele2 in userCoupons){
+        //         if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
+        //             globalCoupons.splice(ele1, 1) 
 
-        console.log(coupons)
+        //         }
+        //     }
+        // }
+
+        let coupons = userCoupons.concat(filteredGlobalCoupons)
 
         res.status(200).render('user/coupon', {coupons})
 

@@ -76,18 +76,6 @@
 
     <div class="container px-0 mt-5">
 
-        <!-- <div class="d-flex justify-content-between">
-            <h2 class="mb-5 fw-bold " style="visibility: hidden;" >Your Orders</h2>
-            
-        </div> -->
-
-        <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
-        <!-- <div class="">
-            <button class="btn btn-dark rounded-circle shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#orderFilters">
-                <i class="bi bi-funnel fs-4"></i>
-            </button>
-        </div> -->
-        
         <div class="row row-cols-1 gap-5">
             <!-- ============= FILTER SIDE BAR ============= -->
             <div class="offcanvas offcanvas-start bg-white border-0 shadow-lg" tabindex="-1" id="orderFilters" style="width: 320px; z-index: 9999;">
@@ -100,48 +88,29 @@
                 <div class="offcanvas-body pt-4">
 
                     <!-- Search -->
-                     <form action="/admin/searchOrder" method="post">
+                     <!-- <form action="/admin/searchOrder" method="post">
                          <div class="input-group mb-4">
                              <input type="text" class="form-control form-control-lg" name="search" id="searchOrder" placeholder="Search orders...">
                              <button class="btn btn-outline-secondary" type="submit" id="searchOrderBtn">Button</button>
                          </div>
                      </form>
-                    <hr class="my-4">
+                    <hr class="my-4"> -->
 
-                    <!-- Status Filter -->
-                    <h6 class="fw-bold mb-3">Status</h6>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="mob-pending">
-                        <label class="form-check-label" for="mob-pending">Pending</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="mob-shipped">
-                        <label class="form-check-label" for="mob-shipped">Shipped</label>
-                    </div>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="mob-delivered">
-                        <label class="form-check-label" for="mob-delivered">Delivered</label>
-                    </div>
-                    <div class="form-check mb-4">
-                        <input class="form-check-input" type="checkbox" id="mob-cancelled">
-                        <label class="form-check-label" for="mob-cancelled">Cancelled</label>
-                    </div>
+                    
 
                     <hr class="my-4">
 
                     <!-- Order Date -->
-                    <h6 class="fw-bold mb-3">Orders</h6>
+                    <h6 class="fw-bold mb-3">Sort</h6>
                     <select class="form-select mb-4">
+                        <option value="" selected>-- Select option --</option>
                         <option>Newest First</option>
                         <option>Oldest First</option>
+                        <option>High to Low</option>
+                        <option>Low to High</option>
                     </select>
 
-                    <!-- Price -->
-                    <h6 class="fw-bold mb-3">Price</h6>
-                    <select class="form-select">
-                        <option>High to Low</option>
-                        <option selected>Low to High</option>
-                    </select>
+                   
 
                 </div>
             </div>
@@ -155,12 +124,25 @@
                 <div class="card-header position-relative">
                     <h1 class="text-center">Order Management</h1>
 
-                    <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
-                    <div class="position-absolute top-0 end-0 mt-2 me-2">
-                        <button class="btn btn-dark rounded-circle shadow-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#orderFilters">
-                            <i class="bi bi-funnel fs-4"></i>
-                        </button>
+                    <div class="container">
+                        <div class="row justify-content-between my-5">                        
+                        
+                        <form action="/admin/searchOrder" class="col-8 col-lg-6 align-self-start d-flex gap-2" method="post">
+                            <input class="form-control me-2 " name="search" type="search" id="searchOrder" placeholder="Search orders..." aria-label="Search" />
+                            <button class="btn btn-outline-success" id="searchOrderBtn" type="submit">Search</button>
+                        </form>  
+                        
+
+                        <a href="/admin/returnRequests" class="btn btn-danger col-4 col-lg-3">Return requests</a>
+
                     </div>
+
+                    <!-- HAMBURGER BUTTON (Visible only on mobile/tablet) -->
+                    <!-- <div class="position-absolute top-0 end-0 mt-2 me-2">
+                        <button class="btn btn-dark rounded-circle shadow-lg" type="button">
+                            <i class="bi bi-bell fs-4"></i>
+                        </button>
+                    </div> -->
     
                     <div class="container">
                         <div class="row justify-content-between my-5">

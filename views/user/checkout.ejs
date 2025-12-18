@@ -374,10 +374,18 @@
 
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
-                                <li>
-                                    <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
-                                    <label for="cod" class="fs-6">Cash on delivery</label>
-                                </li>
+                                <% if(payablePrice > 10000){ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
+                                        <label for="cod" class="fs-6">Cash on delivery</label>
+                                    </li>
+                                <% }else{ %>
+                                    <li>
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" disabled> 
+                                        <label for="cod" class="fs-6">Cash on delivery</label>
+                                    </li>
+                                <% } %>
+
                                 <% if(wallet?.balance >= payablePrice){ %>
                                     <li>
                                         <input type="radio" class="paymentMethod" name="paymentMethod" value="Wallet" id="wallet" >
@@ -518,9 +526,6 @@
 
                     document.getElementById(`subTotal-${index}`).innerHTML = `&#8377; ${value*price}`
 
-                    // const couponDiscount = document.getElementById("couponDiscount")
-                    // const [discountPercentage, maxDiscountPrice] = element.value.split(",")
-
                     const total = document.querySelectorAll('.subtotal-price')
                     let totalPrice=0
                     total.forEach(ele => {
@@ -567,6 +572,16 @@
                     }
                     else{ 
                         document.getElementById("wallet").removeAttribute("disabled")                
+                    }
+
+                    if(payableAmount < 10000){
+                        const cod = document.getElementById("cod")
+
+                        cod.checked = false;
+                        cod.disabled = true                        
+                    }
+                    else{
+                        document.getElementById("cod").removeAttribute("disabled")    
                     }
 
                     
@@ -762,12 +777,10 @@
         async function placeOrder(){
 
 
-            const stripe = Stripe("pk_test_51ScQjnK3GRmT480dys7krr31ysDBzhxyFzV5hcr03hcG0xrfA0xiDBjUfh0OIS4dZf8tuN1YxEJ1Q6Wfdd2lDXci00Txh6IaxE");
-
             const totalPriceBeforeDiscount = Number(document.getElementById("totalPrice").textContent)
             const payablePrice = Number(document.getElementById("payablePrice").textContent)
             // const couponDiscount = Number(document.getElementById("couponDiscount").textContent)
-            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value
+            const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value
 
             const coupon = document.getElementById("coupon")
             const [discountPercentage, maxDiscountPrice, selectedCouponId, minPurchasePrice] = coupon.value.split(",")
@@ -781,11 +794,11 @@
                 })
                 return
             }
-            
-            
 
+            
             let isSelected = <%= addressSelected %>;
 
+            console.log("this is payment mehtod")
 
             if(!isSelected){
                 swal.fire({
@@ -806,13 +819,14 @@
                 return
             }
 
-            console.log("this is payment mehtod", paymentMethod)
+            
             console.log("this is disoucnt amount",  discountAmount)
             console.log("thsi is coupon id", couponId)
 
            
                 try{
                     if(paymentMethod=="Stripe"){
+                        const stripe = Stripe("pk_test_51ScQjnK3GRmT480dys7krr31ysDBzhxyFzV5hcr03hcG0xrfA0xiDBjUfh0OIS4dZf8tuN1YxEJ1Q6Wfdd2lDXci00Txh6IaxE");
                         // return initialize();
     
                         // Create a Checkout Session
@@ -901,6 +915,16 @@
             }
             else{ 
                 document.getElementById("wallet").removeAttribute("disabled")                
+            }
+
+            if(payableAmount < 10000){
+                const cod = document.getElementById("cod")
+
+                cod.checked = false
+                cod.disabled = true                        
+            }
+            else{
+                document.getElementById("cod").removeAttribute("disabled")    
             }
 
             

@@ -364,9 +364,9 @@
                                                                         <!-- Current Status Badge -->
                                                                         <% if(ele?.status == "Return requested"){ %>
                                                                             <div>
-                                                                                <button class="btn btn-dark btn-sm w-100 mb-1"  data-bs-toggle="modal" data-bs-target="#returnReasonModal">Show Reason</button>
+                                                                                <button class="btn btn-dark btn-sm w-100 mb-1"  data-bs-toggle="modal" data-bs-target="#returnReasonModal-<%= index %>">Show Reason</button>
                                                                                 <div class="d-flex gap-1">
-                                                                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#returnRejectModal">Reject</button>
+                                                                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#returnRejectModal-<%= index %>">Reject</button>
                                                                                     <button class="btn btn-success btn-sm" onclick='returnApprove("<%= ele._id %>", "<%= order._id %>", "Return approved", event)'>Approve</button>
                                                                                 </div>
                                                                             </div>
@@ -394,7 +394,7 @@
                                                                         <% } %>
     
                                                                         <!-- =================RETURN REASON MODAL================= -->                                                                        
-                                                                        <div class="modal fade" id="returnReasonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                        <div class="modal fade" id="returnReasonModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
                                                                                 <div class="modal-content bg-dark text-light">
                                                                                     <div class="modal-header border-secondary">
@@ -429,14 +429,14 @@
                                                                         </div>
     
                                                                         <!-- =================RETURN REJECT REASON MODAL================= -->
-                                                                        <div class="modal fade" id="returnRejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                        <div class="modal fade" id="returnRejectModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
                                                                                 <div class="modal-content bg-dark text-light">
                                                                                     <div class="modal-header border-secondary">
                                                                                         <h1 class="modal-title fs-5" id="exampleModalLabel">Reject reason ?</h1>
                                                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                                     </div>
-                                                                                    <form id="rejectRequestForm">
+                                                                                    <form id="rejectRequestForm-<%= index %>">
                                                                                         <div class="modal-body text-start">
     
                                                                                             <input type="hidden" name="itemId" value="<%= ele._id %>" id="itemId">
@@ -460,7 +460,7 @@
                                                                                         </div>
                                                                                         <div class="modal-footer border-secondary">
                                                                                             <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                                            <button type="submit" class="btn btn-primary"  onclick='rejectRequest(event)'  data-bs-dismiss="modal">Reject request</button>
+                                                                                            <button type="submit" class="btn btn-primary"  onclick='rejectRequest("<%= index %>", event)'  data-bs-dismiss="modal">Reject request</button>
                                                                                         </div>
                                                                                     </form>
                                                                                 </div>
@@ -766,10 +766,10 @@
         }
     }
     
-    async function rejectRequest(event) {
+    async function rejectRequest(index, event) {
         event.preventDefault()
 
-        const form = document.getElementById("rejectRequestForm")
+        const form = document.getElementById(`rejectRequestForm-${index}`)
         const formData = new FormData(form)
         const dataObj = Object.fromEntries(formData.entries());
 

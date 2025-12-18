@@ -265,7 +265,7 @@ const verifyOtp = async (req, res) => {
             const hashedPassword = await bcrypt.hash(user.password, salt)
             var referral = rndm.base62(10)
 
-            const saveUser = await new userSchema({
+            const saveUser = new userSchema({
                 username: user.username,
                 email: user.email,
                 password: hashedPassword,
@@ -297,7 +297,7 @@ const verifyOtp = async (req, res) => {
                 })
             }
 
-            const coupon = await couponSchema.findOne({code: "WELCOME10"})
+            const coupon = await couponSchema.findOne({code: "WELCOME15"})
             if(coupon){
                 await userCouponSchema.create({
                     userId: saveUser._id,

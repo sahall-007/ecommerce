@@ -250,8 +250,8 @@
                                             
                                             <!-- ============== ITEM 1==================== -->
                                             <% if(order?.items.length > 0){ %>
-                                                <% order?.items.forEach(ele => { %>
-
+                                                <% order?.items.forEach((ele, index) => { %>
+                                                    
                                                     <% 
                                                         let status = ele.status || order.status;
                                                         let btnColor = 
@@ -366,7 +366,7 @@
                                                                             <div>
                                                                                 <div class="text-end">
                                                                                     
-                                                                                    <button class="btn btn-dark btn-sm mb-1"  data-bs-toggle="modal" data-bs-target="#returnRejectModal">Show Reason</button>
+                                                                                    <button class="btn btn-dark btn-sm mb-1"  data-bs-toggle="modal" data-bs-target="#returnRejectModal-<%= index %>">Show Reason</button>
                                                                                 </div>
                                                                                 <div  class="text-end">
     
@@ -377,7 +377,7 @@
                                                                             <div>
                                                                                 <div class="text-end">
                                                                                     
-                                                                                    <button class="btn btn-dark btn-sm mb-1"  data-bs-toggle="modal" data-bs-target="#showReturnReasonModal">Show Reason</button>
+                                                                                    <button class="btn btn-dark btn-sm mb-1"  data-bs-toggle="modal" data-bs-target="#showReturnReasonModal-<%= index %>">Show Reason</button>
                                                                                 </div>
                                                                                 <div  class="text-end">
     
@@ -399,24 +399,21 @@
                                                                             <button class="btn btn-danger btn-sm" onclick='cancelOrder("<%= ele._id %>", "<%= order.userId._id %>", event)'>Cancel Order</button>
                                                                         <% } %>
                                                                         <% if(status=="Delivered"){ %>
-                                                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#returnReasonModal">Return Order</button>
+                                                                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#returnReasonModal-<%= index %>">Return Order</button>
                                                                         <% } %>
     
                                                                     <% } %>
     
                                                                     <!-- =================RETURN REASON MODAL================= -->
-                                                                    <div class="modal fade" id="returnReasonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                    <div class="modal fade" id="returnReasonModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
                                                                             <div class="modal-content bg-dark text-light">
                                                                                 <div class="modal-header border-secondary">
                                                                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Return reason ?</h1>
                                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                                 </div>
-                                                                                <form id="returnForm">
-                                                                                    <div class="modal-body">
-    
-                                                                                        <input type="hidden" name="itemId" value="<%= ele._id %>" id="itemId">
-                                                                                        <input type="hidden" name="userId" id="userId" value="<%= order.userId._id %>">
+                                                                                <form id="returnForm-<%= index %>">
+                                                                                    <div class="modal-body">                                                                                            
     
                                                                                         <div class="mb-4 mt-3">
                                                                                             <label class="" for="returnReason">Select your reason</label>
@@ -444,7 +441,7 @@
                                                                                     </div>
                                                                                     <div class="modal-footer border-secondary">
                                                                                         <button type="reset" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                                        <button type="submit" class="btn btn-primary"  onclick='returnOrder(event)'  data-bs-dismiss="modal">Request return</button>
+                                                                                        <button type="submit" class="btn btn-primary"  onclick='returnOrder("<%= ele._id %>", "<%= order.userId._id %>", "<%= index %>", event)'  data-bs-dismiss="modal">Request return</button>
                                                                                     </div>
                                                                                 </form>
                                                                             </div>
@@ -452,14 +449,14 @@
                                                                     </div>
     
                                                                     <!-- ===================SHOW RETURN REASON MODAL================= -->                                                                        
-                                                                    <div class="modal fade" id="showReturnReasonModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                    <div class="modal fade" id="showReturnReasonModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
                                                                             <div class="modal-content bg-dark text-light">
                                                                                 <div class="modal-header border-secondary">
                                                                                     <h1 class="modal-title fs-5" id="exampleModalLabel">Return reason</h1>
                                                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                                                 </div>
-                                                                                <form id="returnForm">
+                                                                                <form id="showReturnForm">
                                                                                     <div class="modal-body text-start">
     
                                                                                         <div class="mb-4 mt-3">
@@ -487,7 +484,7 @@
                                                                     </div>
 
                                                                     <!-- =================RETURN REJECT REASON MODAL================= -->
-                                                                    <div class="modal fade" id="returnRejectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                    <div class="modal fade" id="returnRejectModal-<%= index %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                                         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
                                                                             <div class="modal-content bg-dark text-light">
                                                                                 <div class="modal-header border-secondary">
@@ -670,7 +667,7 @@
         })        
     }
     
-    async function returnOrder(event){
+    async function returnOrder(itemId, userId, index, event){
         event.preventDefault()
 
         // swal.fire({
@@ -684,11 +681,12 @@
         //     }
         // })
 
-        const itemId = document.getElementById("itemId").value
-        const userId = document.getElementById("userId").value
+        // const itemId = document.getElementById("itemId").value
+        // const userId = document.getElementById("userId").value
 
         console.log("this is itemId", itemId)
         console.log("this is userId", userId)
+        console.log("this is index", index)
 
         
         // const reason = document.getElementById("returnReason").value
@@ -696,11 +694,13 @@
         const image = document.getElementById("imageInput").files[0]
 
         
-        const form = document.getElementById("returnForm")
+        const form = document.getElementById(`returnForm-${index}`)
         const formdata = new FormData(form)
 
 
-        formdata.append(`returnImage`, `${image}.jpeg`);
+        formdata.append(`returnImage`, `${image}.jpeg`)
+        formdata.append(`itemId`, itemId)
+        formdata.append(`userId`, userId)
 
         try{
             const request = await fetch('/return', {
@@ -711,7 +711,7 @@
                 swal.fire({
                     icon: "success",
                     title: "Success",
-                    text: "This product is cancelled"
+                    text: "Successfully requested for return"
                 })
                 .then(() => window.location.reload())
             }

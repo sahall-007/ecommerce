@@ -59,7 +59,6 @@
 
     <%- include("../partials/admin/navbar.ejs") %>
 
-
     <div class="container px-0 mt-5">
         <div class="row row-cols-1 justify-content-between">
             <div class=" col col-md-3 col-lg-2 border border-secondary rounded text-secondary sidebar align-self-start p-0">
@@ -74,22 +73,9 @@
                     <h1 class="text-center">Coupon Management</h1>
     
                     <div class="container">
-                        <div class="row justify-content-between my-5">
+                        <div class="row my-5 justify-content-end">                            
     
-                        <div class="col-3 d-flex justify-content-around border-bottom border-3 align-self-start pb-1 user-status">
-                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status active">All
-                            </h1>
-                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Blocked
-                            </h1>
-                            <h1 class="fs-6 m-0 align-self-start position-relative flex-fill text-center status">Active</h1>
-                        </div>
-    
-                        <form action="/admin/searchCategory" class="col-4 align-self-start d-flex gap-2" method="post">
-                            <input class="form-control me-2 " name="name" type="search" placeholder="Search" aria-label="Search" />
-                            <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form>
-    
-                        <div class="col-2 d-flex justify-content-end  align-self-start">
+                        <div class="col-4 col-lg-3 d-flex justify-content-end  align-self-start">
                             <a role="button" href="/admin/addCoupon"
                                 class="add-user-btn text-light border-0 rounded px-4 py-1 text-decoration-none">Add new</a>
                         </div>
@@ -163,7 +149,7 @@
                                             <td>
                                                 <div class="d-flex gap-4 ">
     
-                                                    <a class="actions" href="/admin/coupon/<%= coupon.code %>" onclick='coupon("<%= coupon._id%>")' ><i class="bi bi-pencil"></i></a>
+                                                    <a class="actions" href="/admin/editCoupon/<%= coupon._id %>" onclick='coupon("<%= coupon._id%>")' ><i class="bi bi-pencil"></i></a>
                                                     <% if(coupon.isListed) { %>
                                                         <a class="actions block-btn"  onclick='block("<%= coupon._id%>")' data-bs-toggle="modal" data-bs-target="#blockModal"><i class="bi bi-eye"></i></a>
                                                     <% } else{ %>

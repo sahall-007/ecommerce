@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offer adding page</title>
+    <title>Edit Coupon page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <style>
@@ -74,8 +74,8 @@
 
                 <div class="card-body" style="background-color: #edededb8;">
                     <div class="">
-                        <h1 class="text-center m-b5">Add new Coupon</h1>
-                    </div>form
+                        <h1 class="text-center m-b5">Edit coupon</h1>
+                    </div>
                     <form action="" method="post" id="form">
                         <div class="container">
                             <div class="row justify-content-around ">
@@ -83,7 +83,7 @@
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="code" class="form-label mb-2 fs-5">Coupon code</label>
-                                        <input autocomplete="off" id="code" class="form-control rounded w-100" name="code" type="text" placeholder="Type here" />
+                                        <input autocomplete="off" id="code" class="form-control rounded w-100" name="code" type="text" value="<%= coupon?.code %>" />
                                         <p class="text-danger" id="codeMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
@@ -91,27 +91,32 @@
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="discount" class="form-label mb-2 fs-5">Discount</label>                                        
-                                        <input autocomplete="off" id="discount" class="form-control rounded w-100" name="discount" type="number" placeholder="Type here" />
+                                        <input autocomplete="off" id="discount" class="form-control rounded w-100" name="discount" type="number" value="<%= coupon?.discount %>"  />
                                         <p class="text-danger" id="discountMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
 
-                                
+                                <% 
+                                    let SDate = coupon?.startDate                                
+                                    let startDate = SDate?.toISOString()?.split("T")[0];
+
+                                    let EDate = coupon?.endDate                                
+                                    let endDate = EDate?.toISOString()?.split("T")[0];
+                                %>
 
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="start" class="form-label mb-2 fs-5">Start date</label>                                        
-                                        <input autocomplete="off" id="startDate" class="form-control rounded w-100" name="start" type="date" placeholder="Type here" />
+                                        <input autocomplete="off" id="startDate" class="form-control rounded w-100" name="start" type="date" value="<%= startDate %>"  />
                                         <p class="text-danger" id="startMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
 
 
-
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="end" class="form-label mb-2 fs-5">End date</label>                                        
-                                        <input autocomplete="off" id="endDate" class="form-control rounded w-100" name="end" type="date" placeholder="Type here" />
+                                        <input autocomplete="off" id="endDate" class="form-control rounded w-100" name="end" type="date" value="<%= endDate %>"/>
                                         <p class="text-danger" id="endMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
@@ -119,7 +124,7 @@
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="minimumPurchase" class="form-label mb-2 fs-5">Minimum purchase</label>                                        
-                                        <input autocomplete="off" id="minimumPurchase" class="form-control rounded w-100" name="minimumPurchase" type="number" placeholder="Type here" />
+                                        <input autocomplete="off" id="minimumPurchase" class="form-control rounded w-100" name="minimumPurchase" type="number" value="<%= coupon?.minimumPurchase %>" />
                                         <p class="text-danger" id="minimumPurchaseMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
@@ -127,7 +132,7 @@
                                 <div class="col-6 col-lg-5 mt-3">
                                     <div class="row align-items-center position-relative">
                                         <label for="maximumDiscount" class="form-label mb-2 fs-5">Maximum discount amount</label>                                        
-                                        <input autocomplete="off" id="maximumDiscount" class="form-control rounded w-100" name="maximumDiscount" type="number" placeholder="Type here" />
+                                        <input autocomplete="off" id="maximumDiscount" class="form-control rounded w-100" name="maximumDiscount" type="number" value="<%= coupon?.maximumDiscount %>" />
                                         <p class="text-danger" id="maximumDiscountMsg" style="font-size: small;"></p>                                    
                                     </div>
                                 </div>
@@ -136,7 +141,7 @@
 
                                 <div class="col-lg-12 d-flex justify-content-end my-4 gap-3">
                                     <a href="/admin/coupon"button" type="submit" class="text-decoration-none text-light px-4 py-1 border-0 rounded bg-black">Cancel</a>
-                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" id="submitBtn" style="background-color: #EF6627;">Add</button>
+                                    <button type="submit" class="text-light px-4 py-1 border-0 rounded" id="submitBtn" style="background-color: #EF6627;">Edit</button>
                                 </div>
 
                             </div>
@@ -149,6 +154,9 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
+
+            const couponId = "<%= coupon._id %>"
+
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
             const searchResult = document.getElementById("searchResult")
@@ -195,26 +203,26 @@
 
                     return
                 }                
-                else if(new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
-                    startMsg.textContent = "Start date cant be less than current date"
-                    codeMsg.textContent = ""
-                    discountMsg.textContent = ""
-                    endMsg.textContent = ""
-                    minimumPurchaseMsg.textContent = ""
-                    maximumDiscountMsg.textContent = ""
+                // else if(new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                //     startMsg.textContent = "Start date cant be less than current date"
+                //     codeMsg.textContent = ""
+                //     discountMsg.textContent = ""
+                //     endMsg.textContent = ""
+                //     minimumPurchaseMsg.textContent = ""
+                //     maximumDiscountMsg.textContent = ""
 
-                    return
-                }
-                else if(new Date(endDate) <=  Date.now()){
-                    endMsg.textContent = "End date cant be less than current date"
-                    codeMsg.textContent = ""
-                    discountMsg.textContent = ""
-                    startMsg.textContent = ""
-                    minimumPurchaseMsg.textContent = ""
-                    maximumDiscountMsg.textContent = ""
+                //     return
+                // }
+                // else if(new Date(endDate) <=  Date.now()){
+                //     endMsg.textContent = "End date cant be less than current date"
+                //     codeMsg.textContent = ""
+                //     discountMsg.textContent = ""
+                //     startMsg.textContent = ""
+                //     minimumPurchaseMsg.textContent = ""
+                //     maximumDiscountMsg.textContent = ""
 
-                    return
-                }
+                //     return
+                // }
                 else if(!amountRegex.test(minimumPurchase)){
                     minimumPurchaseMsg.textContent = "Field required, Must be a positive integer"
                     codeMsg.textContent = ""
@@ -245,7 +253,7 @@
                 }
 
                 try{
-                    const result = await fetch('/admin/addCoupon', {
+                    const result = await fetch(`/admin/editCoupon/${couponId}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ 
@@ -261,7 +269,7 @@
                         swal.fire({
                             icon: "success",
                             title: "Success",                       
-                            text: "Coupon added successfully",
+                            text: "Coupon edited successfully",
                         })
                         .then(() => window.location.href = "/admin/coupon")
                     }

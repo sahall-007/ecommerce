@@ -52,6 +52,24 @@ const couponManagement = async (req, res) => {
     }
 }
 
+const editCouponPage = async (req, res) => {
+    try{
+        const { couponId } = req.params
+
+        const coupon = await couponSchema.findOne({_id: couponId})
+        if(!coupon){
+            return res.status(404).render('pageNotFound')
+        }
+
+        res.status(200).render('admin/editCoupon', {coupon})
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to get edit coupon page")
+        res.status(500).json({success: false, message: "something went wrong (edit coupon page)"})
+    }
+}
+
 const blockCoupon = async (req, res) => {
 
     try{
@@ -85,11 +103,48 @@ const unBlockCoupon = async (req, res) => {
     }
 }
 
+const editCouponPost = async (req, res) => {
+    try{
+        const { couponId } = req.params
+        let { code, discount, startDate, endDate, minimumPurchase, maximumDiscount } = req.body
+
+        const coupon = await couponSchema.findOne({_id: couponId})
+        if(!coupon){
+            return res.status(404).render('pageNotFound')
+        }
+
+        let editCode = code || coupon.code
+        let editDiscount = discount || coupon.discount
+        let editStartDate = startDate || coupon.startDate
+        let editEndDate = endDate || coupon.endDate
+        let editMinimumPurchase = minimumPurchase || coupon.minimumPurchase
+        let editMaximumDiscount = maximumDiscount || coupon.maximumDiscount
+
+        await couponSchema.updateOne({_id: couponId}, {
+            code: editCode,
+            discount: editDiscount,
+            startDate: editStartDate,
+            endDate: editEndDate,
+            minimumPurchase: editMinimumPurchase,
+            maximumDiscount: editMaximumDiscount
+        })
+
+        logger.info("successfully updated the coupon")
+        res.status(200).json({success: true, message: "successfully edited coupon"})
+    }
+    catch(err){
+        logger.fatal(err)
+        logger.fatal("failed to post coupon edit")
+        res.status(500).json({success: false, message: "something went wrong (coupon edit post)"})
+    }
+}
 
 module.exports = {
     addCouponPage,
     addCouponPost,
     couponManagement,
+    editCouponPage,
     blockCoupon,
-    unBlockCoupon
+    unBlockCoupon,
+    editCouponPost
 }

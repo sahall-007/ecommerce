@@ -20,7 +20,7 @@ const variantRoute = require("./variantRoute.js")
 const orderRoute = require('./orderRoute.js')
 const offerRoute = require('./offerRoute.js')
 const couponRoute = require('./couponRoute.js')
-const invoiceRoute = require('./invoice.js')
+const salesReportRoute = require('./salesReportRoute.js')
 
 const router = express.Router()
 
@@ -32,8 +32,6 @@ router.route('/login')
 router.route('/dashboard')
     .get(middleware.checkSession, adminController.loadDashboard)
 
-router.route('/dashboard/time')
-    .get(middleware.checkSession, adminController.loadDashboard)
 
 router.route('/logout')
     .get(adminController.logout)
@@ -63,6 +61,6 @@ router.use(offerRoute)
 router.use(couponRoute)
 
 // invoice ------------------------------
-router.use(invoiceRoute)
+router.use(salesReportRoute)
 
 module.exports = router

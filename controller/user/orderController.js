@@ -30,6 +30,10 @@ const orderPost = async (req, res) => {
         const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
         const userId = req.session.user || req.session?.passport?.user
 
+        console.log("this is coupon discount", discountAmount)
+        console.log("this is coupon id", couponId)
+
+
         const cart = await cartSchema.aggregate([
             {$match: {_id: new Types.ObjectId(cartId)}},
             {$unwind: "$items"},
@@ -105,11 +109,6 @@ const orderPost = async (req, res) => {
             }
         })
 
-        // console.log(cartItems)
-        console.log("payment method", paymentMethod)
-        console.log("discount ammount", discountAmount)
-        console.log("this is coupon id", couponId)
-
         // to decrease the quantity of the product after while ordering
        const bulkOp = cart.map(ele => {
             return{
@@ -131,7 +130,9 @@ const orderPost = async (req, res) => {
             
         const orderId = await generateOrderId()                
 
+        logger.fatal("first")
         const coupon = await couponSchema.findOne({_id: couponId})
+        logger.fatal("second")
             
         const newOrder = new orderSchema({
             orderId,
@@ -199,13 +200,15 @@ const orderPost = async (req, res) => {
         await cartSchema.findOneAndUpdate({_id: cartId}, {$set: {items: []}})
         
         // to reduce the product quantity
-        await variantSchema.bulkWrite(bulkOp)
+        await variantSchema.bulkWrite(bulkOp)        
+    
+        await newOrder.save()
 
         // to give a coupon if it is the first order
         const orderCount = await orderSchema.find({userId}).countDocuments()
         console.log("order count", orderCount)
         if(orderCount==1){
-            const coupon = await couponSchema.findOne({code: "FIRSTORDER5"})
+            const coupon = await couponSchema.findOne({code: "FIRSTORDER10"})
             if(coupon){
                 await userCouponSchema.create({
                     userId,
@@ -215,8 +218,6 @@ const orderPost = async (req, res) => {
                 })
             }
         }
-    
-        await newOrder.save()
 
         logger.info("order success")
         res.status(200).json({success: true, message: "Order successfully placed"})
@@ -424,8 +425,8 @@ const returnOrder = async (req, res) => {
 
         await order.save()
 
-        console.log("this is items after successffull request", item)
-        console.log("updated order", order)
+        // console.log("this is items after successffull request", item)
+        // console.log("updated order", order)
 
         logger.info("success fully req")
         res.status(200).json({success: true, message: "successfully Returned the order"})

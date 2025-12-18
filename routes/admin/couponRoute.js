@@ -9,16 +9,21 @@ const router = express.Router()
 
 
 router.route('/addCoupon')
-    .get(couponController.addCouponPage)
-    .post(couponController.addCouponPost)
+    .get(middleware.checkSession, couponController.addCouponPage)
+    .post(middleware.checkSession, couponController.addCouponPost)
 
 router.route('/coupon')
-    .get(couponController.couponManagement)
+    .get(middleware.checkSession, couponController.couponManagement)
+
+router.route('/editCoupon/:couponId')
+    .get(middleware.checkSession, couponController.editCouponPage)
+    .post(middleware.checkSession, couponController.editCouponPost)
+
 
 router.route('/blockCoupon')
-    .patch(couponController.blockCoupon)
+    .patch(middleware.checkSession, couponController.blockCoupon)
 
 router.route('/unBlockCoupon')
-    .patch(couponController.unBlockCoupon)
+    .patch(middleware.checkSession, couponController.unBlockCoupon)
 
 module.exports = router

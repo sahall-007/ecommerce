@@ -34,4 +34,6 @@ router.route('/rejectRequest')
 router.route('/searchOrder')
     .post(middleware.checkSession, orderController.searchOrder)
 
+router.route('/returnRequests')
+    .get(middleware.checkSession, orderController.returnRequestPage)
 module.exports = router
