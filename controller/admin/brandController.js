@@ -69,8 +69,6 @@ const brandEditPage = async (req, res) => {
 
         const brand = await brandSchema.findOne({name})
 
-        console.log(brand)
-
         res.status(200).render('admin/editBrand', { brand })
     }
     catch(err){
@@ -82,24 +80,27 @@ const brandEditPage = async (req, res) => {
 
 const brandEditPost = async (req, res) => {
     try{
-        const { newName, newStatus } = req.body
+        const { newName, newStatus, newDiscount } = req.body
         const { name } = req.params
-
-        const brandExist = await brandSchema.findOne({name: newName})
         
         // let lowerCaseNewName = newName.toLowerCase()
         // let lowerCaseCurrentName = brand.name.toLowerCase()
         
-        if(brandExist){
-            return res.status(403).json({success: false, message: "Brand already exist"})
+        if(name.toLowerCase() != newName.toLowerCase()){
+            const brandExist = await brandSchema.findOne({name: new RegExp(`^${newName}$`, "i")})
+                
+            if(brandExist){
+                return res.status(403).json({success: false, message: "brand already exist"})
+            }
         }
 
         const brand = await brandSchema.findOne({name})
         
         let editingName = newName || brand.name
+        let editingDiscount = newDiscount || brand.discount
         let isListed = (newStatus=="active") ? true : false
     
-        const edited = await brandSchema.findOneAndUpdate({name}, {$set: { name: editingName, isListed}})
+        const edited = await brandSchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount, isListed}})
     
         res.redirect('/admin/brand')
     }

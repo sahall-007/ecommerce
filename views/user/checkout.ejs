@@ -374,14 +374,14 @@
 
                             <h5 class="mb-3" id="itemCount">Payment Methods</h5>
                             <ul  style="list-style-type: none;">
-                                <% if(payablePrice > 10000){ %>
+                                <% if(payablePrice >= 100000){ %>
                                     <li>
-                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" disabled> 
                                         <label for="cod" class="fs-6">Cash on delivery</label>
                                     </li>
                                 <% }else{ %>
                                     <li>
-                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" disabled> 
+                                        <input type="radio" class="paymentMethod" name="paymentMethod" value="COD" id="cod" checked> 
                                         <label for="cod" class="fs-6">Cash on delivery</label>
                                     </li>
                                 <% } %>
@@ -574,7 +574,7 @@
                         document.getElementById("wallet").removeAttribute("disabled")                
                     }
 
-                    if(payableAmount < 10000){
+                    if(payableAmount >= 100000){
                         const cod = document.getElementById("cod")
 
                         cod.checked = false;
@@ -917,7 +917,7 @@
                 document.getElementById("wallet").removeAttribute("disabled")                
             }
 
-            if(payableAmount < 10000){
+            if(payableAmount >= 100000){
                 const cod = document.getElementById("cod")
 
                 cod.checked = false

@@ -221,8 +221,9 @@ const editCategoryPage = async (req, res) => {
     try{
 
         const { name } = req.params
+        const category = await categorySchema.findOne({name}, {name: 1, discount: 1})        
 
-        res.status(200).render('admin/editCategory', { editName: name })
+        res.status(200).render('admin/editCategory', { editName: category?.name, editDiscount: category?.discount || 0 })
     }
     catch(err){
         console.log(err)
@@ -233,21 +234,25 @@ const editCategoryPage = async (req, res) => {
 
 const editCategoryPost = async (req, res) => {
     try{
-    const { newName, newStatus } = req.body
-    const { name } = req.params
+    const { newName, newStatus, newDiscount } = req.body
+    const { name } = req.params    
 
-    const categoryExist = await categorySchema.findOne({name: newName})
-    
-    if(categoryExist){
-        return res.status(403).json({success: false, message: "category already exist"})
+    if(name.toLowerCase() != newName.toLowerCase()){
+        const categoryExist = await categorySchema.findOne({name: new RegExp(`^${newName}$`, "i")})
+        
+        if(categoryExist){
+            return res.status(403).json({success: false, message: "category already exist"})
+        }
     }
+
     
     const category = await categorySchema.findOne({name})
 
     let editingName = newName || category.name
+    let editingDiscount = newDiscount || category.discount
     let isListed = (newStatus=="active") ? true : false
 
-    const edited = await categorySchema.findOneAndUpdate({name}, {$set: { name: editingName, isListed}})
+    const edited = await categorySchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount , isListed}})
 
     res.redirect('/admin/category')
 

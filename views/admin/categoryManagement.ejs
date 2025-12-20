@@ -100,7 +100,7 @@
                                         <th>No.</th>
                                         <th> Name </th>
                                         <th> Added </th>
-                                        <th> stock </th>
+                                        <th> Discount </th>
                                         <th> Status </th>
                                         <th> Actions </th>
                                     </tr>
@@ -120,7 +120,7 @@
                                                     year: 'numeric',
                                                 }) %>
                                             <td>
-                                                50
+                                                <%= category.discount || 0 %>
                                             </td>
     
                                             <% if(category.isListed) { %>
