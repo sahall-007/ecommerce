@@ -7,7 +7,16 @@
     <title>Admin home page</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        // Replace Math.random() with a pseudo-random number generator to get reproducible results in e2e tests
+        // Based on https://gist.github.com/blixt/f17b47c62508be59987b
+        var _seed = 42;
+        Math.random = function () {
+            _seed = _seed * 16807 % 2147483647;
+            return (_seed - 1) / 2147483646;
+        };
+    </script>
     <style>
         .test:hover {
             background-color: rgb(238, 238, 238);
@@ -54,75 +63,152 @@
                 </div>
                 <div class="card col-10 col-md-8 col-lg-9  px-0 mx-3 main-content">
                     <div class="card-body">
+                        <div class="m-2 text-end">
+                            <a href="/admin/dashboard?timeFrame=weekly" class="btn btn-outline-secondary">Weekly</a>
+                            <a href="/admin/dashboard?timeFrame=monthly" class="btn btn-outline-secondary">Monthly</a>
+                            <a href="/admin/dashboard?timeFrame=yearly" class="btn btn-outline-secondary">Yearly</a>
+                        </div>
                         <!-- Sales Chart -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="mb-0">Sales Trend (Last 30 Days)</h5>
-                            </div>
-                            <div class="card-body">
-                                <canvas id="salesChart" height="100"></canvas>
+                        <div class="container">
+                            <div class="row">
+
+                                <div class="col-12 col-lg-8 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                    <h5 class="mb-0">Sales Trend</h5>
+                                    </div>
+                                    <div class="card-body">
+                                    <div id="chart"></div>
+                                    </div>
+                                </div>
+                                </div>
+
+                                <div class="col-12 col-lg-4 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header">
+                                    <h5 class="mb-0">Order Status</h5>
+                                    </div>
+                                    <div class="card-body">
+                                    <div id="pie"></div>
+                                    </div>
+                                </div>
+                                </div>
+
                             </div>
                         </div>
 
-                        <div class="row gap-3 justify-content-center">
-                            <div class="card col-12 col-lg-5" style="width: 450px;">
-                                <div class="card-body  table-responsive">
-                                    <table class="table table-hover mb-0">
-                                        <thead class="table-light">
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th scope="col">Name</th>
-                                                <th scope="col" class="text-center">Price</th>
-                                                <th scope="col" class="text-center">Sold</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            
+                        <% if(topSellingProducts){ %>
+                            <div class="row gap-3 justify-content-center">
+                                <div class="card col-12 col-lg-8">
+                                    <div class="card-body  table-responsive">
+                                        <table class="table table-hover mb-0">
+                                            <thead class="table-light">
                                                 <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td class="text-center"></td>
-                                                    <td class="text-center"></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                    <th scope="col">#</th>
+                                                    <th scope="col">Name</th>
+                                                    <th scope="col" class="text-center">Price</th>
+                                                    <th scope="col" class="text-center">Variant</th>
+                                                    <th scope="col" class="text-center">Sold</th>
                                                 </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                                <% topSellingProducts?.variantCount?.forEach((ele, index)=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= index + 1%>
+                                                        </td>
+                                                        <td>
+                                                            <%= ele.name %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= ele.price %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= ele.ram %> | <%= ele.storage %> | <%= ele.color %>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <%= ele.count %>
+                                                        </td>
+                                                    </tr>
+                                                <% }) %>
                                             
-                                        </tbody>
-                                    </table>
+
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-lg-3">
+                                    <div class="card mb-1">
+                                        <div class="card-body  table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Categroy</th>
+                                                        <th scope="col">Sold</th>
+        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+        
+                                                    
+                                                    <% topSellingProducts?.categoryCount?.forEach((ele, index)=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= index + 1%>
+                                                            </td>
+                                                            <td>
+                                                                <%= ele._id %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= ele.count %>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                    
+        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="card">
+                                        <div class="card-body  table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th scope="col">#</th>
+                                                        <th scope="col">Brand</th>
+                                                        <th scope="col">Sold</th>
+        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+        
+                                                    
+                                                    <% topSellingProducts?.brandCount?.forEach((ele, index)=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= index + 1%>
+                                                            </td>
+                                                            <td>
+                                                                <%= ele._id %>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <%= ele.count %>
+                                                            </td>
+                                                        </tr>
+                                                    <% }) %>
+                                                
+        
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="card col-12 col-lg-6">
-                                <div class="card-body  table-responsive">
-                                   <table class="table table-hover mb-0">
-                                       <thead class="table-light">
-                                           <tr>
-                                               <th scope="col">#</th>
-                                               <th scope="col">Order ID</th>
-                                               <th scope="col" class="text-center">Date</th>
-                                               <th scope="col" class="text-center">Customer</th>
-                                               <th scope="col">Amount</th>
-                                               <th scope="col">Discount</th>
-                                               <th scope="col">Coupon</th>
-                                           </tr>
-                                       </thead>
-                                       <tbody>
-                                           
-                                               <tr>
-                                                   <td></td>
-                                                   <td></td>
-                                                   <td class="text-center"></td>
-                                                   <td class="text-center"></td>
-                                                   <td></td>
-                                                   <td></td>
-                                                   <td></td>
-                                               </tr>
-                                           
-                                       </tbody>
-                                   </table>
-                                </div>
-                            </div>
-                        </div>
+                        <% } %>
                     </div>
                 </div>
 
@@ -130,17 +216,86 @@
         </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-    crossorigin="anonymous"></script>
-<script>
-    const sidebar = document.querySelector('.sidebar');
-    const toggleBtn = document.getElementById('menuToggle');
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+            crossorigin="anonymous"></script>
+        <script>
+            const chartDates = <%- JSON.stringify(chartDates) %>
+            const chartValues = <%- JSON.stringify(chartValues) %>
+            const pieFields = <%- JSON.stringify(pieFields) %>
+            const pieValues = <%- JSON.stringify(pieValues) %>
 
-    toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('show');
-    });
-</script>
+            const sidebar = document.querySelector('.sidebar');
+            const toggleBtn = document.getElementById('menuToggle');
+
+            toggleBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+
+            var options = {
+                series: [{
+                    name: "Sales",
+                    data: chartValues
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'straight'
+                },
+                // title: {
+                //     text: 'Product Trends by Month',
+                //     align: 'left'
+                // },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: chartDates
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+
+            var pieOptions = {
+                series: pieValues, 
+                chart: {
+                    type: 'donut',
+                    height: 350 
+                },
+                labels: pieFields, 
+                legend: {
+                    position: 'bottom'  
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var pieChart = new ApexCharts(document.querySelector("#pie"), pieOptions);
+            pieChart.render();
+
+
+        </script>
 
 </body>
 

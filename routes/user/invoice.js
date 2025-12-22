@@ -12,7 +12,7 @@ router.get('/invoice/:orderId', authMiddleware.checkSession, async (req, res) =>
     try {
         const order = await Order.findOne({
             orderId: req.params.orderId,
-            userId: req.session.user
+            userId: req.session?.user || req.session?.passport?.user
         });
 
         if (!order) {

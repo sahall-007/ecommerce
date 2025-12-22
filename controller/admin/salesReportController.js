@@ -127,7 +127,6 @@ const salesReport = async (req, res) => {
                 "user.username": 1
             }},
         ])
-        logger.warn(timeFrame)
         res.render('admin/salesReport', {orders, timeFrame})
     }
     catch(err){

@@ -71,7 +71,10 @@ const checkoutPage = async (req, res) => {
         const address = await addressSchema.findOne({userId: id})
 
         const userCoupons = await userCouponSchema.aggregate([
-            {$match: {userId: new Types.ObjectId(id)}},
+            // {$match: {userId: new Types.ObjectId(id)}},
+            {$match: 
+                {$and: [{userId: new Types.ObjectId(id)}, {startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}]}
+            },
             {$lookup: {
                 from: "coupons",
                 localField: "couponId",
@@ -83,6 +86,14 @@ const checkoutPage = async (req, res) => {
             // {$project: {couponId: 1, "coupon.code": 1, "coupon.discount": 1, "coupon.minimumPurchase": 1, "coupon.maximumDiscount": 1}}
             
         ])
+
+        console.log(userCoupons)
+
+        const userCouponSet = new Set()
+        
+        userCoupons.forEach(ele => {
+            userCouponSet.add(ele.couponId)
+        })
         const globalCoupons = await couponSchema.aggregate([
             {$match: 
                 {$and: [{startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
@@ -90,16 +101,18 @@ const checkoutPage = async (req, res) => {
             // {$project: {_id: 1, code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
         ])
 
-        for(let ele1 in globalCoupons){
-            for(let ele2 in userCoupons){
-                if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
-                    globalCoupons.splice(ele1, 1)
-                }
-            }
-        }
+        const filteredGlobalCoupons = globalCoupons.filter(ele => !userCouponSet.has(ele._id))
+
+        // for(let ele1 in globalCoupons){
+        //     for(let ele2 in userCoupons){
+        //         if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
+        //             globalCoupons.splice(ele1, 1)
+        //         }
+        //     }
+        // }
 
 
-        let coupons = userCoupons.concat(globalCoupons)
+        let coupons = userCoupons.concat(filteredGlobalCoupons)
 
         // console.log("this is usercoupons", userCoupons)
         // console.log("this are global coupons", globalCoupons)

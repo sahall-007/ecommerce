@@ -208,13 +208,14 @@ const orderPost = async (req, res) => {
         const orderCount = await orderSchema.find({userId}).countDocuments()
         console.log("order count", orderCount)
         if(orderCount==1){
+            const now = new Date()
             const coupon = await couponSchema.findOne({code: "FIRSTORDER10"})
             if(coupon){
                 await userCouponSchema.create({
                     userId,
                     couponId: coupon._id,
-                    startDate: Date.now(),
-                    endDate: Date.now() + ((60 * 1000) * 60 * 24 * 3) 
+                    startDate: now,
+                    endDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
                 })
             }
         }
