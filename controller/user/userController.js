@@ -157,15 +157,17 @@ const loginPost = async (req, res) => {
         if(!userExist){
             return res.status(404).json({success: false, message: "create an account first"})
         }
+
+        if(userExist.isListed==false){
+            return res.status(403).json({success: false, message: "You are blocked by the Admin"})
+        }
         
         const isMatch = await bcrypt.compare(password, userExist.password)
         if (!isMatch || userExist.email !== email) {
             return res.status(401).json({success: false, message: "invalid email or password"})
         }
         
-        if(userExist.isListed==false){
-            return res.status(403).json({success: false, message: "You are blocked by the Admin"})
-        }
+        
 
         var referral = rndm.base62(10)
         if(!userExist?.referral){
