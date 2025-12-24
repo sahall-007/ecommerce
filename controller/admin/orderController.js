@@ -36,7 +36,6 @@ const orderManagement = async (req, res) => {
 const adminOrderDetailPage = async (req, res) => {
     try{
         const { orderId } = req.params
-        // logger.info(orderId)
         const order = await orderSchema.findOne({_id: orderId})
 
         if(!order){
@@ -111,9 +110,6 @@ const editStatus = async (req, res) => {
 
         await order.save()
         
-        logger.info("successfully edited the status")
-        // console.log("this is the order item", order.items.id(orderItemId))
-
         res.status(200).json({success: true, message: "successfully changed the product status"})
     }
     catch(err){
@@ -218,8 +214,6 @@ const pagination = async (req, res) => {
         const orderCount = await orderSchema.countDocuments()
         const orders = await orderSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit).populate("userId")
 
-        console.log(orderCount)
-
         if(pageNo * limit + limit >= orderCount){
             res.render('admin/orderManagement', { orders, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
@@ -255,13 +249,7 @@ const rejectRequest = async (req, res) => {
 
         await order.save()
 
-        console.log("this is items after successffull request", item)
-        console.log("updated order", order)
-
-        logger.info("successfully rejected")
         res.status(200).json({success: true, message: "successfully rejected the request"})
-        
-    
     }
     catch(err){
         logger.fatal(err)
@@ -274,18 +262,8 @@ const rejectRequest = async (req, res) => {
 const searchOrder = async (req, res) => {
     try{
         const { search } = req.body
-        // console.log(search)
-        // const orders = await orderSchema.find({orderId: search})
-
-        // if(orders.length > 0){
-        //     return res.status(200).render('admin/orderManagement', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
-        // }
-        // else{
-        //     res.status(404).json({success: false, message: "cannot find the order in the database"})
-        // }
 
         return res.redirect(`/admin/orders?search=${search}`)
-
 
     }
     catch(err){
@@ -300,8 +278,6 @@ const returnRequestPage = async (req, res) => {
         const orders = await orderSchema.aggregate([
             {$match: {"items.status": {$in: ["Return requested", "Return approved", "Returning"]}}}
         ])
-
-        console.log("this is return requested", orders)
 
         res.status(200).render('admin/returnRequest', {orders})
     }

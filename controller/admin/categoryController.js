@@ -1,7 +1,6 @@
 
 const categorySchema = require('../../model/categorySchema.js')
 
-
 const loadCategoryManagement = async (req, res) => {
     try{
         const categoryCount = await categorySchema.countDocuments()
@@ -39,7 +38,6 @@ const addCategoryPost = async(req, res) => {
         const existCategory = await categorySchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
         if(existCategory){
-            // throw new Error()
             return res.status(403).json({success: false, message: "category already exist"})
         }
 
@@ -107,7 +105,6 @@ const deleteCategory = async (req, res) => {
             return res.status(404).json({status: false, message: "category not found"})
         }
 
-        res.status(200).json({message: "successfully deleted the category"})
     }
     catch(err){
         console.log(err)
@@ -129,8 +126,6 @@ const pagination = async (req, res) => {
         const categoryCount = await categorySchema.countDocuments()
         const categories = await categorySchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        console.log(categoryCount)
-
         if(pageNo * limit + limit >= categoryCount){
             res.render('admin/categoryManagement', { categories, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
@@ -146,30 +141,6 @@ const pagination = async (req, res) => {
     }
 }
 
-// const prevPage = async (req, res) => {
-// console.log("prev handler hit.........")
-//     try{
-//         const { page } = req.params
-
-//         const pageNo = Number(page)
-//         const limit = 5
-
-//         if(pageNo==0){
-//             return res.redirect('/admin/category')
-//         }
-
-//         const categories = await categorySchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
-
-//         res.render('admin/categoryManagement', { categories, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-
-//     }
-//     catch(err){
-//         console.log(err)
-//         console.log("failed to get previous page")
-//         res.status(500).json({message: "something went wrong, (category prev page)"})
-//     }
-// }
-
 const searchCategory = async (req, res) => {
     try{
         const { name } = req.body
@@ -181,7 +152,6 @@ const searchCategory = async (req, res) => {
         const category = await categorySchema.findOne({name})
 
         if(!category){
-            console.log("here is the error")
             let nullValue = null
             return res.redirect(`/admin/catSearchResult/${nullValue}`)
         }
@@ -234,34 +204,33 @@ const editCategoryPage = async (req, res) => {
 
 const editCategoryPost = async (req, res) => {
     try{
-    const { newName, newStatus, newDiscount } = req.body
-    const { name } = req.params    
+        const { newName, newStatus, newDiscount } = req.body
+        const { name } = req.params    
 
-    if(name.toLowerCase() != newName.toLowerCase()){
-        const categoryExist = await categorySchema.findOne({name: new RegExp(`^${newName}$`, "i")})
-        
-        if(categoryExist){
-            return res.status(403).json({success: false, message: "category already exist"})
+        if(name.toLowerCase() != newName.toLowerCase()){
+            const categoryExist = await categorySchema.findOne({name: new RegExp(`^${newName}$`, "i")})
+            
+            if(categoryExist){
+                return res.status(403).json({success: false, message: "category already exist"})
+            }
         }
+        
+        const category = await categorySchema.findOne({name})
+
+        let editingName = newName || category.name
+        let editingDiscount = newDiscount || category.discount
+        let isListed = (newStatus=="active") ? true : false
+
+        const edited = await categorySchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount , isListed}})
+
+        res.redirect('/admin/category')
+
     }
-
-    
-    const category = await categorySchema.findOne({name})
-
-    let editingName = newName || category.name
-    let editingDiscount = newDiscount || category.discount
-    let isListed = (newStatus=="active") ? true : false
-
-    const edited = await categorySchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount , isListed}})
-
-    res.redirect('/admin/category')
-
-}
-catch(err){
-    console.log(err)
-    console.log("failed to edit category")
-    res.status(500).json({message: "somthing went wrong (edit category post)"})
-}
+    catch(err){
+        console.log(err)
+        console.log("failed to edit category")
+        res.status(500).json({message: "somthing went wrong (edit category post)"})
+    }
 }
 
 module.exports = {
@@ -272,7 +241,6 @@ module.exports = {
     unBlockCategory,
     deleteCategory,
     pagination,
-    // prevPage,
     searchCategory,
     searchResult,
     editCategoryPage,

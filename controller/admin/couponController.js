@@ -17,7 +17,6 @@ const addCouponPage = async (req, res) => {
 const addCouponPost = async (req, res) => {
     try{
         let { code, discount, startDate, endDate, minimumPurchase, maximumDiscount } = req.body
-        console.log(req.body)
     
         await couponSchema.create({
             code, 
@@ -87,7 +86,6 @@ const blockCoupon = async (req, res) => {
 }
 
 const unBlockCoupon = async (req, res) => {
-    logger.fatal("its hit")    
     try{
         const { id } = req.body
 

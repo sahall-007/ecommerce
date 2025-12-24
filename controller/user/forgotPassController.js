@@ -3,11 +3,10 @@
 const userSchema = require('../../model/userSchema.js')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
-const env = require('dotenv').config()
 const session = require('express-session')
 const { hasSession } = require('../../middlewares/userAuth.js')
 
-const logger = require("../../config/logger.js")
+const logger = require("../../config/pinoLogger.js")
 
 function generateOtp(){
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -75,7 +74,6 @@ const forgotEmailValidation = async (req, res) => {
                     expiryAt: Date.now() + 60 * 1000
                 }
                 req.session.forgotEmail = email
-                // res.render('forgotPassOtp')
                 console.log("OTP: ", otp)
                 return res.status(200).json({success: true, message: "successfully send otp to the email"})
             }
@@ -131,17 +129,6 @@ const otpPost = async (req, res) => {
                 res.status(404).json({success: false, message: "Email not found in the database"})
             }
 
-            // const saveUser = await new userSchema({
-            //     username: user.username,
-            //     email: user.email,
-            //     password: hashedPassword,
-            //     isListed: true
-            // })
-
-            // await saveUser.save()
-            // req.session.user = saveUser._id
-
-            // return res.redirect('/')
             return res.status(200).json({success: false, message: "OTP verified successfully"})
         }
         else{

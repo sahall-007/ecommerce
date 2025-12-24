@@ -121,11 +121,8 @@ const wishlistPost = async(req, res) => {
 const updateQuantity = async (req, res) => {
     try{
         const { change, index, cartId } = req.body
-        const id = req.session.user || req.session?.passport?.user
     
         const cart = await cartSchema.findOne({_id: cartId})
-
-        // console.log(cart)
 
         cart.items[index].quantity+=Number(change)
     
@@ -144,8 +141,6 @@ const updateQuantity = async (req, res) => {
 const removeProduct = async (req, res) => {
     try{
         const { variantId } = req.body
-        logger.fatal({variantId}, "wishlist remove Id")
-        
         
         const userId = req.session.user || req.session?.passport?.user
 
@@ -154,7 +149,6 @@ const removeProduct = async (req, res) => {
         // to remove the variant from the wishlist collection
         wishlist.items = wishlist.items.filter(ele => String(ele.variantId) != String(variantId))
         await wishlist.save()
-        
 
         logger.fatal("successfulyy removed the variant from the wishlist")
         res.status(200).json({success: true, message: "successfully removed the product from wishlist"})
@@ -173,7 +167,6 @@ const moveAllToCart = async (req, res) => {
         
         const id = req.session.user || req.session?.passport?.user
 
-        // const wishlist = await wishlistSchema.findOne({_id: wishlistId})
         const wishlist = await wishlistSchema.aggregate([
             {$match: {_id: new Types.ObjectId(wishlistId)}},
             {$unwind: "$items"},
@@ -227,24 +220,6 @@ const moveAllToCart = async (req, res) => {
             }
         }
 
-        
-        // for(let ele1 in cart.items){
-        //     for(let ele2 in wishlist.items){
-        //         if(String(cart.items[ele1].variantId) == String(wishlist.items[ele2].variantId)){
-        //             if(cart.items[ele1].quantity >= 5){
-        //                 wishlist.items.splice(ele2, 1)
-        //             }
-        //             else{
-        //                 wishlist.items.splice(ele2, 1)
-        //                 cart.items[ele1].quantity+=1
-        //             }
-        //         }
-        //     }
-        // }
-
-        // let result = wishlist.items.concat(cart.items)
-
-        // cart.items = result
         await cart.save()
 
         const moveToCartIds = wishlist.map(ele => ele.items._id)
@@ -262,7 +237,6 @@ const moveAllToCart = async (req, res) => {
         res.status(500).json({success: false, message: "something went wrong (move all to cart from wishlist)"})
     }
 }
-
 
 module.exports = {
     wishlistPage,

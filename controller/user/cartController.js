@@ -1,14 +1,7 @@
 
-const userSchema = require('../../model/userSchema.js')
-const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
-const categorySchema = require('../../model/categorySchema.js')
-const brandSchema = require('../../model/brandSchema.js')
 const cartSchema = require('../../model/cartSchema.js')
 const wishlistSchema = require('../../model/wishlistSchema.js')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
-const env = require('dotenv').config()
 const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
@@ -17,7 +10,6 @@ const cartPage = async (req, res) => {
     try {
         const id = req.session?.user || req.session?.passport?.user
 
-        // const cart = await cartSchema.findOne({userId: id})
         const cart = await cartSchema.aggregate([
             {$match: {userId: new Types.ObjectId(id)}},
             {$unwind: "$items"},
@@ -77,7 +69,6 @@ const cartPost = async(req, res) => {
         const { variantId } = req.body
         const id = req.session.user || req.session?.passport?.user
 
-        // ObjectId('690a022f476fdb5aa0150823')
         const variant = await variantSchema.aggregate([
             {$match: {_id: new Types.ObjectId(variantId)}},
             {$lookup: {
@@ -112,11 +103,11 @@ const cartPost = async(req, res) => {
             })
         }
         if(variant[0].isListed==false ||  variant[0]?.productDoc.isListed==false || variant[0]?.categoryDoc.isListed==false || variant[0]?.brand.isListed==false){
-            logger.fatal("blocked")
+            logger.warn("blocked")
             return res.status(423).json({success: false, message: "this product is blocked"})
         }
         if(variant[0].quantity<=0){
-            logger.fatal("out of stock")
+            logger.warn("out of stock")
             return res.status(400).json({success: false, message: "out of stock"})
         }
         
@@ -128,10 +119,14 @@ const cartPost = async(req, res) => {
             for(let i=0; i<cart.items.length; i++){
 
                 if(cart.items[i].variantId==variantId ){
-                    
+
                     if(cart.items[i].quantity < 5){
                         variantExist = true
-                        cart.items[i].quantity += 1             
+                        cart.items[i].quantity += 1  
+                        
+                            if(cart.items[i].quantity > variant[0].quantity){
+                            return res.status(400).json({success: false, message: "max quantity of product reached"})                            
+                        }
                     }
                     else{
                         return res.status(400).json({success: false, message: "Max quantity cant be greater than 5"})   
@@ -171,7 +166,6 @@ const cartPost = async(req, res) => {
 const updateQuantity = async (req, res) => {
     try{
         const { change, index, cartId } = req.body
-        const id = req.session.user || req.session?.passport?.user
     
         const cart = await cartSchema.findOne({_id: cartId})
 
@@ -196,9 +190,7 @@ const removeProduct = async (req, res) => {
         await cartSchema.findOneAndUpdate({_id: cartId}, {$unset: {[`items.${index}`]: 1}})
         await cartSchema.findOneAndUpdate({_id: cartId}, {$pull: {items: null}})
 
-
         res.status(200).json({success: true, message: "successfully removed the product from cart"})
-
     }
     catch(err){
         logger.fatal(err)

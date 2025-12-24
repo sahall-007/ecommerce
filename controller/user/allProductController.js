@@ -1,41 +1,15 @@
-const userSchema = require('../../model/userSchema.js')
 const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
 const wishlistSchema = require('../../model/wishlistSchema.js')
-const { options } = require('../../routes/user/user.js')
 
-const logger = require("../../config/logger.js")
-
+const logger = require("../../config/pinoLogger.js")
 
 const allProducts = async (req, res) => {
     try {
+        const userId = req.session?.user || req.session?.passport?.user
 
-        const userId = req.session.user || req.session?.passport?.user
-
-        const referer = req.get("Referer");
-
-        if (referer) {
-            const url = new URL(referer);
-            console.log(url.pathname);  // this gives the path
-        }
-        let breadCrumbs
-
-        if(req.get("Referer")=="http://localhost:3000/"){
-            breadCrumbs = [
-                {name: "Home", url: "/"},
-                {name: "All products", url: '/allProducts'}
-            ]
-        }
-        else{
-            breadCrumbs = [
-                {name: "Home", url: "/"},
-                {name: req.get("Referer"), url: req.get("Referer")},
-                {name: "All products", url: '/allProducts'}
-            ]
-        }
-        
         const filter = {}
         const toSort = {}
 
@@ -134,66 +108,7 @@ const filter = async (req, res) => {
             category, brand, min, max, sort
         }
 
-        // console.log(req.body)
-        
-        // const filter = {}
-        // const toSort = {}
-        // // const toSortProduct = {}
-
-        // if(category.length){
-        //     filter["category.name"] = {$in: category}
-        // }
-        // if(brand.length){
-        //     filter["brand.name"] = {$in: brand}
-        // }
-        // if(min || max){
-        //     if(min=="" && max!="") filter.price = {$gte: 0, $lte: +max}            
-        //     if(max=="" && min!="") filter.price = {$gte: +min, $lte: Infinity}            
-        //     if(min!="" && max!="") filter.price = {$gte: +min, $lte: +max}
-        // }
-
-        // if(sort){
-        //     if(sort=="none") toSort.$sort = {"natural": 1}
-
-        //     else if(sort=="h-l") toSort.$sort = {price: -1}
-        //     else if(sort=="l-h") toSort.$sort = {price: 1}
-            
-        //     else if(sort=="a-z") toSort.$sort = {"product.name": 1}
-        //     else if(sort=="z-a") toSort.$sort = {"product.name": -1}
-        //     // if(sort=="none") toSort.$sort = {"natural": 1}
-        // }
-        
-
-        // const products = await variantSchema.aggregate([
-        //     {$lookup: {
-        //         from: "products",
-        //         localField: "productId",
-        //         foreignField: "_id",
-        //         as: "product"
-        //     }},
-        //     {$unwind: "$product"},
-        //     {$lookup: {
-        //         from: "categories",
-        //         localField: "product.categoryId",
-        //         foreignField: "_id",
-        //         as: "category"
-        //     }},
-        //     {$unwind: "$category"},
-        //     {$lookup: {
-        //         from: "brands",
-        //         localField: "product.brandId",
-        //         foreignField: "_id",
-        //         as: "brand"
-        //     }},
-        //     {$unwind: "$brand"},
-        //     {$match: filter},
-        //     toSort,
-        // ])
-
-        // req.session.filterProducts = products
-
         return res.status(200).json({success: true, message: "filter post successfull"})
-
     }
     catch(err){
         console.log(err)
@@ -204,7 +119,6 @@ const filter = async (req, res) => {
 
 const filterPage = async (req, res) => {
     try{
-
         const { category, brand, min, max, sort } = req.session.filter
 
         const filter = {}
@@ -269,8 +183,6 @@ const filterPage = async (req, res) => {
         }
 
         res.status(200).render('user/allProducts', { allProducts: sample, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null })
-
-
     }
     catch(err){
         console.log(err)
@@ -373,58 +285,11 @@ const pagination = async (req, res) => {
     }
 }
 
-// const prevPage = async (req, res) => {
-//     try{
-//         const { page } = req.params
-//         const userId = req.session.userId || req.session?.passport?.userId
-        
-//         const pageNo = Number(page)
-//         const limit = 12
-
-//         if(pageNo==0){
-//             return res.redirect('/allProducts')
-//         }
-
-//         const variantCount = await variantSchema.countDocuments()
-//         const allProducts = await variantSchema.aggregate([
-//             {$skip: limit * pageNo},
-//             {$sort: {_id: -1}},
-//             {$lookup: {
-//                 from: "products",
-//                 localField: "productId",
-//                 foreignField: "_id",
-//                 as: "product"
-//             }},
-//             {$unwind: "$product"},
-//             {$lookup: {
-//                 from: "categories",
-//                 localField: "product.categoryId",
-//                 foreignField: "_id",
-//                 as: "category"
-//             }},
-//             {$unwind: "$category"},
-//             {$match: { isListed: true, "product.isListed": true, "category.isListed": true }},
-//             {$sample: {size: limit}}
-//         ])
-//         const wishlist = await wishlistSchema.findOne({userId})
-//         const category = await categorySchema.find({isListed: true}, {name: 1})
-//         const brand = await brandSchema.find({isListed: true}, {name: 1})
-
-//         res.render( 'user/allProducts', { allProducts, category, brand, wishlist, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-
-//     }
-//     catch(err){
-//         console.log(err)
-//         console.log("failed to get the previous page of all products")
-//         res.status(500).json({success: false, message: "something went wrong (all products previous page)"})
-//     }
-// }
 
 module.exports = {
     allProducts,
     filter,
     filterPage,
     search,
-    pagination,
-    // prevPage
+    pagination
 }

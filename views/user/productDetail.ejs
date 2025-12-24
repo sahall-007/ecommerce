@@ -175,12 +175,8 @@
               <% variant.forEach(ele=> { %>
                 <% ele.image.forEach(image=> { %>
                   <img src="/<%= image %>" class="thumb-img " onclick="changeImage(this)" />
-                  <% }) %>
-                    <% }) %>
-                      <!-- <img src="/uploads/image-1-1762263599050-cropped-1.jpeg" class="thumb-img " onclick="changeImage(this.src)" />
-                <img src="/uploads/image-1-1762263599049-cropped-0.jpeg" class="thumb-img" onclick="changeImage(this.src)" />
-                <img src="/uploads/image-1-1762263599056-cropped-2.jpeg" class="thumb-img" onclick="changeImage(this.src)" />
-                <img src="/uploads/image-1-1762305360199-cropped-1.jpeg" class="thumb-img" onclick="changeImage(this.src)" /> -->
+                <% }) %>
+              <% }) %>
             </div>
 
           </div>
@@ -419,7 +415,14 @@
             })
             return
           }
-
+          if(res.message == "max quantity of product reached"){
+            swal.fire({
+              icon: "warning",
+              title: "Warning",
+              text: "Max quantity of product reached"
+            })
+            return
+          }
           if (request.status == 200) {
             window.location.href = '/cart'
           }

@@ -1,6 +1,5 @@
 
 const userSchema = require('../../model/userSchema.js')
-const productSchema = require('../../model/productSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 const categorySchema = require('../../model/categorySchema.js')
 const brandSchema = require('../../model/brandSchema.js')
@@ -8,15 +7,12 @@ const wishlistSchema = require('../../model/wishlistSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const rndm = require('rndm')
-const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
 const walletSchema = require('../../model/walletSchema.js')
 const couponSchema = require('../../model/couponSchema.js')
 const userCouponSchema = require('../../model/userCouponSchema.js')
-
-// logger.info("server has started")
 
 const salt = 10
 
@@ -94,10 +90,7 @@ const loadRegister = async (req, res) => {
 // to validate the register details from the user
 const registerUser = async (req, res) => {
     try {
-
         const { username, email, password, confirm, referral } = req.body
-
-        // console.log(req.body)
 
         if(password!=confirm){
             req.session.matchPass = false
@@ -204,15 +197,12 @@ const loginPost = async (req, res) => {
                 logger.info("successfully created welcome coupon")
             }
         }
-        
-        
 
         req.session.user = userExist._id
         
         logger.info( {userId: req.session.user}, "login post")
 
         res.status(200).json({success: true, message: "successfully logged in"})
-        // res.redirect('/')
 
     }
     catch(err){
@@ -323,7 +313,7 @@ const verifyOtp = async (req, res) => {
 
 // to resend the otp
 const resendOtp = async (req, res) => {
-    logger.info("resend is working ...........")
+    logger.info("resend handler hit ...........")
     try{
         const { email } = req.session.userData
         
@@ -626,7 +616,6 @@ const newArrivals = async (req, res) => {
 }
 
 module.exports = {
-    // pageNotFound,
     loadRegister,
     registerUser,
     loadLogin,

@@ -30,10 +30,6 @@ const orderPost = async (req, res) => {
         const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
         const userId = req.session.user || req.session?.passport?.user
 
-        console.log("this is coupon discount", discountAmount)
-        console.log("this is coupon id", couponId)
-
-
         const cart = await cartSchema.aggregate([
             {$match: {_id: new Types.ObjectId(cartId)}},
             {$unwind: "$items"},
@@ -130,9 +126,7 @@ const orderPost = async (req, res) => {
             
         const orderId = await generateOrderId()                
 
-        logger.fatal("first")
         const coupon = await couponSchema.findOne({_id: couponId})
-        logger.fatal("second")
             
         const newOrder = new orderSchema({
             orderId,
@@ -179,7 +173,6 @@ const orderPost = async (req, res) => {
             const userCoupon = await userCouponSchema.findOne({userId, couponId})
             if(userCoupon){
                 await userCouponSchema.findOneAndUpdate({userId, couponId}, {$set: {used: true}})
-                // console.log("this is updated usercoupon", userCoupon)
             }
             else{
                 
@@ -190,8 +183,6 @@ const orderPost = async (req, res) => {
                     endDate: coupon.endDate,
                     used: true
                 })
-
-                // console.log("this is new user coupon", newUserCoupon)
             }
 
         }
@@ -258,11 +249,6 @@ const orderFail = async (req, res) => {
 const orderPage = async (req, res) => {
     try{
         const userId = req.session.user || req.session?.passport?.user
-        // const orders = await orderSchema.find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1, couponCode: 1}).sort({_id: -1})
-
-        // res.render('user/order', {orders})
-
-        // -----------------------------------------------------------
         
         if(req.query.search){
             const orderSearch = await orderSchema.find({userId, orderId: req.query.search}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1, couponCode: 1})
@@ -270,7 +256,6 @@ const orderPage = async (req, res) => {
         }
         const limit = 5
         const orderCount = await orderSchema.find({userId}).countDocuments()
-        console.log(orderCount)
         
         const orders = await orderSchema
             .find({userId}, {"items.quantity": 1, "items.image": 1, payablePrice: 1, totalPrice: 1,  status: 1, paymentMethod: 1, placedAt: 1, orderId: 1, couponCode: 1})
@@ -278,13 +263,9 @@ const orderPage = async (req, res) => {
             .limit(limit)            
 
         if (limit >= orderCount) {
-            // return res.status(200).render('user/order', {orders})
-            console.log("condition true")
-
             return res.status(200).render('user/order', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
 
-        // res.status(200).render('user/order', {orders})
         res.status(200).render('user/order', {orders, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "null" })
     }   
     catch(err){
@@ -297,7 +278,6 @@ const orderPage = async (req, res) => {
 const orderDetailPage = async (req, res) => {
     try{
         const { orderId } = req.params
-        // logger.info(orderId)
         const order = await orderSchema.findOne({_id: orderId}).populate("userId")
 
         if(!order){
@@ -336,11 +316,6 @@ const cancelOrder = async (req, res) => {
 
         console.log("this is variant", variant)
         
-        // if (!variant) {
-        //     return res.status(500).json({ success: false, message: "Variant not found" });
-        // }
-
-
         await variantSchema.findByIdAndUpdate(
             item.variantId,
             { $inc: { quantity: item.quantity } }
@@ -375,27 +350,17 @@ const cancelOrder = async (req, res) => {
 }
 
 const returnOrder = async (req, res) => {
-    logger.warn("return controller hit")
     try{
         const { itemId, userId, returnReason, custonReturnReason } = req.body
-
-        logger.info({userId}, "this is user id")
-
-        // console.log("thi sis reqeuest body", req.body)
-        // console.log("this is requsest file", req.file)
 
         let imagePath = req?.file?.path.replace(/\\/g, '/')
 
         const order = await orderSchema.findOne({userId, "items._id":  new Types.ObjectId(itemId)})
 
-        logger.info({itemId}, "this is item id")
-
         if(!order){
             return res.status(404).json({success: false, message: "order not found"})            
         }
         const item = order.items.id(itemId)
-
-        // logger.fatal({item})
 
         const nonReturnable = ["Pending", "Cancelled", "Returned", "Shipped", "Out for delivery"];
         if(nonReturnable.includes(item.status)){
@@ -408,13 +373,6 @@ const returnOrder = async (req, res) => {
             return res.status(500).json({ success: false, message: "Variant not found" });
         }
 
-
-
-        // await variantSchema.findByIdAndUpdate(
-        //     item.variantId,
-        //     { $inc: { quantity: item.quantity } }
-        // );
-
         item.return = {
             requested: true,
             reason: returnReason,
@@ -425,9 +383,6 @@ const returnOrder = async (req, res) => {
         item.status = "Return requested"
 
         await order.save()
-
-        // console.log("this is items after successffull request", item)
-        // console.log("updated order", order)
 
         logger.info("success fully req")
         res.status(200).json({success: true, message: "successfully Returned the order"})
@@ -515,7 +470,7 @@ const checkSession = async (req, res) => {
         lineItems.push({
             price_data: {
                 currency: "inr",
-                unit_amount: 50 * 100,   // e.g. 5000 for ₹50
+                unit_amount: 50 * 100,  
                 product_data: {
                     name: "Delivery Charge",
                 }
@@ -568,8 +523,7 @@ const webhook = async (req, res) => {
                         signature,
                         endpointSecret
                     );
-                    // console.log("this is event", event)
-                    console.log("SESSION METADATA:", event.data.object.metadata);
+                    // console.log("SESSION METADATA:", event.data.object.metadata);
                 } catch (err) {
                     console.log(event)
                     console.log(`⚠️  Webhook signature verification failed.`, err.message);
@@ -591,8 +545,6 @@ const webhook = async (req, res) => {
                     const address = await addressSchema.findOne({_id: addressId}, {billingAddress: 1, userId: 1})
                                      
                     const userId = address.userId
-
-                    logger.fatal({userId}, "this is userId")
 
                     const cart = await cartSchema.aggregate([
                         {$match: {_id: new Types.ObjectId(cartId)}},
@@ -711,14 +663,11 @@ const webhook = async (req, res) => {
                         placedAt: Date.now()
                     })
 
-                    // req.session.orderId = newOrder._id
-                    
                     // to mark coupon as used if order was made using coupon
                     if(coupon){
                         const userCoupon = await userCouponSchema.findOne({userId, couponId})
                         if(userCoupon){
                             await userCouponSchema.findOneAndUpdate({userId, couponId}, {$set: {used: true}})
-                            // console.log("this is updated usercoupon", userCoupon)
                         }
                         else{
                             
@@ -729,8 +678,6 @@ const webhook = async (req, res) => {
                                 endDate: coupon.endDate,
                                 used: true
                             })
-
-                            // console.log("this is new user coupon", newUserCoupon)
                         }
 
                     }
@@ -755,11 +702,9 @@ const webhook = async (req, res) => {
                         }
                     }
 
-                    logger.info({newOrder}, "this is new order with stripe")
                     await newOrder.save()
 
                     logger.info("order success with payment through stripe")
-                    // res.status(200).json({success: true, message: "Order successfully placed"})
  
                     break;
                 default:

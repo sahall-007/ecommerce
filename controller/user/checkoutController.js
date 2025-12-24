@@ -1,9 +1,10 @@
 
-const cartSchema = require('../../model/cartSchema.js')
-const addressSchema = require('../../model/addressSchema.js')
 const { Types, default: mongoose } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
+
+const addressSchema = require('../../model/addressSchema.js')
+const cartSchema = require('../../model/cartSchema.js')
 const walletSchema = require('../../model/walletSchema.js')
 const couponSchema = require('../../model/couponSchema.js')
 const userCouponSchema = require('../../model/userCouponSchema.js')
@@ -11,10 +12,8 @@ const userCouponSchema = require('../../model/userCouponSchema.js')
 
 const checkoutPage = async (req, res) => {
     try{
-
         const id = req.session?.user || req.session?.passport?.user
         
-                // const cart = await cartSchema.findOne({userId: id})
         const cart = await cartSchema.aggregate([
             {$match: {userId: new Types.ObjectId(id)}},
             {$unwind: "$items"},
@@ -61,8 +60,6 @@ const checkoutPage = async (req, res) => {
             {$addFields: {"variant.image": "$$REMOVE"}},
         ])
 
-
-
         const wallet = await walletSchema.findOne({userId: id})
         if(!wallet){
             return res.status(404).json({success: false, message: "wallet not found in the database"})
@@ -71,7 +68,6 @@ const checkoutPage = async (req, res) => {
         const address = await addressSchema.findOne({userId: id})
 
         const userCoupons = await userCouponSchema.aggregate([
-            // {$match: {userId: new Types.ObjectId(id)}},
             {$match: 
                 {$and: [{userId: new Types.ObjectId(id)}, {startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}]}
             },
@@ -83,11 +79,8 @@ const checkoutPage = async (req, res) => {
             }},
             {$unwind: "$coupon"},
             {$match: {"coupon.isListed": true}},
-            // {$project: {couponId: 1, "coupon.code": 1, "coupon.discount": 1, "coupon.minimumPurchase": 1, "coupon.maximumDiscount": 1}}
             
         ])
-
-        console.log(userCoupons)
 
         const userCouponSet = new Set()
         
@@ -98,25 +91,11 @@ const checkoutPage = async (req, res) => {
             {$match: 
                 {$and: [{startDate: {$lte: new Date()}}, {endDate: {$gte: new Date()}}, {isListed: true}]}
             },            
-            // {$project: {_id: 1, code: 1, discount: 1, minimumPurchase: 1, maximumDiscount: 1}}
         ])
 
         const filteredGlobalCoupons = globalCoupons.filter(ele => !userCouponSet.has(ele._id))
 
-        // for(let ele1 in globalCoupons){
-        //     for(let ele2 in userCoupons){
-        //         if(String(globalCoupons[ele1]._id) == String(userCoupons[ele2].couponId)){
-        //             globalCoupons.splice(ele1, 1)
-        //         }
-        //     }
-        // }
-
-
         let coupons = userCoupons.concat(filteredGlobalCoupons)
-
-        // console.log("this is usercoupons", userCoupons)
-        // console.log("this are global coupons", globalCoupons)
-        // console.log("these are checkout coupons", coupons)
 
         res.render('user/checkout', {cart, address, wallet, coupons})
     }

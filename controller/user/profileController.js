@@ -3,7 +3,6 @@ const addressSchema = require('../../model/addressSchema.js')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const orderSchema = require('../../model/orderSchema.js')
-const env = require('dotenv').config()
 const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
@@ -59,8 +58,6 @@ const profilePage = async (req, res) => {
             
         ])
 
-        // logger.info(user)
-
         res.render('user/profile', {user, address})
     }
     catch(err){
@@ -83,7 +80,6 @@ const editProfile = async (req, res) => {
 
         const phoneCount = await userSchema.find({phone}).countDocuments()
 
-        logger.fatal(phoneCount, "this is phone count")
         if(user?.phone!=phone &&  phoneCount>=3){
             return res.status(400).json({success: false, message: "max number of this phone number alrady exist"})
         }
@@ -252,9 +248,6 @@ const newEmailPost = async (req, res) => {
                 res.json({success: false, message: "failed to send otp, please try again"})
             }
         }
-        // else{
-        //     res.render('user/changeEmail')
-        // }
     }
     catch(err){
         logger.fatal(err)
@@ -305,11 +298,6 @@ const newEmailResendOtp = async (req, res) => {
     try{
         const email = req.session.newEmail
 
-        // const user = await userSchema.findOne({email})
-        // if(!user){
-        //     return res.status(404).json({success: false, message: "user not found"})
-        // }
-
         const otp = generateOtp()
 
         req.session.changeEmailOtp = {
@@ -351,9 +339,6 @@ const updatePassword = async (req, res) => {
             return res.status(404).json({success: false, message: "user not found"})
         }
 
-        logger.warn(password)
-        logger.warn(user.password)
-
         const isMatch = await bcrypt.compare(password, user.password)
 
         if(!isMatch){
@@ -361,8 +346,6 @@ const updatePassword = async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10)
-
-        logger.warn(hashedPassword)
 
         await userSchema.findOneAndUpdate({_id: userId}, {$set: {password: hashedPassword}})
         res.status(200).json({success: true, message: "successfully updated password"})
@@ -385,8 +368,6 @@ const profileImage = async (req, res) => {
         }
 
         let path = req.file.path.replace(/\\/g, '/')
-        logger.info(req.file)
-        logger.info(path)
 
         await userSchema.findOneAndUpdate({_id: id}, {image: path})
         res.status(200).json({success: true, message: "successfully added the profile image"})

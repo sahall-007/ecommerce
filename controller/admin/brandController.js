@@ -1,7 +1,6 @@
 
 const brandSchema = require('../../model/brandSchema.js')
 
-
 const addBrandPage = async (req, res) => {
     try{
         res.status(200).render('admin/addBrand')
@@ -16,9 +15,6 @@ const addBrandPage = async (req, res) => {
 const addBrandPost = async (req, res) => {
     try{
         let { name, status } = req.body
-
-        // name = name.toLowerCase()
-        // console.log(name, status)
 
         const brandExist = await brandSchema.findOne({name: new RegExp(`^${name}$`, "i")})
 
@@ -83,9 +79,6 @@ const brandEditPost = async (req, res) => {
         const { newName, newStatus, newDiscount } = req.body
         const { name } = req.params
         
-        // let lowerCaseNewName = newName.toLowerCase()
-        // let lowerCaseCurrentName = brand.name.toLowerCase()
-        
         if(name.toLowerCase() != newName.toLowerCase()){
             const brandExist = await brandSchema.findOne({name: new RegExp(`^${newName}$`, "i")})
                 
@@ -100,7 +93,7 @@ const brandEditPost = async (req, res) => {
         let editingDiscount = newDiscount || brand.discount
         let isListed = (newStatus=="active") ? true : false
     
-        const edited = await brandSchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount, isListed}})
+        await brandSchema.findOneAndUpdate({name}, {$set: { name: editingName, discount: editingDiscount, isListed}})
     
         res.redirect('/admin/brand')
     }
@@ -154,7 +147,6 @@ const deleteBrand = async (req, res) => {
             return res.status(404).json({status: false, message: "brand not found"})
         }
 
-        res.status(200).json({message: "successfully deleted the brand"})
     }
     catch(err){
         console.log(err)
@@ -176,8 +168,6 @@ const pagination = async (req, res) => {
         const brandCount = await brandSchema.countDocuments()
         const brands = await brandSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        console.log(brandCount)
-
         if(pageNo * limit + limit >= brandCount){
             res.render('admin/brandManagement', { brands, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
@@ -191,28 +181,6 @@ const pagination = async (req, res) => {
         res.status(500).json({success: false, message: "something went wrong (brand pagination page)"})
     }
 }
-
-// const prevPage = async (req, res) => {
-//     try{
-//         const { page } = req.query
-        
-//         const pageNo = Number(page)
-//         const limit = 5
-
-//         if(pageNo==0){
-//             return res.redirect('/admin/brand')
-//         }
-
-//         const brands = await brandSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
-
-//         res.render( 'admin/brandManagement', { brands, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-//     }
-//     catch(err){
-//         console.log(err)
-//         console.log('failed to get brand prev page')
-//         res.status(500).json({success: false, messaage: "something went wrong (brand prev page)"})
-//     }
-// }
 
 const searchBrand = async (req, res) => {
     try{
@@ -271,7 +239,6 @@ module.exports = {
     brandUnblock,
     deleteBrand,
     pagination,
-    // prevPage,
     searchBrand,
     searchResult
 }

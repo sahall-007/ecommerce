@@ -37,7 +37,6 @@ const loginVerify = async (req, res) => {
         }
 
         req.session.admin = true
-        console.log("session created")
         res.status(200).redirect('/admin/dashboard')
 
     }
@@ -230,11 +229,6 @@ const loadDashboard = async (req, res) => {
                 chartValues[i] = 0
             }
         }
-
-        
-
-
-
 
         res.render('admin/adminHome', { chartDates, chartValues, topSellingProducts: topSellingProducts[0], pieFields, pieValues })
     }

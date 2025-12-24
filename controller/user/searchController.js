@@ -72,9 +72,7 @@ const searchResult = async (req, res) => {
             {$match: {"product.name": name}},
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
             {$match: filter},
-            // {$sample: {size: limit}},
             toSort,
-            // {$limit: limit},
         ])
 
         const wishlist = await wishlistSchema.findOne({userId})

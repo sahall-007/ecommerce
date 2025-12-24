@@ -242,6 +242,14 @@
           })
           return
         }
+        if(res.message == "max quantity of product reached"){
+          swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "Max quantity of product reached"
+          })
+          return
+        }
         if(request.status==200){
           window.location.href = '/cart'
         }

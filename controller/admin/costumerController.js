@@ -1,5 +1,4 @@
 
-// const adminSchema = require('../../model/adminSchema.js')
 const userSchema = require('../../model/userSchema.js')
 const bcrypt = require('bcrypt')
 
@@ -53,11 +52,7 @@ const addUserPost = async (req, res) => {
 
         await user.save()
 
-        console.log(isListed, status)
-
-
         res.redirect('/admin/userManagement')
-
     }
     catch(err){
         console.log(err)
@@ -66,7 +61,6 @@ const addUserPost = async (req, res) => {
 }
 
 const blockUser = async (req, res) => {
-    console.log("handler hit ..............")
     try{
         const { id } = req.body
 
@@ -84,7 +78,6 @@ const blockUser = async (req, res) => {
 }
 
 const unBlockUser = async (req, res) => {
-    console.log("un block handler hit ........")
     try{
         const { id } = req.body
 
@@ -129,8 +122,6 @@ const pagination = async (req, res) => {
         const userCount = await userSchema.countDocuments()
         const users = await userSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
 
-        console.log(userCount)
-
         if(pageNo * limit + limit >= userCount){
             res.render('admin/userManagement', { users: users, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
@@ -146,31 +137,6 @@ const pagination = async (req, res) => {
     }
 }
 
-// const prevPage = async (req, res) => {
-
-//     console.log("prev handler hit.........")
-//     try{
-//         const { page } = req.query
-
-//         const pageNo = Number(page)
-//         const limit = 5
-
-//         if(pageNo==0){
-//             return res.redirect('/admin/userManagement')
-//         }
-
-//         const users = await userSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
-
-//         res.render('admin/userManagement', { users, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-
-//     }
-//     catch(err){
-//         console.log(err)
-//         console.log("failed to get previous page")
-//         res.status(500).json({message: "something went wrong, (user prev page)"})
-//     }
-// }
-
 const searchUser = async (req, res) => {
     console.log("search handler is hit")
     try{
@@ -183,7 +149,6 @@ const searchUser = async (req, res) => {
         const user = await userSchema.findOne({username})
 
         if(!user){
-            console.log("here is the error")
             let nullValue = null
            return res.redirect(`/admin/searchResult/${nullValue}`)
         }
@@ -198,7 +163,6 @@ const searchUser = async (req, res) => {
 }
 
 const searchResult = async (req, res) => {
-    console.log("search result is hit...")
     try{
         const { username } = req.params
 
@@ -227,7 +191,6 @@ module.exports = {
     unBlockUser,
     deleteUser,
     pagination,
-    // prevPage,
     searchUser,
     searchResult
 }

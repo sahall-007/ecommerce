@@ -312,8 +312,6 @@
                             <input id="l-h" type="radio" name="sort" value="l-h">
                             <label for="l-h">Price Low to high</label><br>
 
-                            <!-- <input id="noneProduct" type="radio" name="sort" value="none" checked="checked"> -->
-                            <!-- <label for="noneProduct">None</label><br> -->
                             <input id="a-z`" type="radio" name="sort" value="a-z">
                             <label for="a-z`">Aa - Zz</label><br>                          
                             <input id="z-a" type="radio" name="sort" value="z-a">
@@ -321,14 +319,6 @@
                           </li>
                         </ul>                        
                       </div>
-                      <!-- <div class="col mb-3">
-                        <p for="">Sort product by: </p>
-                        <ul style="list-style-type: none;">
-                          <li>
-                            
-                          </li>
-                        </ul>                        
-                      </div> -->
                     </div>
                   </div>
                   <div class="d-flex justify-content-center gap-3 mb-3">
@@ -453,6 +443,14 @@
             icon: "warning",
             title: "Warning",
             text: "This product is out of stock"
+          })
+          return
+        }
+        if(res.message == "max quantity of product reached"){
+          swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "Max quantity of product reached"
           })
           return
         }

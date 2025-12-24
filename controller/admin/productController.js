@@ -11,7 +11,6 @@ const productManagement = async (req, res) => {
     try{
         const productCount = await productSchema.countDocuments()
         let limit = 5
-        // const products = await productSchema.find().sort({_id: -1}).limit(limit)
 
         const products = await productSchema.aggregate([
             {$lookup: {
@@ -60,7 +59,6 @@ const addProductPage = async (req, res) => {
     try{
         const category = await categorySchema.find().sort({_id: -1})
         const brand = await brandSchema.find().sort({_id: -1})
-        // console.log(category)
 
         res.status(200).render('admin/addProduct', { category, brand })
     }
@@ -73,8 +71,6 @@ const addProductPage = async (req, res) => {
 
 const addProductPost = async (req, res) => {
     try{       
-        // console.log(req.body)
-        // console.log(req.files)
 
         let totalVariants = 0
         let index =  req.files[0].fieldname.indexOf("-")
@@ -99,8 +95,6 @@ const addProductPost = async (req, res) => {
             }
         }
 
-console.log(images)
-
         let keys = Object.keys(images)
 
         let { name, discount, discription, brand, category, ram, storage, color, quantity, price } = req.body
@@ -114,19 +108,8 @@ console.log(images)
             price = [price]
         }
 
-        // const productExist = await productSchema.find({name})
-
-        // console.log(productExist)
-
-        // if(productExist){
-        //     console.log("product exist check")
-        //     return res.status(403).json({success: false, message: "product already exist"})
-        // }
-
         const categoryDetail = await categorySchema.findOne({name: category}, {name: 1, _id: 1})
         const brandDetail = await brandSchema.findOne({name: brand}, {name: 1, _id: 1})
-
-        // console.log(categoryDetail)
 
         if(!categoryDetail){
             return res.stauts(401).json({success: false, message: "cannot find the category"})
@@ -140,8 +123,6 @@ console.log(images)
             categoryId: categoryDetail._id
         })
 
-        // console.log("new product", product)
-
         let indexOfDash = keys[0].indexOf("-")
 
         for(let i=0; i<totalVariants; i++){
@@ -150,15 +131,10 @@ console.log(images)
 
             for(let j=0; j<keys.length; j++){
                 if(Number(keys[j].slice(indexOfDash+1)) == i+1){
-                    // console.log("before imagefield", imageFieldName, i)
                     imageFieldName = keys[j]
-                    // console.log("after imagefield", imageFieldName, i)
                 }
             }
-            // console.log("imagefield", imageFieldName)
             let variantImage = images[imageFieldName]
-
-            // console.log("this is variant image", variantImage)
 
             await variantSchema.create({
                 ram: ram[i],
@@ -213,7 +189,7 @@ const editProductPost = async (req, res) => {
         const editBrand = newBrand || product.brand
         const editCategory = newCategory || product.category
 
-        const newProduct = await productSchema.updateMany({_id: id}, {$set: {
+        await productSchema.updateMany({_id: id}, {$set: {
             name: editName,
             discount: editDiscount,
             discription: editDiscription,
@@ -326,9 +302,6 @@ const pagination = async (req, res) => {
             {$limit: limit}
         ])
 
-        logger.info(pageNo * limit + limit)
-        logger.info(productCount)
-
         if(pageNo * limit + limit >= productCount){
             res.render('admin/productManagement', { products, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
         }
@@ -342,61 +315,6 @@ const pagination = async (req, res) => {
         res.status(500).json({success: false, message: "something went wrong (product pagination page)"})
     }
 }
-
-// const prevPage = async (req, res) => {
-//     try{
-//         const { page } = req.query
-
-//         const pageNo = Number(page)
-//         const limit = 5
-
-//         if(pageNo==0){
-//             return res.status(200).redirect('/admin/product')
-//         }
-
-//         // const products = await productSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
-
-//         const products = await productSchema.aggregate([
-//             {$lookup: {
-//                 from: "categories",
-//                 localField: "categoryId",
-//                 foreignField: "_id",
-//                 as: "category"
-//             }},
-//             {$unwind: "$category"},
-//             {$lookup: {
-//                 from: "brands",
-//                 localField: "brandId",
-//                 foreignField: "_id",
-//                 as: "brand"
-//             }},
-//             {$unwind: "$brand"},
-//             {$lookup: {
-//                 from: "variants",
-//                 let: {id: "$_id"},
-//                 pipeline: [
-//                     {$match: {$expr: {$eq: ["$$id", "$productId"]}}},
-//                     {$limit: 1},
-//                     {$project: {image: 1}}
-//                 ],
-//                 as: "variant"
-//             }},
-//             {$unwind: "$variant"},
-//             {$sort: {_id: -1}},
-//             {$skip: limit*pageNo},
-//             {$limit: limit}
-//         ])
-        
-
-//         res.status(200).render('admin/productManagement', { products, prevPage: pageNo - 1, nextPage: pageNo + 1, prevDisable: null, nextDisable: null})
-
-//     }
-//     catch(err){
-//         console.log(err)
-//         console.log("failed to get previous page")
-//         res.status(500).json({success: false, message: "something went wrong, (products prev page)"})
-//     }
-// }
 
 const searchProduct = async (req, res) => {
     try{
@@ -423,7 +341,6 @@ const searchProduct = async (req, res) => {
 }
 
 const searchResult = async (req, res) => {
-    console.log("search result is hit...")
     try{
         const { name } = req.params
 
@@ -431,7 +348,6 @@ const searchResult = async (req, res) => {
             return res.render('admin/productManagement', { products: false, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
         }
 
-        // const product = await productSchema.findOne({name})
         const products = await productSchema.aggregate([
             {$match: {name}},
             {$lookup: {
@@ -461,8 +377,6 @@ const searchResult = async (req, res) => {
             {$unwind: "$variant"},
             
         ])
-
-        // let arr = [product]
 
         res.render('admin/productManagement', { products, prevPage: null, nextPage: null, prevDisable: "disabled", nextDisable: "disabled"})
     }

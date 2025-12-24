@@ -66,8 +66,6 @@ const addOfferPost = async (req, res) => {
             }
         })
 
-        console.log(req.body)
-
         if(!discount) return res.status(400).json({success: false, message: "enter a discount number"})
         if(discount<0 || discount>100) return res.status(400).json({success: false, message: "enter a valid discount number from 1 to 100"})
         if(product.length>0) await productSchema.bulkWrite(bulkOp)    

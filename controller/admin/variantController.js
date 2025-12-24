@@ -42,9 +42,6 @@ const addvariantPost = async (req, res) => {
     try{
 
         const { id } = req.params
-        // console.log(id)
-        // console.log("this is variant body", req.body)
-        // console.log("this is variant img files", req.files)
 
         let images = {}
         for(let i=0; i<req.files.length; i++){
@@ -60,13 +57,11 @@ const addvariantPost = async (req, res) => {
             }
         }
 
-        // console.log(images)
-
         let { ram, storage, color, quantity, price } = req.body
 
         const product = await productSchema.findOne({_id: id})
 
-        const newVariant = await variantSchema.create({
+        await variantSchema.create({
             ram,
             storage,
             color,
@@ -75,8 +70,6 @@ const addvariantPost = async (req, res) => {
             image: images["image-1"],
             productId: product._id
         })
-
-        // console.log("new variant", newVariant)
 
         res.status(200).json({message: "kalapilaaa"})
     }
@@ -90,9 +83,6 @@ const editVariantPage = async (req, res) => {
         const { id } = req.params
 
         const variant = await variantSchema.findOne({_id: id})
-
-        // console.log(id)
-        // console.log(variant)
 
         res.status(200).render('admin/editVariant', { variant, images: variant.image, productId: variant.productId})
     }
@@ -130,8 +120,6 @@ const deleteImg = async (req, res) => {
 const editVariantPost = async (req, res) => {
     try{
         const { id } = req.params
-        // console.log(req.files)
-        // console.log(req.body)
 
         // ---------------- to update the variant details -------------------
 
@@ -142,8 +130,6 @@ const editVariantPost = async (req, res) => {
         }
 
         const { ram, storage, color, quantity, price } = req.body
-
-        console.log(" this is req.body ", req.body)
 
         let editRam = ram || variant.ram
         let editStorage = storage || variant.storage
@@ -170,15 +156,14 @@ const editVariantPost = async (req, res) => {
                 let path = req.files[i].path.replace(/\\/g, '/')
                 
                 if(req.files[i].originalname == "extraNewImage.jpeg"){
-                    console.log(path)
                     const addNewExtraImg = await variantSchema.updateOne({_id: id}, {$push: {image: path}})
                 }
                 else{
                     let index = Number(req.files[i].fieldname.slice(indexOfDash+1))
 
                     const img = await variantSchema.findOne({_id: id}, {image: 1})
-                    const deleteVariantImg = await variantSchema.updateOne({_id: id}, {$pull: {image: img.image[index]}})
-                    const insertNewImage = await variantSchema.updateOne({_id: id}, {$push: {image: {$each: [path], $position: index}}})
+                    await variantSchema.updateOne({_id: id}, {$pull: {image: img.image[index]}})
+                    await variantSchema.updateOne({_id: id}, {$push: {image: {$each: [path], $position: index}}})
                 }
             }
 
@@ -192,8 +177,7 @@ const editVariantPost = async (req, res) => {
             }
         }
 
-        const afterDelete = await variantSchema.findOne({_id: id})
-        console.log("this is after delete", afterDelete)
+         await variantSchema.findOne({_id: id})
 
         res.status(200).json({success: true, message: "successfully edited the variant"})
 
@@ -209,8 +193,6 @@ const blockVariant = async (req, res) => {
     try{
         const { id } = req.body
 
-        console.log(id)
-                
         await variantSchema.findOneAndUpdate({_id: id}, {$set: {isListed: false}})
 
         res.status(200).json({message: "variant has been blocked"})
@@ -226,8 +208,6 @@ const unBlockVariant = async (req, res) => {
     try{
       const { id } = req.body
 
-    console.log(id)
-            
     await variantSchema.findOneAndUpdate({_id: id}, {$set: {isListed: true}})
 
     res.status(200).json({message: "variant has been un blocked"})

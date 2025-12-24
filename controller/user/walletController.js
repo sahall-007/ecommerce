@@ -1,14 +1,7 @@
 const userSchema = require('../../model/userSchema.js')
 const walletSchema = require('../../model/walletSchema.js')
-const addressSchema = require('../../model/addressSchema.js')
-const bcrypt = require('bcrypt')
-const nodemailer = require('nodemailer')
-const orderSchema = require('../../model/orderSchema.js')
-const env = require('dotenv').config()
-const { Types } = require('mongoose')
 
 const logger = require("../../config/pinoLogger.js")
-
 
 const getWalletPage = async (req, res) => {
     try{    
@@ -21,9 +14,7 @@ const getWalletPage = async (req, res) => {
         
         const wallet = await walletSchema.findOne({userId: userId})
 
-        console.log(wallet)
-
-        res.status(200).render('user/wallet', {wallet})
+        res.status(200).render('user/wallet', {wallet: wallet[0]})
 
     }
     catch(err){
