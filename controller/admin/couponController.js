@@ -17,6 +17,13 @@ const addCouponPage = async (req, res) => {
 const addCouponPost = async (req, res) => {
     try{
         let { code, discount, startDate, endDate, minimumPurchase, maximumDiscount } = req.body
+
+        
+        const coupon = await couponSchema.findOne({code: new RegExp(`^${code}$`, "i")})
+
+        if(coupon){
+            return res.status(400).json({success: false, message: "coupon with this code already exist"})
+        }
     
         await couponSchema.create({
             code, 
@@ -40,14 +47,48 @@ const addCouponPost = async (req, res) => {
 
 const couponManagement = async (req, res) => {
     try{
-        const coupons = await couponSchema.find().sort({_id: -1}).limit(5)
+        const couponCount = await couponSchema.countDocuments()
+        const limit = 5
+        const coupons = await couponSchema.find().sort({_id: -1}).limit(limit)
 
-        res.status(200).render('admin/couponManagement', {coupons,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled"})
+        if (limit >= couponCount) {
+            return res.status(200).render('admin/couponManagement', {coupons,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled"})
+        }
+
+        res.status(200).render('admin/couponManagement', {coupons,  nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: null})
     }
     catch(err){
         logger.fatal(err)
         logger.fatal("failed to get coupon management page")
         res.status(500).json({success: false, message: "something went wrong (coupon management page)"})
+    }
+}
+
+const pagination = async (req, res) => {
+    try{
+        const { page } = req.params
+        
+        const pageNo = Number(page)
+        const limit = 5
+
+        if(pageNo==0){
+            return res.redirect('/admin/coupon')
+        }
+        const couponCount = await couponSchema.countDocuments()
+        const coupons = await couponSchema.find().sort({_id: -1}).skip(limit * pageNo).limit(limit)
+
+        if(pageNo * limit + limit >= couponCount){
+            res.render('admin/couponManagement', { coupons, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: "disabled"})            
+        }
+        else{
+            res.render('admin/couponManagement', { coupons, nextPage: pageNo + 1, prevPage: pageNo - 1, prevDisable: null, nextDisable: null})            
+        }
+
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to retrieve next page")
+        res.status(500).json({message: "something went wrong, (category next page)"})
     }
 }
 
@@ -141,6 +182,7 @@ module.exports = {
     addCouponPage,
     addCouponPost,
     couponManagement,
+    pagination,
     editCouponPage,
     blockCoupon,
     unBlockCoupon,

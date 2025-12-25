@@ -15,6 +15,9 @@ router.route('/addCoupon')
 router.route('/coupon')
     .get(middleware.checkSession, couponController.couponManagement)
 
+router.route('/coupon/:page')
+    .get(middleware.checkSession, couponController.pagination)
+
 router.route('/editCoupon/:couponId')
     .get(middleware.checkSession, couponController.editCouponPage)
     .post(middleware.checkSession, couponController.editCouponPost)

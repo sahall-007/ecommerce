@@ -205,8 +205,8 @@
 
                     return
                 }
-                else if(new Date(endDate) <=  Date.now()){
-                    endMsg.textContent = "End date cant be less than current date"
+                else if(new Date(endDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0)){
+                    endMsg.textContent = "End date cant be less than or equal to current date"
                     codeMsg.textContent = ""
                     discountMsg.textContent = ""
                     startMsg.textContent = ""
@@ -269,7 +269,7 @@
                         swal.fire({
                             icon: "error",
                             title: "Error",                       
-                            text: "Enter a numer between 1 to 100",
+                            text: "Coupon with this code already exist",
                         })
                     }
                     else{
