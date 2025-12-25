@@ -9,8 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
-        // Replace Math.random() with a pseudo-random number generator to get reproducible results in e2e tests
-        // Based on https://gist.github.com/blixt/f17b47c62508be59987b
         var _seed = 42;
         Math.random = function () {
             _seed = _seed * 16807 % 2147483647;
@@ -63,10 +61,22 @@
                 </div>
                 <div class="card col-10 col-md-8 col-lg-9  px-0 mx-3 main-content">
                     <div class="card-body">
-                        <div class="m-2 text-end">
-                            <a href="/admin/dashboard?timeFrame=weekly" class="btn btn-outline-secondary">Weekly</a>
+                        <div class="m-2 row justify-content-end">
+                            <div class="col-9 col-md-6 col-lg-3">
+                                <select class="w-100 rounded p-2" id="selectTime" name="timeFrame">
+                                    <option value="weekly">Weekly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-3 col-md-2 col-lg-1">
+                                <button type="submit" class="btn btn-primary me-1" onclick="applyFilter(event)">Apply</button>
+                            </div>
+
+
+                            <!-- <a href="/admin/dashboard?timeFrame=weekly" class="btn btn-outline-secondary">Weekly</a>
                             <a href="/admin/dashboard?timeFrame=monthly" class="btn btn-outline-secondary">Monthly</a>
-                            <a href="/admin/dashboard?timeFrame=yearly" class="btn btn-outline-secondary">Yearly</a>
+                            <a href="/admin/dashboard?timeFrame=yearly" class="btn btn-outline-secondary">Yearly</a> -->
                         </div>
                         <!-- Sales Chart -->
                         <div class="container">
@@ -111,7 +121,7 @@
                                                     <th scope="col" class="text-center">Sold</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="topSellingProductsTable">
                                                 
                                                 <% topSellingProducts?.variantCount?.forEach((ele, index)=> { %>
                                                     <tr>
@@ -151,7 +161,7 @@
         
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="topSellingCategoryTable">
         
                                                     
                                                     <% topSellingProducts?.categoryCount?.forEach((ele, index)=> { %>
@@ -184,7 +194,7 @@
         
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody id="topSellingBrandsTable">
         
                                                     
                                                     <% topSellingProducts?.brandCount?.forEach((ele, index)=> { %>
@@ -220,10 +230,13 @@
             integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"></script>
         <script>
-            const chartDates = <%- JSON.stringify(chartDates) %>
-            const chartValues = <%- JSON.stringify(chartValues) %>
-            const pieFields = <%- JSON.stringify(pieFields) %>
-            const pieValues = <%- JSON.stringify(pieValues) %>
+            let chartDates = <%- JSON.stringify(chartDates) %>
+            let chartValues = <%- JSON.stringify(chartValues) %>
+            let pieFields = <%- JSON.stringify(pieFields) %>
+            let pieValues = <%- JSON.stringify(pieValues) %>
+
+            
+            let options, chart, pieOptions, pieChart
 
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
@@ -232,7 +245,126 @@
                 sidebar.classList.toggle('show');
             });
 
-            var options = {
+            async function applyFilter (event){
+                const selectTime = document.getElementById("selectTime").value
+
+                try{
+                    const request = await fetch(`/admin/dashboard`, {
+                        method: "POST",
+                        headers: { "Content-Type" : "application/json" },
+                        body: JSON.stringify({timeFrame: selectTime})
+                    })
+
+                    const res = await request.json()
+
+                    chartDates = res.chartDates
+                    chartValues = res.chartValues
+                    pieFields = res.pieFields
+                    pieValues = res.pieValues
+
+                    // to update the top selling products, category, brands
+                    if(res?.topSellingProducts){
+                        // getting the id's of the tables to update them
+                        const topSellingProductsTable = document.getElementById("topSellingProductsTable")
+                        const topSellingCategoryTable = document.getElementById("topSellingCategoryTable")
+                        const topSellingBrandsTable = document.getElementById("topSellingBrandsTable")
+
+                        // to update the top selling product/variant
+                        if(res?.topSellingProducts?.variantCount?.length > 0){
+                            topSellingProductsTable.innerHTML = ""
+
+                            res?.topSellingProducts?.variantCount.forEach((ele, index) => {
+                                topSellingProductsTable.innerHTML += `
+                                    <tr>
+                                        <td>
+                                            ${index+1}
+                                        </td>
+                                        <td>
+                                            ${ele.name}
+                                        </td>
+                                        <td class="text-center">
+                                            ${ele.price}
+                                        </td>
+                                        <td class="text-center">
+                                            ${ele.ram} | ${ele.storage} | ${ele.color}
+                                        </td>
+                                        <td class="text-center">
+                                            ${ele.count}
+                                        </td>
+                                    </tr>
+                                `
+                            })
+
+                        }
+                        
+                        // to update the top selling category
+                        if(res?.topSellingProducts?.categoryCount?.length > 0){
+                            topSellingCategoryTable.innerHTML = ""
+
+                            res?.topSellingProducts?.categoryCount.forEach((ele, index) => {
+                                topSellingCategoryTable.innerHTML += `
+                                    <tr>
+                                        <td>
+                                            ${index+1}
+                                        </td>
+                                        <td>
+                                            ${ele._id}
+                                        </td>                                        
+                                        <td class="text-center">
+                                            ${ele.count}
+                                        </td>
+                                    </tr>
+                                `
+                            })
+
+                        }
+
+                        // to update the top selling brands
+                        if(res?.topSellingProducts?.brandCount?.length > 0){
+                            topSellingBrandsTable.innerHTML = ""
+
+                            res?.topSellingProducts?.brandCount.forEach((ele, index) => {
+                                topSellingBrandsTable.innerHTML += `
+                                    <tr>
+                                        <td>
+                                            ${index+1}
+                                        </td>
+                                        <td>
+                                            ${ele._id}
+                                        </td>                                        
+                                        <td class="text-center">
+                                            ${ele.count}
+                                        </td>
+                                    </tr>
+                                `
+                            })
+                        }
+
+                    }
+                    
+                    // to update the line chart
+                    chart.updateOptions({                    
+                        xaxis: {
+                            categories: chartDates
+                        },
+                        series: [{
+                            data: chartValues
+                        }]
+                    })
+                    
+                    // to update the pie chart
+                    pieChart.updateSeries(pieValues)
+
+                }
+                catch(err){
+                    alert("sales chart select time error")
+                    console.log(err)
+                }
+            }
+
+
+
+            options = {
                 series: [{
                     name: "Sales",
                     data: chartValues
@@ -265,10 +397,10 @@
                 }
             };
 
-            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart = new ApexCharts(document.querySelector("#chart"), options);
             chart.render();
 
-            var pieOptions = {
+            pieOptions = {
                 series: pieValues, 
                 chart: {
                     type: 'donut',
@@ -291,7 +423,7 @@
                 }]
             };
 
-            var pieChart = new ApexCharts(document.querySelector("#pie"), pieOptions);
+            pieChart = new ApexCharts(document.querySelector("#pie"), pieOptions);
             pieChart.render();
 
 

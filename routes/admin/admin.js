@@ -31,6 +31,7 @@ router.route('/login')
 
 router.route('/dashboard')
     .get(middleware.checkSession, adminController.loadDashboard)
+    .post(middleware.checkSession, adminController.applyFilter)
 
 
 router.route('/logout')
