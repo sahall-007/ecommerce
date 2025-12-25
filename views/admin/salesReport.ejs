@@ -221,32 +221,42 @@
         const selectTime = document.getElementById("selectTime").value
         const startDate = document.getElementById("startDate").value
         const endDate = document.getElementById("endDate").value
+        
+        if(selectTime=="custom"){
 
-        if(new Date(endDate) >  Date.now() && new Date(startDate) >  Date.now()){
-            startMsg.textContent = "Start date cant be greater than current date"
-            endMsg.textContent = "End date cant be greater than current date"
-         
-            return
-        }
-        if(new Date(endDate) >  Date.now()){
-            endMsg.textContent = "End date cant be greater than current date"
-            startMsg.textContent = ""
-
-            return
-        }
-        if(new Date(startDate) >  Date.now()){
-            startMsg.textContent = "Start date cant be greater than current date"
-            endMsg.textContent = ""
-            
-            return
-        }
-        if(new Date(endDate) < new Date(startDate)){
-            endMsg.textContent = "End date cant be less than start date"
-            startMsg.textContent = ""
-        }
-        else{ 
-            startMsg.textContent = ""
-            endMsg.textContent = ""
+            if(!startDate.value && !endDate.value){
+                startMsg.textContent = "Atleast one field must be filled"
+                endMsg.textContent = "Atleast one field must be filled"
+             
+                return
+            }
+            else if(new Date(endDate) >  Date.now() && new Date(startDate) >  Date.now()){
+                startMsg.textContent = "Start date cant be greater than current date"
+                endMsg.textContent = "End date cant be greater than current date"
+             
+                return
+            }
+            else if(new Date(endDate) >  Date.now()){
+                endMsg.textContent = "End date cant be greater than current date"
+                startMsg.textContent = ""
+    
+                return
+            }
+            else if(new Date(startDate) >  Date.now()){
+                startMsg.textContent = "Start date cant be greater than current date"
+                endMsg.textContent = ""
+                
+                return
+            }
+            else if(new Date(endDate) < new Date(startDate)){
+                endMsg.textContent = "End date cant be less than start date"
+                startMsg.textContent = ""
+            }
+            else{ 
+                startMsg.textContent = ""
+                endMsg.textContent = ""
+            }
+        
         }
 
         try{
