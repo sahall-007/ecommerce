@@ -68,7 +68,7 @@ const allProducts = async (req, res) => {
             {$unwind: "$brand"},
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
             {$match: filter},            
-            {$sample: {size: limit}},
+            // {$sample: {size: limit}},
             {$addFields: {
                 discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
             }},
