@@ -30,8 +30,8 @@ const allProducts = async (req, res) => {
             if(sort){
                 if(sort=="none") toSort.$sort = {"natural": 1}
     
-                else if(sort=="h-l") toSort.$sort = {price: -1}
-                else if(sort=="l-h") toSort.$sort = {price: 1}
+                else if(sort=="h-l") toSort.$sort = {discountedPrice: -1}
+                else if(sort=="l-h") toSort.$sort = {discountedPrice: 1}
                 
                 else if(sort=="a-z") toSort.$sort = {"product.name": 1}
                 else if(sort=="z-a") toSort.$sort = {"product.name": -1}
@@ -69,10 +69,11 @@ const allProducts = async (req, res) => {
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
             {$match: filter},            
             {$sample: {size: limit}},
-            toSort,
             {$addFields: {
                 discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
             }},
+            {$addFields: {discountedPrice: {$floor: {$subtract: ['$price', {$multiply: [{$divide: ['$discount', 100]}, '$price']}]}}}},
+            toSort,        
             {$limit: limit},
         ])
 
@@ -177,6 +178,8 @@ const filterPage = async (req, res) => {
             }},
             {$limit: limit}
         ])
+
+        // {$addFields: {discountedPrice: {$floor: {$subtract: ['$price', {$multiply: [{$divide: ['$discount', 100]}, '$price']}]}}}},
 
         if(limit >= variantCount){
             return res.status(200).render('user/allProducts', { allProducts: products, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
