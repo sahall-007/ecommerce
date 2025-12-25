@@ -8,6 +8,8 @@ router.get('/salesReport', middleware.checkSession, salesReportController.salesR
 
 router.get('/salesReport/time', middleware.checkSession, salesReportController.salesReport)
 
+router.post('/applyFilter', middleware.checkSession, salesReportController.applyFilter)
+
 router.get('/pdfSalesReport', middleware.checkSession, salesReportController.pdfDownload)
 
 router.get('/excelSalesReport', middleware.checkSession, salesReportController.excelDownload)

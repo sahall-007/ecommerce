@@ -47,6 +47,140 @@ const salesReport = async (req, res) => {
         }
         else if(endDate && !startDate){
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
+
+            filter = {
+                $match: { createdAt: {$lte: end} }
+            }
+        }
+        else if(startDate && endDate){
+            const start = new Date(startDate)
+            start.setHours(0, 0, 0, 0)
+            
+            const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
+            
+            filter = {
+                $match: { createdAt: {$gte: start, $lt: end} }
+            }
+        }
+        else if(timeFrame=="monthly"){
+            filter = {
+                $match:{
+                    $expr: {
+                        $and: [{$eq: [{$month: "$createdAt"}, {$month: "$$NOW"}]}, {$eq: [{$year: "$createdAt"}, {$year: "$$NOW"}]}]
+                    }
+                }
+            }
+        }
+        else{
+            timeFrame = "daily"
+
+            const start = new Date()
+            start.setHours(0, 0, 0, 0)
+
+            const end = new Date(start)
+            end.setDate(start.getDate() + 1)
+            filter = {
+                $match: { createdAt: {$gte: start, $lt: end} }
+            }
+        }
+  
+        const orders = await orderSchema.aggregate([
+            filter,
+            {$addFields: {
+                
+                totalOriginalPrice: {
+                    $reduce: {
+                        input: "$items",
+                        initialValue: 0,
+                        in: {$add: ["$$value", "$$this.price"]}
+                    } 
+                },
+                totalPriceAfterDiscount: {
+                    $reduce: {
+                        input: "$items",
+                        initialValue: 0,
+                        in: {$add: ["$$value", "$$this.priceAfterDiscount"]}
+                    } 
+                }                               
+            }},
+            {$addFields: {
+                totalDiscountPrice: {
+                    $subtract: ["$totalOriginalPrice", "$totalPriceAfterDiscount"]
+                }                
+            }}, 
+            {$lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "user"
+            }},
+            {$unwind: "$user"},
+
+            {$project: {
+                _id: 1,
+                orderId: 1,
+                payablePrice: 1,
+                discountAmount: 1,
+                totalDiscountPrice: 1,
+                createdAt: 1,
+                "user.username": 1
+            }},
+            {$sort: {_id: -1}}
+        ])
+        
+        res.render('admin/salesReport', {orders, timeFrame})
+    }
+    catch(err){
+        console.log(err)
+        console.log("failed to load admin dashboard!")
+    }
+}
+
+const applyFilter = async (req, res) => {
+    try{
+        let { timeFrame, startDate, endDate } = req.body
+        let filter 
+        
+        if(timeFrame=="weekly"){
+            const currentDate = new Date()
+            let monthDate = currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -7 : 0);
+
+            let start = new Date(currentDate.setDate(monthDate))
+            start.setHours(0, 0, 0, 0)
+
+            let end = new Date(start)
+            end.setDate(monthDate + 7)
+
+            filter = {
+                $match: { createdAt: {$gte: start, $lt: end} }
+            }
+        }
+        else if(timeFrame == "yearly"){
+            const start = new Date()
+            start.setMonth(1)
+            start.setDate(1)
+            start.setHours(0, 0, 0, 0)
+
+            const end = new Date(start)
+            end.setFullYear(start.getFullYear() + 1)
+            filter = {
+                $match: { createdAt: {$gte: start, $lt: end} }
+            }
+        }
+        else if(startDate && !endDate){
+            const start = new Date(startDate)
+            start.setHours(0, 0, 0, 0)
+
+            filter = {
+                $match: { createdAt: {$gte: start} }
+            }
+        }
+        else if(endDate && !startDate){
+            const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
             end.setHours(0, 0, 0, 0)
 
             filter = {
@@ -58,6 +192,7 @@ const salesReport = async (req, res) => {
             start.setHours(0, 0, 0, 0)
 
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
 
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
@@ -126,8 +261,10 @@ const salesReport = async (req, res) => {
                 createdAt: 1,
                 "user.username": 1
             }},
+            {$sort: {_id: -1}}
         ])
-        res.render('admin/salesReport', {orders, timeFrame})
+        
+        res.status(200).json({orders, timeFrame})
     }
     catch(err){
         console.log(err)
@@ -384,11 +521,7 @@ const excelDownload = async(req, res) => {
     try{
         let { timeFrame, startDate, endDate } = req.query
         let filter 
-        // let totalRevenue = 0
-        // let totalOrder = 0
-        // let totalDiscountPrice = 0
-        // let couponDiscountAmount = 0
-        
+
         if(timeFrame=="weekly"){
             const currentDate = new Date()
             let monthDate = currentDate.getDate() - currentDate.getDay() + (currentDate.getDay() === 0 ? -7 : 0);
@@ -552,5 +685,6 @@ const excelDownload = async(req, res) => {
 module.exports = {
     pdfDownload,
     excelDownload,
-    salesReport
+    salesReport,
+    applyFilter
 }

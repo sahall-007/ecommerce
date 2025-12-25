@@ -88,10 +88,12 @@
                                     <div class="col-12 col-md-6 col-lg-3 d-none customTimeFrames">
                                         <label for="startDate" class="form-label">Start Date</label>
                                         <input type="date" class="form-control" id="startDate" name="startDate">
+                                        <p class="text-danger" id="startMsg" style="font-size: small;"></p>                                    
                                     </div>
                                     <div class="col-12 col-md-6 col-lg-3 d-none customTimeFrames">
                                         <label for="endDate" class="form-label">End Date</label>
                                         <input type="date" class="form-control" id="endDate" name="endDate">
+                                        <p class="text-danger" id="endMsg" style="font-size: small;"></p>                                    
                                     </div>
                                     <div class="col-12 col-lg-3 d-flex align-items-end mt-3 mt-lg-0">
                                         <button type="submit" class="btn btn-primary me-1" id="applyFilter">Apply</button>
@@ -108,7 +110,7 @@
                                     <div class="card border-primary">
                                         <div class="card-body">
                                             <h5 class="card-subtitle mb-2 text-muted">Total Revenue</h5>
-                                            <h3 class="card-text text-primary">&#8377; <%= totalRevenue %></h3>
+                                            <h3 class="card-text text-primary">&#8377; <span id="totalRevenue"><%= totalRevenue %></span></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -116,7 +118,7 @@
                                     <div class="card border-success">
                                         <div class="card-body">
                                             <h5 class="card-subtitle mb-2 text-muted">Total Orders</h5>
-                                            <h3 class="card-text text-success"><%= totalOrder %></h3>
+                                            <h3 class="card-text text-success"><span id="totalOrder"><%= totalOrder %></span></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +126,7 @@
                                     <div class="card border-info">
                                         <div class="card-body">
                                             <h5 class="card-subtitle mb-2 text-muted">Total discount</h5>
-                                            <h3 class="card-text text-info">&#8377; <%= totalDiscountPrice %></h3>
+                                            <h3 class="card-text text-info">&#8377; <span id="totalDiscountPrice"><%= totalDiscountPrice %></span></h3>
                                         </div>
                                     </div>
                                 </div>
@@ -132,30 +134,16 @@
                                     <div class="card border-warning">
                                         <div class="card-body">
                                             <h5 class="card-subtitle mb-2 text-muted">Coupon discount</h5>
-                                            <h3 class="card-text text-warning">&#8377; <%= couponDiscountAmount %></h3>
+                                            <h3 class="card-text text-warning">&#8377; <span id="couponDiscountAmount"><%= couponDiscountAmount %></span></h3>
                                         </div>
                                     </div>
                                 </div>
                             </div>
     
-                            <!-- Sales Chart -->
-                            <!-- <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0">Sales Trend (Last 30 Days)</h5>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="salesChart" height="100"></canvas>
-                                </div>
-                            </div> -->
-    
                             <!-- Sales Table -->
                             <div class="card">
                                 <div class="card-header d-flex justify-content-between align-items-center">
                                     <h5 class="mb-0">Detailed Sales Data</h5>
-                                    <!-- <div class="input-group" style="width: 300px;">
-                                        <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                        <input type="text" class="form-control" placeholder="Search orders...">
-                                    </div> -->
                                 </div>
                                 <div class="card-body p-0">                                    
                                     <div class="table-responsive">
@@ -171,7 +159,7 @@
                                                     <th scope="col">Coupon</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="tableDatas">
                                                 <% orders?.forEach((ele, index) => { %>
                                                     <tr>
                                                         <td><%= index + 1 %></td>
@@ -222,6 +210,100 @@
         sidebar.classList.toggle('show');
     });
 
+    document.getElementById("applyFilter").addEventListener('click', async (event) => {
+        event.preventDefault()
+
+        const tableDatas = document.getElementById("tableDatas")
+
+        const startMsg = document.getElementById("startMsg")
+        const endMsg = document.getElementById("endMsg")
+            
+        const selectTime = document.getElementById("selectTime").value
+        const startDate = document.getElementById("startDate").value
+        const endDate = document.getElementById("endDate").value
+
+        if(new Date(endDate) >  Date.now() && new Date(startDate) >  Date.now()){
+            startMsg.textContent = "Start date cant be greater than current date"
+            endMsg.textContent = "End date cant be greater than current date"
+         
+            return
+        }
+        if(new Date(endDate) >  Date.now()){
+            endMsg.textContent = "End date cant be greater than current date"
+            startMsg.textContent = ""
+
+            return
+        }
+        if(new Date(startDate) >  Date.now()){
+            startMsg.textContent = "Start date cant be greater than current date"
+            endMsg.textContent = ""
+            
+            return
+        }
+        if(new Date(endDate) < new Date(startDate)){
+            endMsg.textContent = "End date cant be less than start date"
+            startMsg.textContent = ""
+        }
+        else{ 
+            startMsg.textContent = ""
+            endMsg.textContent = ""
+        }
+
+        try{
+            const request = await fetch('/admin/applyFilter', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ timeFrame: selectTime, startDate, endDate })
+            })
+
+            const res = await request.json()
+
+            if(res.orders.length > 0){
+            
+                let totalRevenue = 0, totalOrder = 0, totalDiscountPrice = 0, couponDiscountAmount = 0
+
+                res?.orders?.forEach(ele => {
+                    totalRevenue += ele?.payablePrice
+                    totalOrder++
+                    totalDiscountPrice += ele?.totalDiscountPrice
+                    couponDiscountAmount += ele?.discountAmount
+                    
+                })
+
+                document.getElementById("totalRevenue").textContent = totalRevenue
+                document.getElementById("totalOrder").textContent = totalOrder
+                document.getElementById("totalDiscountPrice").textContent = totalDiscountPrice
+                document.getElementById("couponDiscountAmount").textContent = couponDiscountAmount
+
+                tableDatas.innerHTML = ''
+                for(let i=0; i<res.orders.length; i++){
+                    tableDatas.innerHTML += `
+                        <tr>
+                            <td>${i+1}</td>
+                            <td>#${res.orders[i].orderId}</td>
+                            <td class="text-center">
+                                ${new Date(res.orders[i].createdAt).toLocaleDateString('en-GB', {
+                                    day: 'numeric',
+                                    month: 'short',
+                                    year: 'numeric',
+                                })}
+                            </td>
+                            <td class="text-center">${res.orders[i]?.user?.username}</td>
+                            <td>&#8377; ${res.orders[i]?.payablePrice}</td>
+                            <td>&#8377; ${res.orders[i]?.totalDiscountPrice}</td>
+                            <td>&#8377; ${res.orders[i]?.discountAmount}</td>
+                        </tr>
+                    `
+                }
+            }
+        }
+        catch(err){
+            alert("sales report filter error")
+            console.log(err)
+        }
+
+    })
+
     // to make the start and end date appear when we select custom on the select input
     function customDate(element){
         const customTimeFrames = document.querySelectorAll(".customTimeFrames")
@@ -241,16 +323,18 @@
 
     async function downloadPDF(event){
         event.preventDefault()
+        const selectTime = document.getElementById("selectTime").value
         const startDate = document.getElementById("startDate").value
         const endDate = document.getElementById("endDate").value
-        window.location.href = `/admin/pdfSalesReport?timeFrame=${timeFrame}&startDate=${startDate}&endDate=${endDate}`
+        window.location.href = `/admin/pdfSalesReport?timeFrame=${selectTime}&startDate=${startDate}&endDate=${endDate}`
     }
 
     async function downloadExcel(event){
         event.preventDefault()
+        const selectTime = document.getElementById("selectTime").value
         const startDate = document.getElementById("startDate").value
         const endDate = document.getElementById("endDate").value
-        window.location.href = `/admin/excelSalesReport?timeFrame=${timeFrame}&startDate=${startDate}&endDate=${endDate}`
+        window.location.href = `/admin/excelSalesReport?timeFrame=${selectTime}&startDate=${startDate}&endDate=${endDate}`
     }
 
 </script>

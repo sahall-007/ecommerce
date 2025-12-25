@@ -72,7 +72,11 @@ const allProducts = async (req, res) => {
             {$addFields: {
                 discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
             }},
-            {$addFields: {discountedPrice: {$floor: {$subtract: ['$price', {$multiply: [{$divide: ['$discount', 100]}, '$price']}]}}}},
+            {$addFields: {
+                discountedPrice: {
+                    $floor: {$subtract: ['$price', {$multiply: [{$divide: ['$discount', 100]}, '$price']}]} // to calculate discount price
+                }
+            }},
             toSort,        
             {$limit: limit},
         ])
