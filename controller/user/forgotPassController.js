@@ -60,7 +60,6 @@ const forgotPassPage = async (req, res) => {
 
 const forgotEmailValidation = async (req, res) => {
     try{
-        console.log("email validation")
         const { email } = req.body
         
         const finduser = await userSchema.findOne({email})
@@ -82,7 +81,7 @@ const forgotEmailValidation = async (req, res) => {
             }
         }
         else{
-            res.render("user/forgotEmail", {message: "user with this email does not exist"})
+            res.status(404).json({success: false, message: "user with this email does not exist"})
         }
 
     }

@@ -14,7 +14,7 @@ const getWalletPage = async (req, res) => {
         
         const wallet = await walletSchema.findOne({userId: userId})
 
-        res.status(200).render('user/wallet', {wallet: wallet[0]})
+        res.status(200).render('user/wallet', {wallet: wallet})
 
     }
     catch(err){

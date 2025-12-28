@@ -364,7 +364,6 @@ const returnOrder = async (req, res) => {
 
         const nonReturnable = ["Pending", "Cancelled", "Returned", "Shipped", "Out for delivery"];
         if(nonReturnable.includes(item.status)){
-            console.log("inside non returnable", item.status)
             return res.status(400).json({success: false, message: `This item is ${item.status.toLowerCase()} and cannot be requeset to return.`})
         }
 
@@ -384,7 +383,6 @@ const returnOrder = async (req, res) => {
 
         await order.save()
 
-        logger.info("success fully req")
         res.status(200).json({success: true, message: "successfully Returned the order"})
     }
     catch(err){

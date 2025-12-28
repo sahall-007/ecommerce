@@ -120,19 +120,10 @@
 
                 <div>
                     <p class="text-light opacity-75 mb-1">Wallet Balance</p>
-                    <h1 class="fw-bold display-5">₹<%= wallet?.balance %></h1>
+                    <h1 class="fw-bold display-5">₹<%= wallet?.balance || 0 %></h1>
                     <p class="opacity-75 mb-0">Available for shopping </p>
                 </div>
 
-                <!-- <div class="mt-4 mt-md-0 d-flex gap-3">
-                    <button class="btn btn-light text-primary fw-semibold px-4 py-2 shadow-sm">
-                        <i class="fas fa-plus me-2"></i>Add Money
-                    </button>
-
-                    <button class="btn btn-outline-light fw-semibold px-4 py-2">
-                        <i class="fas fa-arrow-down me-2"></i>Withdraw
-                    </button>
-                </div> -->
                 <div class="mt-4 mt-md-0 d-flex gap-3">                    
 
                     <a href="/allproducts" class="btn btn-outline-light fw-semibold px-4 py-2">
