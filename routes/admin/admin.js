@@ -26,8 +26,8 @@ const router = express.Router()
 
 
 router.route('/login')
-    .get(adminController.loadLogin)
-    .post(adminController.loginVerify)
+    .get(middleware.checkSession, adminController.loadLogin)
+    .post(middleware.checkSession, adminController.loginVerify)
 
 router.route('/dashboard')
     .get(middleware.checkSession, adminController.loadDashboard)

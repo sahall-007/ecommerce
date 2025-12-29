@@ -489,8 +489,8 @@ const checkSession = async (req, res) => {
                 paymentMethod, 
                 couponId
             },
-            success_url: `http://localhost:3000/orderSuccess`,
-            cancel_url: "http://localhost:3000/orderFail",
+            success_url: `https://techlux.shop/orderSuccess`,
+            cancel_url: "https://techlux.shop/orderFail",
             // return_url: `http://localhost:4242/orderSuccess?session_id={CHECKOUT_SESSION_ID}`,
             // payment_method_types: ['bancontact', 'card', 'eps', 'ideal', 'p24', 'sepa_debit'],
         });
