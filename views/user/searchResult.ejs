@@ -193,6 +193,7 @@
               <div class="row row-cols-2 row-cols-md-3 row-cols-xl-4  g-4">
                 <% let productName = allProducts.length ? allProducts[0].product.name : "" %>
                 <% allProducts.forEach(ele => { %>
+                  <% let inWishlist=false %>
                   <% if(ele.category.isListed && ele.product.isListed ){ %>
                     <div class="col" onclick='viewProduct("<%= ele._id %>")'>
                       <div class="card product-card  border-1  border-dark  shadow-sm">
