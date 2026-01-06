@@ -71,6 +71,28 @@ const searchResult = async (req, res) => {
             {$unwind: "$brand"},
             {$match: {"product.name": name}},
             {$match: { isListed: true, "product.isListed": true, "category.isListed": true, "brand.isListed": true }},
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
+            {$addFields: {
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$offerTargetDiscount"]}
+            }},
             {$match: filter},
             toSort,
         ])

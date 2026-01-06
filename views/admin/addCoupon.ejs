@@ -157,7 +157,7 @@
                 event.preventDefault()
 
                 const codeRegex = /^(?!\s*$).{3,15}$/
-                const discountRegex = /^(100|[1-9]?[0-9])$/
+                const discountRegex = /^(99|[1-9]?[0-9])$/
                 const amountRegex = /^[0-9]\d*$/
 
                 const codeMsg = document.getElementById("codeMsg")
@@ -186,7 +186,7 @@
                     return
                 }
                 else if(!discountRegex.test(discount)){
-                    discountMsg.textContent = "Enter a valid number between 1 to 100"
+                    discountMsg.textContent = "Enter a valid number between 1 to 99"
                     codeMsg.textContent = ""
                     startMsg.textContent = ""
                     endMsg.textContent = ""
@@ -205,7 +205,7 @@
 
                     return
                 }
-                else if(new Date(endDate).setHours(0, 0, 0, 0) <= new Date().setHours(0, 0, 0, 0)){
+                else if(new Date(endDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
                     endMsg.textContent = "End date cant be less than or equal to current date"
                     codeMsg.textContent = ""
                     discountMsg.textContent = ""

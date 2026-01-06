@@ -46,8 +46,27 @@ const checkoutPage = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},        
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$product._id" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$offerTargetDiscount"]}
             }},
 
             {$project: {

@@ -56,7 +56,7 @@
     </style>
 </head>
 
-<body onclick="bodyClick()">
+<body>
 
     <!-- //  ========== NAVBAR ========== -->
 
@@ -156,6 +156,8 @@
         <script>
 
             const couponId = "<%= coupon._id %>"
+            const couponStartDate = "<%= coupon?.startDate %>"
+            const couponEndDate = "<%= coupon?.endDate %>"
 
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
@@ -165,7 +167,7 @@
                 event.preventDefault()
 
                 const codeRegex = /^(?!\s*$).{3,15}$/
-                const discountRegex = /^(100|[1-9]?[0-9])$/
+                const discountRegex = /^(99|[1-9]?[0-9])$/
                 const amountRegex = /^[0-9]\d*$/
 
                 const codeMsg = document.getElementById("codeMsg")
@@ -182,7 +184,6 @@
                 const minimumPurchase = document.getElementById("minimumPurchase").value
                 const maximumDiscount = document.getElementById("maximumDiscount").value
 
-                
                 if(!codeRegex.test(code)){
                     codeMsg.textContent = "Field required. Should not be empty and characters should be between 3 to 15"
                     discountMsg.textContent = ""
@@ -194,7 +195,7 @@
                     return
                 }
                 else if(!discountRegex.test(discount)){
-                    discountMsg.textContent = "Enter a valid number between 1 to 100"
+                    discountMsg.textContent = "Enter a valid number between 1 to 99"
                     codeMsg.textContent = ""
                     startMsg.textContent = ""
                     endMsg.textContent = ""
@@ -203,27 +204,98 @@
 
                     return
                 }                
-                // else if(new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
-                //     startMsg.textContent = "Start date cant be less than current date"
-                //     codeMsg.textContent = ""
-                //     discountMsg.textContent = ""
-                //     endMsg.textContent = ""
-                //     minimumPurchaseMsg.textContent = ""
-                //     maximumDiscountMsg.textContent = ""
+                
+                // ================START DATE VALIDATION=================
+                
+                // if already existing start date is greater then current date and new start date is less than current date
+                if(couponStartDate && new Date(couponStartDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)){
+                    console.log("start first")
+                    if(new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                    console.log("start first true")
+                        startMsg.textContent = "Start date cant be less than current date"
+                        codeMsg.textContent = ""
+                        discountMsg.textContent = ""
+                        endMsg.textContent = ""
+                        minimumPurchaseMsg.textContent = ""
+                        maximumDiscountMsg.textContent = ""
+    
+                        return
+                    }
+                }
+                // if already existing start date is less then current date and new start date is less then already existing start date
+                else if(couponStartDate && new Date(couponStartDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                    console.log("start second")
+                    if(new Date(startDate).setHours(0, 0, 0, 0) < new Date(couponStartDate).setHours(0, 0, 0, 0)){
+                    console.log("start second true")
+                        startMsg.textContent = "Start date cant be less than already existing start date"
+                        codeMsg.textContent = ""
+                        discountMsg.textContent = ""
+                        endMsg.textContent = ""
+                        minimumPurchaseMsg.textContent = ""
+                        maximumDiscountMsg.textContent = ""
+    
+                        return
+                    }
+                }
+                // if no already existing start date and new start date is lesser than current date
+                else if(!couponStartDate && new Date(startDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                    console.log("start third")
+                    startMsg.textContent = "Start date cant be less than current date"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    endMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
 
-                //     return
-                // }
-                // else if(new Date(endDate) <=  Date.now()){
-                //     endMsg.textContent = "End date cant be less than current date"
-                //     codeMsg.textContent = ""
-                //     discountMsg.textContent = ""
-                //     startMsg.textContent = ""
-                //     minimumPurchaseMsg.textContent = ""
-                //     maximumDiscountMsg.textContent = ""
+                    return
+                }
+                
+                // ================END DATE VALIDATION====================
+                
+                // if already existing end date is greater than the current date and new end date is lessar than the current date
+                if(couponEndDate && new Date(couponEndDate).setHours(0, 0, 0, 0) >= new Date().setHours(0, 0, 0, 0)){
+                    console.log("end first")
+                    if(new Date(endDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                        console.log("end first true")
+                        endMsg.textContent = "End date cant be less than current date"
+                        codeMsg.textContent = ""
+                        discountMsg.textContent = ""
+                        startMsg.textContent = ""
+                        minimumPurchaseMsg.textContent = ""
+                        maximumDiscountMsg.textContent = ""
 
-                //     return
-                // }
-                else if(!amountRegex.test(minimumPurchase)){
+                        return
+                    }
+                }
+                // if already existing end date is lesser than the current date and new end date is lessar than the already existing end date             
+                else if(couponEndDate && new Date(couponEndDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                    console.log("end second")
+                    if(new Date(endDate).setHours(0, 0, 0, 0) < new Date(couponEndDate).setHours(0, 0, 0, 0)){
+                        console.log("end second true")
+                        endMsg.textContent = "End date cant be less than already existing end date"
+                        codeMsg.textContent = ""
+                        discountMsg.textContent = ""
+                        startMsg.textContent = ""
+                        minimumPurchaseMsg.textContent = ""
+                        maximumDiscountMsg.textContent = ""
+
+                        return
+                    }
+                }
+                // if no end date exist and new end date is lesser than current date
+                else if(!couponEndDate && new Date(endDate).setHours(0, 0, 0, 0) < new Date().setHours(0, 0, 0, 0)){
+                    console.log("end third")
+                    endMsg.textContent = "End date cant be less than current date"
+                    codeMsg.textContent = ""
+                    discountMsg.textContent = ""
+                    startMsg.textContent = ""
+                    minimumPurchaseMsg.textContent = ""
+                    maximumDiscountMsg.textContent = ""
+
+                    return
+                }
+                
+                if(!amountRegex.test(minimumPurchase)){
                     minimumPurchaseMsg.textContent = "Field required, Must be a positive integer"
                     codeMsg.textContent = ""
                     discountMsg.textContent = ""

@@ -13,6 +13,7 @@ const logger = require("../../config/pinoLogger.js")
 const walletSchema = require('../../model/walletSchema.js')
 const couponSchema = require('../../model/couponSchema.js')
 const userCouponSchema = require('../../model/userCouponSchema.js')
+const offerTargetSchema = require('../../model/offerTargetSchema.js')
 
 const salt = 10
 
@@ -376,9 +377,28 @@ const getHomePage = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
-            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},    
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},   
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$offerTargetDiscount"]}
             }},
             { $sample: { size: 5 }}
         ])
@@ -407,8 +427,27 @@ const getHomePage = async (req, res) => {
             }},
             {$unwind: "$brand"},
             {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$offerTargetDiscount"]}
             }},
             {$sample: {size: 10}}
         ])
@@ -468,8 +507,28 @@ const productDetail = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$offerTargetDiscount"]}
             }},
         ])
 
@@ -500,10 +559,29 @@ const productDetail = async (req, res) => {
                 as: "brand"
             }},
             {$unwind: "$brand"},
+            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true, "brand.isListed": true }},
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$productDoc.discount", "$categoryDoc.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$productDoc.discount", "$offerTargetDiscount"]}
             }},
-            {$match: { isListed: true, "productDoc.isListed": true, "categoryDoc.isListed": true }},
             {$sample: {size: 10}}
         ])
 
@@ -585,8 +663,27 @@ const newArrivals = async (req, res) => {
             {$match: filter},
             {$sample: {size: limit}},
             toSort,
+            {$lookup: {
+                from: "offertargets",
+                let: { productId: "$productId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$eq: ["$productId", "$$productId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offerTargets"
+            }},      
+            {$lookup: {
+                from: "offers",
+                let: { offerId: "$offerTargets.offerId" },
+                pipeline: [{
+                    $match: {$expr: {$and: [{$in: ["$_id", "$$offerId"]}, { $eq: ["$isActive", true] }]}}
+                }],
+                as: "offer"
+            }},   
             {$addFields: {
-                discount: {$max: ["$product.discount", "$category.discount", "$brand.discount"]}
+                offerTargetDiscount: {$ifNull: [{ $max: "$offer.discount" }, 0]}
+            }}, 
+            {$addFields: {
+                discount: {$max: ["$product.discount", "$offerTargetDiscount"]}
             }},
             {$limit: limit},
         ])

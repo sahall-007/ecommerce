@@ -16,16 +16,18 @@ const stripe = require('./config/stripe.js')
 
 const app = express()
 
+// stripe webhook
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.webhook);
+
 // middlewares---------------------------------------
 
 app.use(express.static('public'))
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 
-app.post('/webhook', express.raw({ type: 'application/json' }), orderController.webhook);
 
 app.use(express.json())
-app.use(express.urlencoded({ extends: true }))
+app.use(express.urlencoded({ extended: true }))
 app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,

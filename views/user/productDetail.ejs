@@ -190,8 +190,12 @@
               <p class="fs-5 mb-3">PlayStation5 Digital Edition The PS5 Digital Edition unleashes new gaming
                 possibilities that you never anticipated. *PS5 Digital Edition (CFI-2000 model group slim).</p>
 
-              <% let price1=Number(variant[0].price); let discount1=Number(variant[0].productDoc.discount); let
-                offAmount1=price1 * (discount1 / 100); let finalPrice1=Math.floor(price1 - offAmount1); %>
+              <%
+                let price1=Number(variant[0].price);
+                let discount1=Number(variant[0].discount);
+                let offAmount1=price1 * (discount1 / 100);
+                let finalPrice1=Math.floor(price1 - offAmount1); 
+              %>
 
                 <h4 class=" fs-2 fw-bold">
                   <%= finalPrice1 %> <span class="price-old fs-3">

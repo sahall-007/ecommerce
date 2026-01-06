@@ -154,8 +154,8 @@ const editCouponPost = async (req, res) => {
 
         let editCode = code || coupon.code
         let editDiscount = discount || coupon.discount
-        let editStartDate = startDate || coupon.startDate
-        let editEndDate = endDate || coupon.endDate
+        let editStartDate = startDate
+        let editEndDate = endDate
         let editMinimumPurchase = minimumPurchase || coupon.minimumPurchase
         let editMaximumDiscount = maximumDiscount || coupon.maximumDiscount
 

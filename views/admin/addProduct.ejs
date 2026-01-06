@@ -390,6 +390,9 @@
                                         <div class="col-2">
                                             <button class="btn btn-primary mt-4" onclick="formSubmit(${variantCount})" >submit</button>                                        
                                         </div>
+                                        <div class="col-2">
+                                             <button class="btn btn-dark mt-4" onclick="cancelVariantSubmit(this, ${variantCount})" >cancel</button>                                        
+                                        </div>
                                     </div>
 
                                 </div>
@@ -399,25 +402,24 @@
 
                         </div>
             `) 
-                                        //             <div class="col-2">
-                                        //     <button class="btn btn-dark mt-4" onclick="cancelVariantSubmit(this, ${variantCount})" >cancel</button>                                        
-                                        // </div>
+                                        
             
         }
 
         // to cancel the newly created variant session
-        // function cancelVariantSubmit(element, id){
+        function cancelVariantSubmit(element, id){
 
-        //     event.preventDefault()
+            event.preventDefault()
 
-        //     const parent = document.getElementById("variant-session-" + id)
-        //     parent.classList.add("d-none")
+            const parentContainer = document.getElementById("variant-session-" + id)
+            parentContainer.remove()
 
-        // }
+            variantCount-=1
+
+        }
 
         const cropBtn = document.getElementById("cropBtn")
         
-
         function newFile(id) {
 
             const imageInput = document.getElementById("image-" + id)                           
@@ -453,7 +455,7 @@
                         document.getElementById(`image-input-${id}`).classList.add("d-none")
                     }   
                     
-                    console.log("this is files", file)
+                    // console.log("this is files", file)
                     count += 1
 
                     imageRow.insertAdjacentHTML('beforeend', `
@@ -495,7 +497,7 @@
                     //   console.log("cropper array inside the loop", cropper)
                     reader.readAsDataURL(file[i])
                 }
-                console.log("cropper array after the loop", croppers)
+                // console.log("cropper array after the loop", croppers)
             }
 
             event.target.value = ''
@@ -505,24 +507,21 @@
         let croppedBlobs = [];
 
         // to crop the image
-        async function cropImg(element, id, variantNumber) {
-
-            // console.log(`=====================${variant}========================`)
+        async function cropImg(element, imageCount, variantNumber) {
 
             event.preventDefault()
 
-            console.log("cropper array during btn click", croppers)
             const closeImg = element.parentElement.parentElement.querySelector("img")
 
             let croppedCanvas;
 
-            if(id<=deleteCount){
-             croppedCanvas = croppers[id-1].getCroppedCanvas()
+            if(imageCount<=deleteCount){
+             croppedCanvas = croppers[imageCount-1].getCroppedCanvas()
             }
             else{
-                croppedCanvas = croppers[(id-1)-(deleteCount)].getCroppedCanvas()
+                croppedCanvas = croppers[(imageCount-1)-(deleteCount)].getCroppedCanvas()
             }
-            console.log(element.id)
+            // console.log(element.imageCount)
             // console.log("working///........", croppedCanvas)
 
             closeImg.src = croppedCanvas.toDataURL('image/jpeg', 1.0);
@@ -545,7 +544,7 @@
             croppedBlob.variant = variantNumber
             croppedBlobs.push(croppedBlob)
 
-            console.log("this is blob during btn click",  croppedBlob)
+            // console.log("this is blob during btn click",  croppedBlob)
 
             if(cropCount[variantNumber-1]==undefined) cropCount[variantNumber-1] = 1
             else cropCount[variantNumber-1]++
@@ -560,7 +559,7 @@
         function deleteImg(element, id){
             event.preventDefault()
 
-            console.log("this is delete croppers", croppers)            
+            // console.log("this is delete croppers", croppers)            
             
             if(id<=deleteCount){
                 croppers.splice(id-1, 1)         
@@ -771,7 +770,7 @@
             const form = document.getElementById("productForm")
             const formdata = new FormData(form)
 
-            console.log("blob duirng publish", croppedBlobs)
+            // console.log("blob duirng publish", croppedBlobs)
 
             croppedBlobs.forEach((blob, index) => {
                 formdata.append(`image-${blob.variant}`, blob, `cropped-${index}.jpeg`);

@@ -7,9 +7,10 @@ const uploads = require('../../middlewares/multer.js')
 const router = express.Router()
 
 router.route('/wallet')
-    .get(walletController.getWalletPage)
+    .get(middleware.checkSession, walletController.getWalletPage)
 
-
+router.route('/wallet/:page')
+    .get(middleware.checkSession, walletController.pagination)
 
 
 

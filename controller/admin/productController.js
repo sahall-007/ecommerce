@@ -6,6 +6,7 @@ const { castObject } = require('../../model/userSchema.js')
 const variantSchema = require('../../model/variantSchema.js')
 
 const logger = require('../../config/pinoLogger.js')
+const { Types } = require('mongoose')
 
 const productManagement = async (req, res) => { 
     try{
@@ -163,11 +164,27 @@ const editProductPage = async (req, res) => {
 
         const category = await categorySchema.find().sort({_id: -1})
         const brand = await brandSchema.find()
-        const product = await productSchema.findOne({_id: id})
+        // const product = await productSchema.findOne({_id: id})
 
-        console.log(product)
-        
-        res.render('admin/editProduct', { product, category, brand })
+        const product = await productSchema.aggregate([
+            {$match: {_id: new Types.ObjectId(id)}},
+            {$lookup: {
+                from: "categories",
+                localField: "categoryId",
+                foreignField: "_id",
+                as: "category"
+            }},
+            {$unwind: "$category"},
+            {$lookup: {
+                from: "brands",
+                localField: "brandId",
+                foreignField: "_id",
+                as: "brand"
+            }},
+            {$unwind: "$brand"}
+        ])
+
+        res.render('admin/editProduct', { product: product[0], category, brand })
     }
     catch(err){
         console.log(err)
@@ -397,7 +414,6 @@ module.exports = {
     unblockProduct,
     deleteProduct,
     pagination,
-    // prevPage,
     searchProduct,
     searchResult
 
