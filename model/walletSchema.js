@@ -3,7 +3,12 @@ const mongoose = require('mongoose')
 const walletSchema = new mongoose.Schema({
     balance: {
         type: Number,
-        default: 0
+        default: 0,
+        set: v => {
+            const n = Number(v);
+            if (Number.isNaN(n)) return undefined;
+            return Math.floor(n);
+        }
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,

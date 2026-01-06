@@ -97,7 +97,7 @@ const allProducts = async (req, res) => {
                 }
             }},
             toSort,        
-            // {$limit: limit},
+            {$limit: limit},
         ])      
 
         const wishlist = await wishlistSchema.findOne({userId})
@@ -329,6 +329,8 @@ const pagination = async (req, res) => {
             }},
             {$sample: {size: limit}}
         ])
+
+        console.log("this is variant count", variantCount)
 
         const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})

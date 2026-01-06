@@ -306,6 +306,14 @@
                     `
                 }
             }
+            else if(res?.orders?.length==0){
+                document.getElementById("totalRevenue").textContent = 0
+                document.getElementById("totalOrder").textContent = 0
+                document.getElementById("totalDiscountPrice").textContent = 0
+                document.getElementById("couponDiscountAmount").textContent = 0
+
+                tableDatas.innerHTML = ''
+            }
         }
         catch(err){
             alert("sales report filter error")

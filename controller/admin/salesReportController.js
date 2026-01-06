@@ -27,7 +27,7 @@ const salesReport = async (req, res) => {
         }
         else if(timeFrame == "yearly"){
             const start = new Date()
-            start.setMonth(1)
+            start.setMonth(0)
             start.setDate(1)
             start.setHours(0, 0, 0, 0)
 
@@ -60,6 +60,7 @@ const salesReport = async (req, res) => {
             
             const end = new Date(endDate)
             end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
             
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
@@ -81,7 +82,8 @@ const salesReport = async (req, res) => {
             start.setHours(0, 0, 0, 0)
 
             const end = new Date(start)
-            end.setDate(start.getDate() + 1)
+            end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
             }
@@ -118,7 +120,6 @@ const salesReport = async (req, res) => {
                 as: "user"
             }},
             {$unwind: "$user"},
-
             {$project: {
                 _id: 1,
                 orderId: 1,
@@ -143,6 +144,12 @@ const applyFilter = async (req, res) => {
     try{
         let { timeFrame, startDate, endDate } = req.body
         let filter 
+
+        
+        if(timeFrame!="custom"){
+            startDate = ""
+            endDate = ""
+        }
         
         if(timeFrame=="weekly"){
             const currentDate = new Date()
@@ -160,7 +167,7 @@ const applyFilter = async (req, res) => {
         }
         else if(timeFrame == "yearly"){
             const start = new Date()
-            start.setMonth(1)
+            start.setMonth(0)
             start.setDate(1)
             start.setHours(0, 0, 0, 0)
 
@@ -168,6 +175,15 @@ const applyFilter = async (req, res) => {
             end.setFullYear(start.getFullYear() + 1)
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
+            }
+        }
+        else if(timeFrame=="monthly"){
+            filter = {
+                $match:{
+                    $expr: {
+                        $and: [{$eq: [{$month: "$createdAt"}, {$month: "$$NOW"}]}, {$eq: [{$year: "$createdAt"}, {$year: "$$NOW"}]}]
+                    }
+                }
             }
         }
         else if(startDate && !endDate){
@@ -193,20 +209,13 @@ const applyFilter = async (req, res) => {
 
             const end = new Date(endDate)
             end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
 
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
             }
         }
-        else if(timeFrame=="monthly"){
-            filter = {
-                $match:{
-                    $expr: {
-                        $and: [{$eq: [{$month: "$createdAt"}, {$month: "$$NOW"}]}, {$eq: [{$year: "$createdAt"}, {$year: "$$NOW"}]}]
-                    }
-                }
-            }
-        }
+        
         else{
             timeFrame = "daily"
 
@@ -215,10 +224,12 @@ const applyFilter = async (req, res) => {
 
             const end = new Date(start)
             end.setDate(start.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
             }
         }
+
   
         const orders = await orderSchema.aggregate([
             filter,
@@ -263,7 +274,7 @@ const applyFilter = async (req, res) => {
             }},
             {$sort: {_id: -1}}
         ])
-        
+
         res.status(200).json({orders, timeFrame})
     }
     catch(err){
@@ -296,7 +307,7 @@ const pdfDownload = async (req, res) => {
         }
         else if(timeFrame == "yearly"){
             const start = new Date()
-            start.setMonth(1)
+            start.setMonth(0)
             start.setDate(1)
             start.setHours(0, 0, 0, 0)
 
@@ -316,6 +327,7 @@ const pdfDownload = async (req, res) => {
         }
         else if(endDate && !startDate){
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
             end.setHours(0, 0, 0, 0)
 
             filter = {
@@ -327,6 +339,8 @@ const pdfDownload = async (req, res) => {
             start.setHours(0, 0, 0, 0)
 
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
 
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }
@@ -384,7 +398,6 @@ const pdfDownload = async (req, res) => {
                 as: "user"
             }},
             {$unwind: "$user"},
-
             {$project: {
                 _id: 1,
                 orderId: 1,
@@ -402,6 +415,8 @@ const pdfDownload = async (req, res) => {
             totalDiscountPrice += ele.totalDiscountPrice
             couponDiscountAmount += ele.discountAmount
         })
+
+        console.log(orders)
 
         // ------------------ PDF Generation Starts Here ------------------
 
@@ -538,7 +553,7 @@ const excelDownload = async(req, res) => {
         }
         else if(timeFrame == "yearly"){
             const start = new Date()
-            start.setMonth(1)
+            start.setMonth(0)
             start.setDate(1)
             start.setHours(0, 0, 0, 0)
 
@@ -558,6 +573,7 @@ const excelDownload = async(req, res) => {
         }
         else if(endDate && !startDate){
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
             end.setHours(0, 0, 0, 0)
 
             filter = {
@@ -569,6 +585,8 @@ const excelDownload = async(req, res) => {
             start.setHours(0, 0, 0, 0)
 
             const end = new Date(endDate)
+            end.setDate(end.getDate() + 1)
+            end.setHours(0, 0, 0, 0)
 
             filter = {
                 $match: { createdAt: {$gte: start, $lt: end} }

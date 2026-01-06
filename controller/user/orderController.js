@@ -338,15 +338,17 @@ const cancelOrder = async (req, res) => {
         );
 
         const newTransactions = {
-            amount: item.priceAfterCouponDiscount,
+            amount: Math.floor(item.priceAfterCouponDiscount),
             date: Date.now(),
             transactionType: "credit" ,
             description: `Cancellation of order #${order.orderId}`,
             status: "Completed"
         }
 
-        const updatedWallet = await walletSchema.findOneAndUpdate({userId}, {$inc: {balance: item.priceAfterCouponDiscount}, $push: {transactions: newTransactions}})
-        console.log("updated wallet", updatedWallet)
+
+        if(order.paymentMethod!="COD"){
+            const updatedWallet = await walletSchema.findOneAndUpdate({userId}, {$inc: {balance: item.priceAfterCouponDiscount}, $push: {transactions: newTransactions}})
+        }
 
         item.cancellation = {
             requested: true,
@@ -764,7 +766,7 @@ const webhook = async (req, res) => {
                     console.log(`Unhandled event type ${event.id}.`);
             }
         
-        res.status(200).send();
+        res.status(200).json({ received: true });
     }
     catch(err){
         logger.fatal(err)

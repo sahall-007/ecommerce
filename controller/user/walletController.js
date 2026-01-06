@@ -24,8 +24,6 @@ const getWalletPage = async (req, res) => {
             {$limit: limit}
         ])
 
-        console.log(wallet)
-
         if (limit >= walletCount) {
             return res.status(200).render('user/wallet', { wallet, nextPage: 1, prevPage: 0, prevDisable: "disabled", nextDisable: "disabled" })
         }
