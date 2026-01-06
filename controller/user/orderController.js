@@ -764,7 +764,7 @@ const webhook = async (req, res) => {
                     console.log(`Unhandled event type ${event.id}.`);
             }
         
-        res.send();
+        res.status(200).send();
     }
     catch(err){
         logger.fatal(err)
