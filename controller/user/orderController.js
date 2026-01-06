@@ -27,8 +27,12 @@ async function generateOrderId(){
 
 const orderPost = async (req, res) => {
     try{
-        const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
+        let { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
         const userId = req.session.user || req.session?.passport?.user
+
+        if(couponId==0){
+            couponId=undefined
+        }
 
         const cart = await cartSchema.aggregate([
             {$match: {_id: new Types.ObjectId(cartId)}},
