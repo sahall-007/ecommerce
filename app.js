@@ -17,8 +17,8 @@ const stripe = require('./config/stripe.js')
 const app = express()
 
 // stripe webhook
-app.post('/webhook', express.raw({ type: 'application/json' }), orderController.webhook);
 
+app.post('/webhook', express.raw({ type: 'application/json' }), orderController.webhook);
 // middlewares---------------------------------------
 
 app.use(express.static('public'))
