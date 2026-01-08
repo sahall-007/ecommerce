@@ -9,7 +9,7 @@ const getWalletPage = async (req, res) => {
         const userId = req.session.user || req.session?.passport?.user
         const user = await userSchema.findOne({_id: userId})  
         const limit = 5
-        
+
         if(!user){
             return res.status(404).redirect('/login')
         }
@@ -19,7 +19,7 @@ const getWalletPage = async (req, res) => {
         
         const wallet = await walletSchema.aggregate([
             {$match: {userId: new Types.ObjectId(userId)}},
-            {$unwind: "$transactions"},
+            {$unwind: {path: "$transactions", preserveNullAndEmptyArrays: true}},
             {$sort: {"transactions._id": -1}},
             {$limit: limit}
         ])

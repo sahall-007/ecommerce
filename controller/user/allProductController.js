@@ -100,6 +100,9 @@ const allProducts = async (req, res) => {
             {$limit: limit},
         ])      
 
+        console.log(allProducts[2])
+
+
         const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})
         const brand = await brandSchema.find({isListed: true}, {name: 1})
@@ -327,10 +330,16 @@ const pagination = async (req, res) => {
             {$addFields: {
                 discount: {$max: ["$product.discount", "$offerTargetDiscount"]}
             }},
+            {$addFields: {
+                discountedPrice: {
+                    $floor: {$subtract: ['$price', {$multiply: [{$divide: ['$discount', 100]}, '$price']}]} 
+                }
+            }},
             {$sample: {size: limit}}
         ])
 
-        console.log("this is variant count", variantCount)
+        console.log(allProducts[0])
+        console.log("dndkkdkdkkd")
 
         const wishlist = await wishlistSchema.findOne({userId})
         const category = await categorySchema.find({isListed: true}, {name: 1})

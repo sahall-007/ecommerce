@@ -116,9 +116,7 @@
                                             </select>
                                         </div>
                                     </div>     
-                                <% } %>
-
-                                <% console.log("this is targetid", targetIds[0]) %>
+                                <% } %>                                
 
                                 <% if(offerType=="brand"){ %>                               
                                     <div class="col-12 col-lg-7 mt-3" id="brandOptions">
@@ -195,6 +193,7 @@
         <script>
 
             const editName = "<%= editName %>"
+            const offerType = "<%= offerType %>"
 
             const sidebar = document.querySelector('.sidebar');
             const toggleBtn = document.getElementById('menuToggle');
@@ -267,37 +266,7 @@
 
             toggleBtn.addEventListener('click', () => {
             sidebar.classList.toggle('show');
-            });
-
-            // document.getElementById("offerType").addEventListener('change', offerType)
-            
-            // function offerType() {
-            //     const offerType = document.getElementById("offerType").value
-            //     const productSearch = document.getElementById("productSearch")
-            //     const categoryOptions = document.getElementById("categoryOptions")
-            //     const brandOptions = document.getElementById("brandOptions")
-
-            //     if(offerType=="product"){
-            //         productSearch.classList.remove("d-none")
-            //         categoryOptions.classList.add("d-none")
-            //         brandOptions.classList.add("d-none")
-            //     }
-            //     else if(offerType=="category"){
-            //         productSearch.classList.add("d-none")
-            //         categoryOptions.classList.remove("d-none")
-            //         brandOptions.classList.add("d-none")
-            //     }
-            //     else if(offerType=="brand"){
-            //         productSearch.classList.add("d-none")
-            //         categoryOptions.classList.add("d-none")
-            //         brandOptions.classList.remove("d-none")
-            //     }
-            //     else {
-            //         productSearch.classList.add("d-none")
-            //         categoryOptions.classList.add("d-none")
-            //         brandOptions.classList.add("d-none")
-            //     }
-            // }
+            });            
 
             const submitBtn = document.getElementById("submitBtn")
             submitBtn.addEventListener('click', async (event) => {
@@ -343,7 +312,7 @@
                     const request = await fetch(`/admin/editOffer/${editName}`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ offerName, discount, category: categoryName, brand:  brandName, product })
+                        body: JSON.stringify({ offerName, discount, offerType, category: categoryName, brand:  brandName, product })
                     })
 
                     if(request.status==200){

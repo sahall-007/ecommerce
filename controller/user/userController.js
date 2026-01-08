@@ -119,6 +119,7 @@ const registerUser = async (req, res) => {
     
         req.session.userData = { username, email, password, referral }
 
+        console.log("this is otp", otp)
         console.log("this is userdata", req.session.userData)
 
         res.redirect('/otp')
@@ -280,9 +281,24 @@ const verifyOtp = async (req, res) => {
             if(userWithReferralCode){
                 await walletSchema.create({
                     balance: 10000,
+                    transactions: [{
+                        amount: 10000,
+                        date: Date.now(),
+                        transactionType: "credit" ,
+                        description: `Reward for using referral code`,
+                        status: "Completed"
+                    }],
                     userId: saveUser._id,
                 })
-                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
+
+                const newTransation = {
+                    amount: 10000,
+                    date: Date.now(),
+                    transactionType: "credit" ,
+                    description: `Reward for referring an user`,
+                    status: "Completed"
+                }
+                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}, $push: {transactions: newTransation}})
             }
             else{
                 await walletSchema.create({

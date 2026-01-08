@@ -133,22 +133,6 @@ const addOfferPost = async (req, res) => {
 
         if(offerTarget) res.status(200).json({success: true, message: "successfully added new offer"})
 
-        // const bulkOp = product.map(ele => {
-        //     return{
-        //         updateOne: {
-        //             filter: {name: ele},
-        //             update: {$set: {discount: discount}}
-        //         }
-        //     }
-        // })
-
-        // if(!discount) return res.status(400).json({success: false, message: "enter a discount number"})
-        // if(discount<0 || discount>100) return res.status(400).json({success: false, message: "enter a valid discount number from 1 to 100"})
-        // if(product.length>0) await productSchema.bulkWrite(bulkOp)    
-        // if(category) await categorySchema.findOneAndUpdate({name: category}, {discount})
-        // if(brand) await brandSchema.findOneAndUpdate({name: brand}, {discount})
-
-        // res.status(200).json({success: true, mesage: "offer added successfully"})
     }
     catch(err){
         logger.fatal(err)
@@ -161,8 +145,6 @@ const editOfferPage = async (req, res) => {
     try{
         const { name } = req.params
         const offer = await offerSchema.findOne({offerName: name}).lean(); 
-        
-        console.log(offer)
         
         let targetNames
 
@@ -181,7 +163,6 @@ const editOfferPage = async (req, res) => {
                 productMap.get(id.toString()) || null
             );
 
-            console.log(targetNames)
         }
 
         const category = await categorySchema.find({}, {_id: 1, name: 1})
@@ -209,26 +190,45 @@ const editOfferPage = async (req, res) => {
 
 const editOfferPost = async (req, res) => {
     try{
-        let { offerName, discount, category, brand, product } = req.body
-        const { name } = req.params   
-
-        // if(name.toLowerCase() != offerName.toLowerCase()){
-        //     const offerExist = await offerSchema.findOne({offerName: new RegExp(`^${offerName}$`, "i")})
+        let { offerName, discount, offerType, category, brand, product } = req.body
+        const { name } = req.params  
+        
+        let targetIds = []
+        let products
+        
+        if(offerType=="product"){
+            targetIds = product         
             
-        //     if(offerExist){
-        //         return res.status(400).json({success: false, message: "offer already exist"})
-        //     }
-        // }
+            products = product.map(ele => {
+                return {
+                    _id: new mongoose.Types.ObjectId(ele)
+                }
+            })
+        }
+        else if(offerType=="category"){
+            targetIds.push(category)
+
+            products = await productSchema.find({categoryId: category}, {_id: 1})
+            const categoryName = await categorySchema.findOne({_id: category}, {name: 1})
+
+        }
+        else if(offerType=="brand"){
+            targetIds.push(brand)
+
+            products = await productSchema.find({brandId: brand}, {_id: 1})
+            const brandName = await brandSchema.findOne({_id: brand}, {name: 1})
+
+        }
 
         const categoryName = await categorySchema.findOne({_id: category}, {name: 1})
         const brandName = await brandSchema.findOne({_id: brand}, {name: 1})
         const offer = await offerSchema.findOne({offerName: name})
 
-        let targetIds
+        // let targetIds
 
-        if(category) targetIds = [category]
-        else if(brand) targetIds = [brand]
-        else if(product.length>0) targetIds = product
+        // if(category) targetIds = [category]
+        // else if(brand) targetIds = [brand]
+        // else if(product.length>0) targetIds = product
 
 
         let editingName = offerName || offer.offerName
@@ -238,6 +238,26 @@ const editOfferPost = async (req, res) => {
         let offerFor = categoryName?.name || brandName?.name || offer?.offerFor
 
         const edited = await offerSchema.findOneAndUpdate({offerName: name}, {$set: { offerName: editingName, discount: editingDiscount , targetIds,  offerFor}})
+
+        
+        
+        const bulkOperation = products.map(ele => {
+            return {
+                updateOne: {
+                    "filter": { offerId: edited._id, productId: ele._id },
+                    "update": {$set: { discount: editingDiscount, offerId: edited._id, productId: ele._id }},
+                    "upsert": true
+                }
+            }
+        })
+        const deleteProducts = products.map(ele => ele.name)
+        
+
+        await offerTargetSchema.deleteMany({offerId: edited._id, productId: {$nin: deleteProducts}})
+
+        await offerTargetSchema.bulkWrite(bulkOperation)
+        
+        console.log(edited)
 
         if(edited) return res.status(200).json({success: true, message: "successfully edited the offer"})
     }
@@ -253,7 +273,7 @@ const blockOffer = async (req, res) => {
         const { id } = req.body
 
         await offerSchema.findOneAndUpdate({_id: id}, {$set: {isActive: false}})
-        await offerTargetSchema.updateMany({offerId: _id}, {$set: {isActive: false}})
+        await offerTargetSchema.updateMany({offerId: id}, {$set: {isActive: false}})
 
         res.status(200).json({message: "offer has been blocked"})
     }
@@ -269,7 +289,7 @@ const unBlockOffer = async (req, res) => {
         const { id } = req.body
 
         await offerSchema.findOneAndUpdate({_id: id}, {$set: {isActive: true}})
-        await offerTargetSchema.updateMany({offerId: _id}, {$set: {isActive: true}})
+        await offerTargetSchema.updateMany({offerId: id}, {$set: {isActive: true}})
 
         res.status(200).json({message: "offer has been unblocked"})
 
