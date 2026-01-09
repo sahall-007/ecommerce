@@ -19,7 +19,7 @@ const getWalletPage = async (req, res) => {
         
         const wallet = await walletSchema.aggregate([
             {$match: {userId: new Types.ObjectId(userId)}},
-            {$unwind: {path: "$transactions", preserveNullAndEmptyArrays: true}},
+            {$unwind: {path: "$transactions"}},
             {$sort: {"transactions._id": -1}},
             {$limit: limit}
         ])

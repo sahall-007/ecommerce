@@ -60,19 +60,19 @@ async (req, accessToken, refreshToken, profile, done) => {
             })
 
             // creating a wallet for the user based on the referral code the user enter
-            const userWithReferralCode = await userSchema.findOne({referral: user.referral})
-            if(userWithReferralCode){
-                await walletSchema.create({
-                    balance: 10000,
-                    userId: googleUser._id,
-                })
-                await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
-            }
-            else{
-                await walletSchema.create({
-                    userId: googleUser._id,
-                })
-            }
+            // const userWithReferralCode = await userSchema.findOne({referral: user.referral})
+            // if(userWithReferralCode){
+            //     await walletSchema.create({
+            //         balance: 10000,
+            //         userId: googleUser._id,
+            //     })
+            //     await walletSchema.findOneAndUpdate({userId: userWithReferralCode._id}, {$inc: {balance: +10000}})
+            // }
+            // else{
+            //     await walletSchema.create({
+            //         userId: googleUser._id,
+            //     })
+            // }
 
             logger.info("this is google register")
             // req.session.user = googleUser._id

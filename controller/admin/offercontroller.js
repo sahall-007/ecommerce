@@ -85,6 +85,12 @@ const addOfferPost = async (req, res) => {
         let products
         let offerFor
 
+        const offerExistCheck = await offerSchema.findOne({offerName: new RegExp(`^${offerName}$`, "i")})
+
+        if(offerExistCheck){
+            return res.status(400).json({success: false, message: "offer with this name already exist"})
+        }
+
         if(offerType=="product"){
             targetIds = product         
             
@@ -192,6 +198,13 @@ const editOfferPost = async (req, res) => {
     try{
         let { offerName, discount, offerType, category, brand, product } = req.body
         const { name } = req.params  
+
+        const offerExistCheck = await offerSchema.findOne({offerName: new RegExp(`^${offerName}$`, "i")})
+
+        if(offerExistCheck){
+            return res.status(400).json({success: false, message: "offer with this name already exist"})
+        }
+
         
         let targetIds = []
         let products
@@ -252,7 +265,7 @@ const editOfferPost = async (req, res) => {
         })
         const deleteProducts = products.map(ele => ele.name)
         
-
+        
         await offerTargetSchema.deleteMany({offerId: edited._id, productId: {$nin: deleteProducts}})
 
         await offerTargetSchema.bulkWrite(bulkOperation)
