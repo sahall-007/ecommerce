@@ -418,6 +418,8 @@ const checkSession = async (req, res) => {
     try{
         const { addressId, cartId, totalPriceBeforeDiscount, payablePrice, discountAmount, paymentMethod, couponId } = req.body
         
+        console.log(req.body)
+        
         const cart = await cartSchema.aggregate([
             {$match: {_id: new Types.ObjectId(cartId)}},
             {$unwind: "$items"},
@@ -497,7 +499,7 @@ const checkSession = async (req, res) => {
             return {
                 price_data: {
                     currency: "inr",
-                    unit_amount: priceAfterCouponDiscount * 100,
+                    unit_amount: Math.floor(priceAfterCouponDiscount) * 100,
                     product_data: {
                         name: ele.product.name,
                         description: `${ele.variant.ram} | ${ele.variant.storage} | ${ele.variant.color} `
